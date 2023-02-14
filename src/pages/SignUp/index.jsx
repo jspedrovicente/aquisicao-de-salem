@@ -14,7 +14,7 @@ const SignUp = () => {
             <form onSubmit={handleSignUp}>
                 <Form type="text" label="Nome" state={name} changeState={setName}> </Form>
                 <Form type="email" label="Email" state={email} changeState={setEmail}> </Form>
-                <Form type="password" label="Senha" state={password} changeState={setPassword}> </Form>
+                <Form type="password" label="Senhas" state={password} changeState={setPassword}> </Form>
             <button className="button">Cadastrar</button>
             </form>
         </div>
