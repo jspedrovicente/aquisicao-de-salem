@@ -24,7 +24,6 @@ h2{
 h3{
     font-size: 24px;
 }
-
 .button{
         background-color: #B0B159;
         color: #000;
@@ -37,6 +36,7 @@ h3{
         border: 1px solid #836E00;
         transition: all ease .5s;
         font-size: 16px;
+        margin: 5px 0px;
 }
 .button:hover{
     background-color: #f9fb7a;

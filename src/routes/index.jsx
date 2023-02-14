@@ -8,6 +8,8 @@ import PlayerRole from '../pages/PlayerRole'
 import Day from '../pages/Day'
 import Night from '../pages/Night'
 import Victory from '../pages/Victory'
+import Private from './Private'
+
 
 
 const RoutesApp = () => {
@@ -17,7 +19,9 @@ const RoutesApp = () => {
             <Route path='/' element={<Home />} />
             
             <Route path='login' element={ <LogIn/>} />
+            <Route path='tutorial' element={ <Tutorial/>} />
             <Route path='signup' element={ <SignUp/>} />
+            <Route path='playerlist' element={<Private><PlayerList/></Private> } />
         </Routes>        
     )
 } 

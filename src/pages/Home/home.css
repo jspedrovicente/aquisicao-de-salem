@@ -7,10 +7,5 @@
     height: 100%;
 }
 .home .button-container{
-    position: absolute;
-    bottom: 0;
-    margin-bottom: 50px;
-}
-.home .button-container a{
-    margin-bottom: 10px;
+    margin-top: 50px;
 }
