@@ -1,8 +1,12 @@
 const Form = (props) => {
+
+    const label = props.label
+    const type = props.type
+    const state = props.state
     return (
-        <label>{props.label}
+        <label>{label}
         
-        <input type={props.type} value={props.state} onChange={(e) => props.changeState(e.target.value)}  />
+        <input type={type} value={state} onChange={(e) => props.changeState(e.target.value)}  />
         </label>
     )
 }
