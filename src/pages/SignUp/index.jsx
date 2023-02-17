@@ -30,7 +30,6 @@ const SignUp = () => {
                           onScreen: true
                         }
                     })
-                    navigate('/', {replace: true})
                 })
                 .catch((e) => {
                     Store.addNotification({
