@@ -27,6 +27,7 @@ const PlayerList = () => {
                         })
                     })
                     setPlayerList(list);
+                    console.log(list)
                 })
             }
         }
@@ -65,7 +66,7 @@ const PlayerList = () => {
                 <h4> Lista de Jogadores</h4>
                 <div className="playerlist-list card-border">
                         {playerList.map((player) => (
-                            <PlayerListing playerName={player.playerName} key={player.key} id={player.id} />
+                            <PlayerListing key={player.key} playerName={player.playerName}  id={player.id} />
                             )
                         )}
                 </div>
