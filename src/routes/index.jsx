@@ -22,6 +22,10 @@ const RoutesApp = () => {
             <Route path='tutorial' element={ <Tutorial/>} />
             <Route path='signup' element={ <SignUp/>} />
             <Route path='playerlist' element={<Private><PlayerList/></Private> } />
+            <Route path='playerrole' element={<Private><PlayerRole/></Private> } />
+            <Route path='day' element={<Private><Day/></Private> } />
+            <Route path='night' element={<Private><Night/></Private> } />
+            <Route path='victory' element={<Private><Victory/></Private> } />
         </Routes>        
     )
 } 
