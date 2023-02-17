@@ -43,7 +43,8 @@ const PlayerList = () => {
             await addDoc(docRef, {
                 playerName: playerName,
                 victoryPoints: 0,
-                currentRole: "none"
+                role: "none",
+                filliation: "none"
             })
         }
     }

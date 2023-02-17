@@ -1,0 +1,80 @@
+.playerRole{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.playerRole-roles{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 200px 200px 100px;
+    grid-template-areas: 
+    "town evil"
+    "town neutral"
+    "button-area button-area";
+}
+.playerRole-town{
+    width: 200px;
+    min-height: 350px;
+    max-height: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 30px;
+    margin-right: 10px;
+}
+
+.playerRole-evil{
+    width: 200px;
+    min-height: 150px;
+    max-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 30px;
+}
+
+.playerRole-neutral{
+    width: 200px;
+    min-height: 150px;
+    max-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 30px;
+}
+.town{
+    grid-area: town;
+}
+.evil{
+    grid-area: evil;
+}
+.neutral{
+    grid-area: neutral;
+}
+.button-area{
+    grid-area: button-area;
+}
+.playerRole-main{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-around;
+    margin-top: 30px;
+}
+.playerRole-assign label{
+    display: flex;
+    flex-direction: column;
+
+}
+
+.playerRole .button-container{
+    display: flex;
+    justify-content: center;
+}
+.playerRole .button-container .button{
+    margin: 0 5px;
+}
+
+.playerRole-assign form label{
+    margin: 15px 0px;
+}
