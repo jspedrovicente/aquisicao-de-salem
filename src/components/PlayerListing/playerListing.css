@@ -1,0 +1,18 @@
+.delete-button{
+    border: none;
+    background: none;
+    color: white;
+    cursor: pointer;
+    transition: all ease .5s;
+}
+
+.delete-button:hover{
+    cursor: pointer;
+    color: rgb(172, 2, 2);
+}
+
+.playerlisting-name{
+    display: flex;
+    width: 90%;
+    justify-content: space-between;
+}

@@ -46,16 +46,37 @@ h4{
     cursor: pointer;
 }
 
-.delete-button{
-    cursor: pointer;
-    transition: all ease .5s;
-}
-.delete-button:hover{
-    cursor: pointer;
-    color: rgb(172, 2, 2);
-}
 
 .card-border{
     border: 1px solid #836E00;
     border-radius: 25px;
+}
+
+input{
+    border-radius: 10px;
+    padding: 5px 20px;
+}
+
+
+.scrollable{
+    overflow-y: scroll;
+
+}
+::-webkit-scrollbar-track{
+    border-radius: 10px;
+    background-color: gray;
+}
+
+::-webkit-scrollbar-thumb{
+    background-color: #f9fb7a;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    
+  }
+
+::-webkit-scrollbar-button{
+    visibility: hidden;
 }

@@ -1,8 +1,8 @@
-
+import { useState } from "react";
 
 const PlayerRole = () => {
     return (
-        <div>
+        <div className="playerRole">
             PlayerRole
         </div>
     )

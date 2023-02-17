@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { database } from "../../firebaseConnection";
 import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc } from "firebase/firestore";
 import PlayerListing from "../../components/PlayerListing"
-
+import ButtonLink from "../../components/ButtonLink";
+import "./playerList.css"
 const PlayerList = () => {
     const [playerName, setPlayerName] = useState('');
     const [user, setUser] = useState({});
@@ -27,7 +28,6 @@ const PlayerList = () => {
                         })
                     })
                     setPlayerList(list);
-                    console.log(list)
                 })
             }
         }
@@ -47,14 +47,10 @@ const PlayerList = () => {
             })
         }
     }
-    const handleDelete = async (id) => {
-        const docRef = collection(database, user.email)
-        deleteDoc(docRef, id);
-    }
 
     return (
             <div className="logIn">
-            <h3>
+            <h3 className="page-title">
             Cadastre todos os jogadores antes de começar
             </h3>
             <div className="playerlist-main">
@@ -64,12 +60,13 @@ const PlayerList = () => {
                 </div>
                 <div className="playerlist-container">
                 <h4> Lista de Jogadores</h4>
-                <div className="playerlist-list card-border">
+                <div className="playerlist-list card-border scrollable">
                         {playerList.map((player) => (
                             <PlayerListing key={player.key} playerName={player.playerName}  id={player.id} />
                             )
                         )}
                 </div>
+                <ButtonLink destination="/playerrole" buttonText="Começar Partida" />
                 </div>
             </div>
         </div>

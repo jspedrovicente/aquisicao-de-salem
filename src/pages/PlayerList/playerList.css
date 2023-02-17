@@ -1,0 +1,38 @@
+.playerlist-main{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.logIn .page-title{
+    padding-bottom: 100px;
+}
+
+.playerlist-container, .playerlist-register{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+.playerlist-register label{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.playerlist-list{
+    width: 200px;
+    min-height: 300px;
+    max-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 30px;
+}
+
+@media (max-width: 768px) {
+    .playerlist-main{
+        flex-direction: column;
+    }
+}
