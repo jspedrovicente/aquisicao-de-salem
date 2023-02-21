@@ -16,7 +16,7 @@ const PlayerList = () => {
             setUser(JSON.parse(userDetail));
             if (userDetail) {
                 const data = JSON.parse(userDetail);
-                const unsub = onSnapshot(collection(database, data?.email), (snapshot) => {
+                const unsub = onSnapshot(collection(database, `playeradmin/players/${data.email}`), (snapshot) => {
                     let list = [];
                     snapshot.forEach((doc) => {
                         list.push({
@@ -39,7 +39,7 @@ const PlayerList = () => {
         e.preventDefault();
 
         if (playerName !== '') {
-            const docRef = collection(database, user.email)
+            const docRef = collection(database, `playeradmin/players/${user.email}`)
             await addDoc(docRef, {
                 playerName: playerName,
                 victoryPoints: 0,
