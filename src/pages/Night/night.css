@@ -1,0 +1,29 @@
+.huge-container{
+        width: 600px;
+        height: 300px;
+}
+.night{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.nightMain{
+    display: flex;
+
+}
+
+.event-currentplayers{
+    margin-left: 20px;
+}
+
+.night-right{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.night-right button{
+    margin-top: 20px;
+}
