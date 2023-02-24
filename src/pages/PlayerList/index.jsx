@@ -25,6 +25,7 @@ const PlayerList = () => {
                             playerName: doc.data().playerName,
                             victoryPoints: doc.data().victoryPoints,
                             role: doc.data().role,
+                            life: doc.data().life,
                         })
                     })
                     setPlayerList(list);
@@ -44,7 +45,8 @@ const PlayerList = () => {
                 playerName: playerName,
                 victoryPoints: 0,
                 role: "none",
-                filliation: "none"
+                filliation: "none",
+                life: "none"
             })
         }
     }

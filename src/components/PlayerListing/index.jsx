@@ -6,7 +6,7 @@ function playerListing(props){
     const data = JSON.parse(userDetail);
     const email = data.email
     async function handleDelete(id) {
-        const docRef = doc(database, email, id)
+        const docRef = doc(database, `playeradmin/players/${data.email}`, id)
         await deleteDoc(docRef);
     }
 

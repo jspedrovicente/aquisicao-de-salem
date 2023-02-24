@@ -103,13 +103,12 @@ const PlayerRole = () => {
        }
         addAllRoles(covenRole, mafiaRole, townRole, neutralRole);
     }, [covenRole])
-
     const handleConfirm = async (e) => {
         e.preventDefault(); 
         for (let i = 0; i < playerList.length; i++) {
             if (playerList[i].playerName === currentPlayer) {
                 const currentId = playerList[i].id;
-            await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), {role: currentRole, filliation: currentFilliation})
+            await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), {role: currentRole, filliation: currentFilliation, life: "alive"})
             }
         }
 
