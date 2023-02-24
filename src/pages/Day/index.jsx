@@ -1,4 +1,5 @@
 import "./day.css"
+import ButtonLink from "../../components/ButtonLink"
 
 const Day = () => {
     return (
@@ -54,9 +55,9 @@ const Day = () => {
                             <option value="selena">SelenaGomez</option>
                         </select>
                         <button className="button">Matar Jogador</button>
-                        <button className="button">Começar Noite</button>
+                        <ButtonLink destination="/night" buttonText="Começar Noite"/>
 
-                        </div>
+                    </div>
                 </div>
 
             </div>
