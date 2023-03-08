@@ -1,6 +1,9 @@
 .huge-container{
         width: 600px;
         height: 300px;
+        display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .night{
     display: flex;
