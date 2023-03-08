@@ -4,7 +4,7 @@ Last update: 08/03/2023
 
 
 Jist of it:
-
+-
 So this project is actually an administrative panel for use in a card game that I created that follows similar logic to the town of salem game.
 
 With this administrative panel, there is about 10 pages:
@@ -17,7 +17,6 @@ PlayerRole Page (done)
 Day Page (working on)
 Night Page (working on)
 Victory Page (not started)
-------------------------------------
 
 The idea of the game is applied in real life.
 I recommend about 8-25 players for the gameplay, the more players, the more complex the game gets and more fun.
