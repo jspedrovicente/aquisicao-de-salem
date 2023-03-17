@@ -3,6 +3,7 @@ import ButtonLink from "../../components/ButtonLink"
 
 const Day = () => {
     return (
+        // The day has to set all the player actions as pending
         <div className="day">
             <h3 className="page-title">
             Dia 1

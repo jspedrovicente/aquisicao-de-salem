@@ -83,3 +83,10 @@ input, select{
 ::-webkit-scrollbar-button{
     visibility: hidden;
 }
+
+
+/* Css for game mechanics */
+
+.invisible{
+    display: none;
+}

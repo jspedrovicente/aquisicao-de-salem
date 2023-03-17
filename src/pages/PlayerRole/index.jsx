@@ -44,7 +44,8 @@ const PlayerRole = () => {
                         filliation: "town",
                         role: doc.data().role,
                         skill: doc.data().skill,
-                        special: doc.data().special
+                        special: doc.data().special,
+                        wakeOrder: doc.data().wakeOrder
                     })
                 })
                 setTownRole(roles)
@@ -57,7 +58,9 @@ const PlayerRole = () => {
                         filliation: "mafia",
                         role: doc.data().role,
                         skill: doc.data().skill,
-                        special: doc.data().special
+                        special: doc.data().special,
+                        wakeOrder: doc.data().wakeOrder
+
                     })
                 })
                 setMafiaRole(roles);
@@ -69,7 +72,9 @@ const PlayerRole = () => {
                         filliation: "coven",
                         role: doc.data().role,
                         skill: doc.data().skill,
-                        special: doc.data().special
+                        special: doc.data().special,
+                        wakeOrder: doc.data().wakeOrder
+
                     })
                 })
                 setCovenRole(roles);
@@ -82,17 +87,15 @@ const PlayerRole = () => {
                         filliation: "neutral",
                         role: doc.data().role,
                         skill: doc.data().skill,
-                        special: doc.data().special
+                        special: doc.data().special,
+                        wakeOrder: doc.data().wakeOrder
+
                     })
                 })
                 setNeutralRole(roles);
                 
             })
-
-            
-
         }
-
         loadInfo();
     }, []) 
     useEffect(() => {
@@ -108,10 +111,26 @@ const PlayerRole = () => {
         for (let i = 0; i < playerList.length; i++) {
             if (playerList[i].playerName === currentPlayer) {
                 const currentId = playerList[i].id;
-            await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), {role: currentRole, filliation: currentFilliation, life: "alive"})
+                if (currentRole === "meretriz") {
+                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 2})
+                    return;  
+                }
+                if (currentRole === "executor") {
+                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 1})
+                    return;
+                }
+                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 99})
+                return;
             }
         }
 
+    }
+
+    const handleReset = async (e) => {
+        for (let i = 0; i < playerList.length; i++) {
+            const currentId = playerList[i].id;
+            await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), {role: "none", filliation: "none", life: "none", action: "none", wakeOrder: 0})
+        }
     }
     return (
         <div className="playerRole">
@@ -149,6 +168,7 @@ const PlayerRole = () => {
                             </select>
                         </label>
                         <button type="submit" className="button" onClick={handleConfirm}>Confirmar</button>
+                        <button type="button" className="button" onClick={handleReset}>Resetar Todos</button>
                     </form>
                 </div>
                 <div className="playerRole-roles">
