@@ -47,11 +47,12 @@ const Night = () => {
     const [attackAction, setAttackAction] = useState([]);
     const [protectAction, setProtectAction] = useState('');
     const [ferreiroProtectAction, setferreiroProtectAction] = useState('');
-    const [alertAction, setAlertAction] = useState(false);
+    const [alertAction, setAlertAction] = useState('');
     const [padeiraTemp, setPadeiraTemp] = useState([]);
     const [currentDayTemp, setCurrentDayTemp] = useState([]);
     const [multipleCharactersPresent, setMultipleCharactersPresent] = useState('')
     const [specialAttack, setSpecialAttack] = useState([]);
+    const [nightImmunity, setNightImmunity] = useState(['arsonista', '']);
     let blockAction2 = '';
 
     useEffect(() => {
@@ -209,7 +210,29 @@ const Night = () => {
         loadRememberedData();
     }, [user.email])
     const encerrarNoite = () => {
-        
+        console.log(attackAction)
+        for (let i = 0; i < attackAction.length; i++){
+            const player = alivePlayers.filter(player => { return player.playerName === attackAction[i].target })
+            if (nightImmunity.includes(player[0].role)) {
+                // Nothing happens
+                console.log('This character did not die')
+                
+            }
+            else {
+                if (cureAction.some(e => e.target === attackAction[i].target)){
+                    // Nothing happens
+                    console.log('This character did not die')
+
+                } else {
+                    if (alertAction.includes(attackAction[i].target)) {
+                    // nothing happens
+                    console.log('This character did not die')
+                        
+                    } else {
+                }
+                }
+            }
+        }
     }
     const incrementCounter = () => {
         setControlCounter(controlCounter => controlCounter + 1);
@@ -736,7 +759,7 @@ const Night = () => {
                 closeDeadDropDown();
                 break;
             case 'veterano':
-                setAlertAction(true);
+                setAlertAction(alivePlayers[controlCounter - 1].playerName);
                 break;
             case 'godfather':
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
@@ -799,6 +822,11 @@ const Night = () => {
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
                 closeSingleDropDown();
                 break;
+            case 'assassino em serie':
+                setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
+                setAttackAction([...attackAction, { attacker: alivePlayers[controlCounter - 1].playerName, attackerRole: alivePlayers[controlCounter - 1].role, target: player }]);
+                closeSingleDropDown();
+                break;
             case 'arsonista':
                 document.querySelector('.arsonistaButton').classList.add('invisible');
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
@@ -858,6 +886,13 @@ const Night = () => {
         document.querySelector(".skipButton").classList.remove('invisible')
         setPadeiraHealCount(padeiraTemp[0].healCount);
         setCurrentDay(currentDayTemp[0].currentDay)
+        if (currentDay % 2 === 0) {
+            setNightImmunity(['arsonista', 'assassino em serie', 'lobisomen', 'sobrevivente' ])
+            
+        } else {
+            setNightImmunity(['arsonista', 'assassino em serie', 'sobrevivente' ])
+            
+        }
         wakeUpPlayers();
     } 
     const checkstuff = () => {
