@@ -119,6 +119,22 @@ const PlayerRole = () => {
                 await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 1})
                     return;
                 }
+                if (currentRole === "godfather") {
+                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 28})
+                    return;
+                }
+                if (currentRole === "afilhado") {
+                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 29})
+                    return;
+                }
+                if ( currentRole === "conselheira" || currentRole === "vigarista" || currentRole === "zelador") {
+                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 30})
+                    return;
+                }
+                if ( currentRole === "envenenadora" || currentRole === "feiticeira benevolente" || currentRole === "ilusionista" || currentRole === "parasita") {
+                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 35})
+                    return;
+                }
                 await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 99})
                 return;
             }
@@ -188,6 +204,9 @@ const PlayerRole = () => {
                         </h4>
                         <div className="playerRole-evil card-border scrollable">
                         {playerList.filter(player => player.filliation.includes("mafia")).map(filteredPlayer => (
+                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role}</p>
+                                ))}
+                        {playerList.filter(player => player.filliation.includes("coven")).map(filteredPlayer => (
                             <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role}</p>
                                 ))}
                         </div>
