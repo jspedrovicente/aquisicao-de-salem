@@ -35,6 +35,7 @@ const [arsonTarget, setArsonTarget] = useState([]);
 const [poisonedTarget, setPoisonedTarget] = useState([]);
 const [newPoisonedTarget, setNewPoisonedTarget] = useState([]);
 const [parasiteAction, setParasiteAction] = useState([]);
+const [statusAfliction, setStatusAfliction] = useState([]);    
     useEffect(() => {
         const loadUserInformation = () => {
             const userDetail = localStorage.getItem("UserLogin");
@@ -144,6 +145,19 @@ const [parasiteAction, setParasiteAction] = useState([]);
         }
         addAllRoles(covenRole, mafiaRole, townRole, neutralRole);
     }, [covenRole])
+
+    useEffect(() => {
+        const importData = () => {
+            const aflictionData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`), (snapshot) => {
+                let temp = [];
+                snapshot.forEach((doc) => {
+                    temp.push({ target: doc.data().target, status: doc.data().status, key: doc.id });
+                })
+                setStatusAfliction(temp)
+            })
+        }
+        importData();
+    }, [user.email])
     return (
         // The day has to set all the player actions as pending
         <div className="day">
@@ -190,7 +204,12 @@ const [parasiteAction, setParasiteAction] = useState([]);
                         <h4>
                         Status
                         </h4>
-                        <div className="small-container card-border scrollable">
+                    <div className="small-container card-border scrollable">
+                    {statusAfliction.map((player) => (
+                                        <option key={player.key}>
+                            {player.target} - {player.status}
+                                        </option>
+                                    ))}
                         </div>
                 </div>
                 <div className="event-killplayer event">
