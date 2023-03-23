@@ -50,6 +50,7 @@ const PlayerList = () => {
             })
         }
     }
+    console.log(playerList)
 
     return (
             <div className="logIn">
@@ -63,9 +64,9 @@ const PlayerList = () => {
                 </div>
                 <div className="playerlist-container">
                 <h4> Lista de Jogadores</h4>
-                <div className="playerlist-list card-border scrollable">
+                    <div className="playerlist-list card-border scrollable">
                         {playerList.map((player) => (
-                            <PlayerListing key={player.key} playerName={player.playerName}  id={player.id} />
+                            <PlayerListing key={player.id} playerName={player.playerName}  id={player.id} />
                             )
                         )}
                 </div>

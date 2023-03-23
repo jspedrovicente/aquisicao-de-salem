@@ -12,7 +12,7 @@ function playerListing(props){
 
     return (
         <div className="playerlisting-name">
-            <p key={props.key}>{props.playerName}</p>
+            <p key={props.id}>{props.playerName}</p>
             <button className="delete-button" onClick={() => handleDelete(props.id)}>x</button>
         </div>
         

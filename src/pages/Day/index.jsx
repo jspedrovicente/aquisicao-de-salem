@@ -3,6 +3,8 @@ import ButtonLink from "../../components/ButtonLink"
 import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { database } from "../../firebaseConnection";
+import { useNavigate } from "react-router-dom";
+
 const Day = () => {
 
 const [user, setUser] = useState([]);
@@ -15,12 +17,15 @@ const [mafiaRole, setMafiaRole] = useState([]);
 const [neutralRole, setNeutralRole] = useState([]);
 const [allRoles, setAllRoles] = useState([]);
 const [currentDayTemp, setCurrentDayTemp] = useState([]);
+const [currentDay, setCurrentDay] = useState(0);
+const navigateToNight = useNavigate();
+
     
     
 
 
 // Night actions that transfers to morning
-const [visitAction, setVisitAction] = useState('');
+const [visitAction, setVisitAction] = useState([]);
 const [executorAction, setExecutorAction] = useState('');
 const [motivateAction, setMotivateAction] = useState('');
 const [armadilheiroAction, setArmadilheiroAction] = useState('');
@@ -126,12 +131,15 @@ const [statusAfliction, setStatusAfliction] = useState([]);
                 
             })
             const dayCounterSnapshot = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/dayCounter/dayCounter`), (snapshot) => {
-                let currentDay = [];
+                const currentDayx = [];
                 snapshot.forEach((doc) => {
-                    currentDay.push({ currentDay: doc.data().currentDay })
+
+                    currentDayx.push({ currentDay: doc.data().currentDay })
+
                 })
-                setCurrentDayTemp(currentDay)
-    
+                
+                setCurrentDay(currentDayx[0].currentDay)
+                setCurrentDayTemp(currentDayx)
             })
         }
     
@@ -151,20 +159,79 @@ const [statusAfliction, setStatusAfliction] = useState([]);
             const aflictionData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`), (snapshot) => {
                 let temp = [];
                 snapshot.forEach((doc) => {
-                    temp.push({ target: doc.data().target, status: doc.data().status, key: doc.id });
+                    temp.push({ target: doc.data().target, status: doc.data().status, key: doc.id, id: doc.id });
                 })
                 setStatusAfliction(temp)
+            })
+            const visitData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/visitAction/visitAction`), (snapshot) => {
+                let temp = [];
+                snapshot.forEach((doc) => {
+                    temp.push({
+                        visitor: doc.data().visitor,
+                        target: doc.data().target,
+                        id: doc.id,
+                        key: doc.id
+                    })
+                })
+                setVisitAction(temp);
             })
         }
         importData();
     }, [user.email])
+    const endGameCompletely = async () => {
+        for (let p = 0; p < statusAfliction.length; p++) {
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusAfliction[p].id)
+            await deleteDoc(theRef)
+
+        }
+
+        updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "dayCounter", "dayCounter", "dayCounter"), { currentDay: 1})
+        navigateToNight('/playerlist')
+    }
+    const clearNeedlessData = () => {
+        // clears visitAction
+        for (let p = 0; p < visitAction.length; p++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/visitAction/visitAction`, visitAction[p].id)
+            deleteDoc(theRef);
+        }
+        // clears bomb, marks, motivations and parasites.
+        const bombClear = statusAfliction.filter(status => { return status.status === 'bomba' })
+        const markClear = statusAfliction.filter(status => {return status.status === 'marcado'})
+        const motivateClear = statusAfliction.filter(status => { return status.status === 'motivado' })
+        const parasiteClear = statusAfliction.filter(status => { return status.status === 'parasita' })
+        for (let p = 0; p < bombClear.length; p++) {
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, bombClear[p].id)
+            deleteDoc(theRef)
+        }
+        for (let p = 0; p < markClear.length; p++) {
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, markClear[p].id)
+            deleteDoc(theRef)
+        }
+        for (let p = 0; p < motivateClear.length; p++) {
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, motivateClear[p].id)
+            deleteDoc(theRef)
+        }
+
+        if (currentDay > 4) {
+            for (let p = 0; p < parasiteClear.length; p++) {
+                const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, parasiteClear[p].id)
+                deleteDoc(theRef)
+            }
+        }
+    }
+
+    const startNight = () => {
+        clearNeedlessData();
+        navigateToNight('/night');
+    }
+
     return (
         // The day has to set all the player actions as pending
         <div className="day">
             <h3 className="page-title">
-            Dia 1
+                Dia {currentDay}
             </h3>
-            <button className="button">Encerrar Jogo</button>
+            <button className="button" onClick={endGameCompletely}>Encerrar Jogo</button>
             <div className="dayMain">
                 <div className="event-ocurrence event">
                         <h4>
@@ -180,9 +247,9 @@ const [statusAfliction, setStatusAfliction] = useState([]);
                         </h4>
                     <div className="small-container card-border scrollable">
                     {alivePlayers.map((player) => (
-                                        <option key={player.key + '2'}>
+                                        <p key={player.key + '2'}>
                             {player.playerName} - {player.role}
-                                        </option>
+                                        </p>
                                     ))}
                         </div>
                 </div>
@@ -190,15 +257,25 @@ const [statusAfliction, setStatusAfliction] = useState([]);
                         <h4>
                         Ações da Noite
                         </h4>
-                        <div className="small-container card-border scrollable">
-                        </div>
+                    <div className="small-container card-border scrollable">
+                        {visitAction.map((visit) => (
+                            <p key={visit.key}>
+                                {visit.visitor} visitou {visit.target}
+                        </p>
+                    ))}    
+                    </div>
                 </div>
                 <div className="event-death event">
                         <h4>
                         Jogadores Mortos
                         </h4>
-                        <div className="large-container card-border scrollable">
-                        </div>
+                    <div className="large-container card-border scrollable">
+                        {deadPlayers.map((player) => (
+                            <p key={player.key + '3'}>
+                            {player.playerName} - {player.role}
+                                        </p>
+                                    ))}
+                    </div>
                 </div>
                 <div className="event-status event">
                         <h4>
@@ -222,7 +299,7 @@ const [statusAfliction, setStatusAfliction] = useState([]);
                             <option value="selena">SelenaGomez</option>
                         </select>
                         <button className="button">Matar Jogador</button>
-                        <ButtonLink destination="/night" buttonText="Começar Noite"/>
+                        <button type="button" onClick={startNight} className="button">Começar Noite</button>
 
                     </div>
                 </div>

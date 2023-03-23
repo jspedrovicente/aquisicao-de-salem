@@ -2,6 +2,7 @@ import { async } from "@firebase/util";
 import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { database } from "../../firebaseConnection";
+import { useNavigate } from "react-router-dom";
 import "./night.css"
 // SET THE Function wakeup ORDER IN FIREBASE FOR EACH CHARACTER, REMEMBER MERETRIZ IS FIRST IF THE EXECUTOR HAS ALREADY MADE HIS DECISION
 const Night = () => {
@@ -14,6 +15,7 @@ const Night = () => {
     const [mafiaRole, setMafiaRole] = useState([]);
     const [neutralRole, setNeutralRole] = useState([]);
     const [allRoles, setAllRoles] = useState([]);
+    const navigateToMorning = useNavigate();
     
     // Night Manipulation
     const [player, setPlayer] = useState('');
@@ -22,22 +24,24 @@ const Night = () => {
     const [controlCounter, setControlCounter] = useState(0);
     const [currentPlayerTitle, setCurrentPlayerTitle] = useState('');
     const [currentPlayerDescription, setCurrentPlayerDescription] = useState('');
+    const [currentPlayerName, setCurrentPlayerName] = useState('');
     // Night actions that transfers to morning
 
     // Information that is transfered solo
     const [visitAction, setVisitAction] = useState([]);
     const [executorAction, setExecutorAction] = useState([]);
-    const [armadilheiroAction, setArmadilheiroAction] = useState('');
-    const [spyAction, setSpyAction] = useState('');
     const [weaponCreateAction, setWeaponCreateAction] = useState([]);
     const [padeiraHealCount, setPadeiraHealCount] = useState(0);
     
+    const [armadilheiroAction, setArmadilheiroAction] = useState('');
+    const [spyAction, setSpyAction] = useState('');
     // Information that gets processed together
     const [motivateAction, setMotivateAction] = useState('');
     const [blackMailAction, setBlackMailAction] = useState('');
     const [cleanUpAction, setCleanUpAction] = useState('');
     const [markAction, setMarkAction] = useState('');
     const [clownBombAction, setClownBombAction] = useState('');
+    const [inGameStatusAfliction, setinGameStatusAfliction] = useState([])
 
     // Information that transfers but is processed SOLO
     const [arsonTarget, setArsonTarget] = useState([]);
@@ -46,11 +50,12 @@ const Night = () => {
     const [parasiteAction, setParasiteAction] = useState([]);
     const [newParasiteAction, setNewParasiteAction] = useState([]);
     const [deadAction, setDeadAction] = useState([]);
-    const [newsUpdate, setNewsUpdate] = useState([]);
+    const [publicEvents, setPublicEvents] = useState([]);
 
     // Night actions that do not transfer
     const [cureAction, setCureAction] = useState([]);
     const [blockAction, setBlockAction] = useState('');
+    const [mirageBlockAction, setMirageBlockAction] = useState('');
     const [weapon, setWeapon] = useState('');
     const [attackAction, setAttackAction] = useState([]);
     const [protectAction, setProtectAction] = useState('');
@@ -194,7 +199,6 @@ const Night = () => {
                 snapshot.forEach((doc) => {
                     temp.push({ target: doc.data().target, id: doc.id });
                 })
-                console.log(temp)
                 setExecutorAction(temp)
             })
             const arsonData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/arsonTarget/arsonTarget`), (snapshot) => {
@@ -214,22 +218,28 @@ const Night = () => {
             const parasiteData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/parasiteTarget/parasiteTarget`), (snapshot) => {
                 let pse = [];
                 snapshot.forEach((doc) => {
-                    pse.push({ playerName: doc.data().playerName });
+                    pse.push({ playerName: doc.data().playerName, id: doc.id });
                 })
                 setParasiteAction(pse);
+            })
+            const currentAf = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`), (snapshot) => {
+                let pse = [];
+                snapshot.forEach((doc) => {
+                    pse.push({ playerName: doc.data().target, status: doc.data().status, id: doc.id });
+                })
+                setinGameStatusAfliction(pse);
             })
         }
         loadRememberedData();
     }, [user.email])
     const encerrarNoite = async () => {
-        const dead = []
-        const temporaryStatusAfliction = []
+        const dead = [];
+        const temporaryStatusAfliction = [];
+        const allpublicEvents = []
         for (let i = 0; i < attackAction.length; i++) {
             const player = alivePlayers.filter(player => { return player.playerName === attackAction[i].target })
-            console.log(player)
             if (nightImmunity.includes(player[0].role)) {
                 // Nothing happens
-                console.log('This character did not die')
                 
             }
             else {
@@ -237,7 +247,6 @@ const Night = () => {
                     
                     if (cureAction.some(e => e.target === attackAction[i].target)) {
                         // Nothing happens
-                        console.log('This character did not die')
                         
                     }
                 }
@@ -246,7 +255,6 @@ const Night = () => {
                         
                         if (alertAction.includes(attackAction[i].target)) {
                             // nothing happens
-                            console.log('This character did not die')
                             
                         }
                     }
@@ -265,7 +273,6 @@ const Night = () => {
                                 
                                 if (ferreiroProtectAction.includes(attackAction[i].target)) {
                                     // nothing happens
-                                    console.log('this character did not die');
                                 }
                             }
                             else {
@@ -280,34 +287,32 @@ const Night = () => {
             const veteran = alivePlayers.filter(player => { return player.role === 'veterano' });
             const alerted = visitAction.filter(visitor => { return visitor.target === veteran[0].playerName })
             if (alerted.length > 0) {
-                console.log('here')
                 for (var i = 0; alerted.length > i; i++) {
                     dead.push({ killedPlayer: alerted[i].visitor, reason: 'visitou um veterano em alerta.' })
                 };
-                console.log(dead);
             };
         };
 
         if (specialAttack.length > 0) {
             for (let i = 0; i < specialAttack.length; i++) {
                 const player = alivePlayers.filter(player => { return player.playerName === specialAttack[i].target })
-                console.log(player)
-                if (nightImmunity.includes(player[0].role)) {
-                    // Nothing happens
-                    console.log('This character did not die')
+                if (player.length > 0) {
                     
-                }
-                else {
-                    if (cureAction.length > 0) {
+                    if (nightImmunity.includes(player[0].role)) {
+                        // Nothing happens
                         
-                        if (cureAction.some(e => e.target === specialAttack[i].target)) {
-                            // Nothing happens
-                            console.log('This character did not die')
-                            
-                        }
                     }
                     else {
-                        dead.push({ killedPlayer: specialAttack[i].target, reason: 'Morto por Arsonista ou amaldiçoadora' })
+                        if (cureAction.length > 0) {
+                        
+                            if (cureAction.some(e => e.target === specialAttack[i].target)) {
+                                // Nothing happens
+                                
+                            }
+                        }
+                        else {
+                            dead.push({ killedPlayer: specialAttack[i].target, reason: 'Morto por Arsonista ou amaldiçoadora' })
+                        }
                     }
                 }
             }
@@ -329,13 +334,18 @@ const Night = () => {
             temporaryStatusAfliction.push({ target: motivateAction, status: 'motivado' });
         }
         if (arsonTarget.length > 0) {
-            for (let n = 0; arsonTarget.length > n; n++){
-                temporaryStatusAfliction.push({ target: arsonTarget[n].playerName, status: 'doused' });
+            for (let n = 0; arsonTarget.length < n; n++){
+                temporaryStatusAfliction.push({ target: arsonTarget[n].playerName, status: 'ensopado' });
+            }  
+        }
+        if (newParasiteAction.length > 0) {
+            for (let n = 0; newParasiteAction.length > n; n++){
+                temporaryStatusAfliction.push({ target: newParasiteAction[n].playerName, status: 'parasita' });
             }  
         }
         if (newPoisonedTarget.length > 0) {
             for (let m = 0; newPoisonedTarget > m; m++){
-                temporaryStatusAfliction.push({ target: newPoisonedTarget[m], status: 'cursed' });
+                temporaryStatusAfliction.push({ target: newPoisonedTarget[m], status: 'amaldiçoado' });
             }
             
         }
@@ -360,7 +370,7 @@ const Night = () => {
             await updateDoc(doc(database, "playeradmin", "players", user.email, infoPlayer[0].id), { life: "dead"})
         }
         // Update Arsonist Data
-
+        navigateToMorning('/day');
     };
     const exportNewDatabase = async () => {
         const docRef = collection(database, `playeradmin/playerStatuses/${user.email}/arsonTarget/arsonTarget`)
@@ -370,9 +380,9 @@ const Night = () => {
             })
         }
         const parasiteRef = collection(database, `playeradmin/playerStatuses/${user.email}/parasiteTarget/parasiteTarget`)
-        for (var x = 0; x < parasiteAction.length; x++) {
+        for (var x = 0; x < newParasiteAction.length; x++) {
             await addDoc(parasiteRef, {
-                playerName: parasiteAction[x].playerName
+                playerName: newParasiteAction[x].playerName
             })
         }
         const poisonRef = collection(database, `playeradmin/playerStatuses/${user.email}/poisonTarget/poisonTarget`)
@@ -386,6 +396,8 @@ const Night = () => {
         if (executorAction.length > 0) {
             await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "executorTarget"), { target: executorAction[0].target })
         }
+            await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "dayCounter", "dayCounter", "dayCounter"), { currentDay: currentDay + 1})
+
     } 
     const exportvisitDatabase = async () => {
         const docRef = collection(database, `playeradmin/playerStatuses/${user.email}/visitAction/visitAction`)
@@ -411,6 +423,16 @@ const Night = () => {
             temp.push({ attacker: alivePlayers[controlCounter - 1].playerName, attackerRole: 'arsonista', target: arsonTarget[index].playerName })
         }
         setSpecialAttack(...specialAttack, temp );
+        for (let p = 0; p < arsonTarget.length; p++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/arsonTarget/arsonTarget`, arsonTarget[p].id)
+            deleteDoc(theRef);
+        }
+        // BITCH
+        const aflicted = inGameStatusAfliction.filter(afliction => { return afliction.status === 'ensopado' });
+        for (let p = 0; p < aflicted.length; p++){
+            const arsonAflictionRef = (doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, aflicted[p].id))
+            deleteDoc(arsonAflictionRef);
+        }
         setArsonTarget([]);
         document.querySelector('.arsonistaButton').classList.add('invisible');
         closeSingleDropDown();
@@ -470,6 +492,7 @@ const Night = () => {
         var currentPlayer = alivePlayers[controlCounter];
         var roledetails = allRoles.filter(singleRole => { return singleRole.role === currentPlayer.role });
         setCurrentPlayerTitle(currentPlayer.role);
+        setCurrentPlayerName(currentPlayer.playerName);
         setCurrentPlayerDescription(roledetails[0].skill);
     }
     const wakeUpPlayers = () => {
@@ -488,13 +511,13 @@ const Night = () => {
                     writePlayerInformation();
                 } else {
                     writePlayerInformation();
-                    setCurrentPlayerDescription(`Seu alvo é ${executorAction}, não precisa acordar a pessoa, clique em confirmar Ação`);
+                    setCurrentPlayerDescription(`Não precisa acordar a pessoa, clique em confirmar Ação`);
                 }
                 incrementCounter();
                 break;
             case 'bardo':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -504,7 +527,7 @@ const Night = () => {
                 break;
             case 'armadilheiro':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -514,7 +537,7 @@ const Night = () => {
                 break;
             case 'carteiro':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -523,7 +546,7 @@ const Night = () => {
                 break;
             case 'curandeira':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -533,7 +556,7 @@ const Night = () => {
                 break;
             case 'espiao':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -543,7 +566,7 @@ const Night = () => {
                 break;
             case 'ferreiro':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 }
@@ -560,7 +583,7 @@ const Night = () => {
                 break;
             case 'guardiao':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -570,7 +593,7 @@ const Night = () => {
                     break;
             case 'investigador':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -580,7 +603,7 @@ const Night = () => {
                     break;
             case 'xerife':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -590,7 +613,7 @@ const Night = () => {
                     break;
             case 'medium':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -600,7 +623,7 @@ const Night = () => {
                     break;
             case 'vigilante':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -610,7 +633,7 @@ const Night = () => {
                     break;
             case 'veterano':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -620,7 +643,7 @@ const Night = () => {
             case 'padeira':
                 writePlayerInformation();
                 document.querySelector('.padeiraCounter').classList.remove('invisible');
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -638,7 +661,7 @@ const Night = () => {
             case 'godfather':
                 writePlayerInformation();
                 writeMafiaInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -652,7 +675,7 @@ const Night = () => {
             case 'conselheira':
                 writePlayerInformation();
                 writeMafiaInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -666,7 +689,7 @@ const Night = () => {
             case 'vigarista':
                 writePlayerInformation();
                 writeMafiaInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -680,7 +703,7 @@ const Night = () => {
             case 'zelador':
                 writePlayerInformation();
                 writeMafiaInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -694,7 +717,7 @@ const Night = () => {
             case 'afilhado':
                 writePlayerInformation();
                 writeMafiaInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -717,7 +740,7 @@ const Night = () => {
                 break;
             case 'pistoleiro':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -728,7 +751,7 @@ const Night = () => {
                 break;
             case 'palhaco':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -739,7 +762,7 @@ const Night = () => {
                 break;
             case 'medico da peste':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -758,7 +781,7 @@ const Night = () => {
                 break;
             case 'arsonista':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -769,7 +792,7 @@ const Night = () => {
                 break;
             case 'assassino em serie':
                 writePlayerInformation();
-                if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
@@ -800,6 +823,7 @@ const Night = () => {
                     for (var i = 0; poisonedTarget.length > i; i++){
                         temp.push({ attacker: alivePlayers[controlCounter].playerName, attackerRole: 'amaldicoadora', target: poisonedTarget[i].playerName })
                     } 
+
                     setSpecialAttack(...specialAttack, temp);
                     setPoisonedTarget([]);
                     for (let p = 0; p < poisonedTarget.length; p++){
@@ -812,7 +836,6 @@ const Night = () => {
                     closeConfirmButton();
                 }
                 else {
-                    console.log(currentDay)
                     if (currentDayTemp[0].currentDay >= 4) {
                         openSecondAttackDropDown();
                         openSingleDropDown();
@@ -830,6 +853,16 @@ const Night = () => {
                 writeCovenInformation();
                 if (currentDayTemp[0].currentDay >= 4) {
                     setCurrentPlayerDescription('Todos seus parasitas EXPLODEM');
+                    const here = [];
+                    for (let index = 0; index < parasiteAction.length; index++){
+                        here.push({ attacker: alivePlayers[controlCounter].playerName, attackerRole: 'parasita', target: parasiteAction[index].playerName })
+                    }
+                    setSpecialAttack(...specialAttack, here);
+                    for (let i = 0; i < parasiteAction; i++){
+
+                        const parasiteRef = doc(database, `playeradmin/playerStatuses/${user.email}/parasiteTarget/poisonTarget`, parasiteAction[i].id)
+                        deleteDoc(parasiteRef);
+                    }
                 }
                 else {
                     if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
@@ -845,6 +878,18 @@ const Night = () => {
                     }
                 incrementCounter();
                 break;
+            case 'miragem':
+                writeCovenInformation();
+                writePlayerInformation();
+                if (currentDayTemp[0].currentDay >= 4) {
+                    openSingleDropDown();
+                    break;
+                }
+                if (alivePlayers[controlCounter + 1] === null || alivePlayers[controlCounter + 1].filliation !== 'coven') {
+                    endCovenNight();
+                }
+                incrementCounter();
+                break;                
             default:
                 writePlayerInformation();
                 setCurrentPlayerDescription('Esse personagem não acorda a noite, clique em confirmar');
@@ -1005,7 +1050,7 @@ const Night = () => {
             case 'arsonista':
                 document.querySelector('.arsonistaButton').classList.add('invisible');
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
-                setArsonTarget([...arsonTarget, { playerName: player }])
+                setArsonTarget([{ playerName: player }])
                 closeSingleDropDown();
                 break;
             case 'feiticeira benevolente':
@@ -1040,10 +1085,22 @@ const Night = () => {
                 }
                 RemoveCovenInformation();
                 break;
+            case 'miragem':
+                if (currentDayTemp[0].currentDay >= 4) {
+                    
+                    setMirageBlockAction(player);
+                    blockAction2 = player;
+                    setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
+                }
+
+                RemoveCovenInformation();
+                break;
             default:
                 closeSingleDropDown();
                 closeDeadDropDown();
                 document.querySelector('.padeiraButton').classList.add('invisible');
+                document.querySelector('.padeiraCounter').classList.add('invisible');
+
                 break;
         }        
         wakeUpPlayers();
@@ -1055,6 +1112,7 @@ const Night = () => {
         RemoveCovenInformation();
         document.querySelector('.weaponDropDownAction').classList.add('invisible');
         document.querySelector('.padeiraButton').classList.add('invisible');
+        document.querySelector('.padeiraCounter').classList.add('invisible');
         wakeUpPlayers();
         closeSecondAttackDropDown();
     }
@@ -1101,7 +1159,7 @@ const Night = () => {
                         </h4>
                     <div className="huge-container card-border scrollable">
                         <h4 className="specialCases">{multipleCharactersPresent}</h4>
-                        <h4 className="playerRole">{currentPlayerTitle}</h4>
+                        <h4 className="playerRole">{currentPlayerTitle} - { currentPlayerName }</h4>
                         <p className="playerDescription">{ currentPlayerDescription }</p>
                         <div className="actionContainer">
                             <div className="alivePlayerDropDownAction invisible">
