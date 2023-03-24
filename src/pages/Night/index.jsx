@@ -235,7 +235,7 @@ const Night = () => {
     const encerrarNoite = async () => {
         const dead = [];
         const temporaryStatusAfliction = [];
-        const allpublicEvents = []
+        const allpublicEvents = [];
         for (let i = 0; i < attackAction.length; i++) {
             const player = alivePlayers.filter(player => { return player.playerName === attackAction[i].target })
             if (nightImmunity.includes(player[0].role)) {
@@ -264,8 +264,8 @@ const Night = () => {
                             if (protectAction.includes(attackAction[i].target)) {
                                 const protector = alivePlayers.filter(player => { return player.role === 'guardiao' })
                                 const agressor = alivePlayers.filter(player => { return player.playerName === attackAction[i].attacker })
-                                dead.push({ killedPlayer: agressor[0].playerName, reason: 'atacou um jogador protegido.' });
-                                dead.push({ killedPlayer: protector[0].playerName, reason: 'protegeu alguém que foi atacado.' });
+                                dead.push({ killedPlayer: agressor[0].playerName, killedPlayerRole: agressor[0].role, attackerRole: "guardiao"});
+                                dead.push({ killedPlayer: protector[0].playerName, killedPlayerRole: protector[0].role, attackerRole: "guardiao" });
                             }
                         }
                         else {
@@ -276,7 +276,13 @@ const Night = () => {
                                 }
                             }
                             else {
-                                dead.push({ killedPlayer: attackAction[i].target })
+                                if (cleanUpAction === attackAction[i].target) {
+                                dead.push({ killedPlayer: attackAction[i].target, killedPlayerRole: "LIMPADO", attackerRole: attackAction[i].attackerRole  })
+                                    
+                                } else {
+                                    
+                                }
+                                dead.push({ killedPlayer: attackAction[i].target, killedPlayerRole: player[0].role, attackerRole: attackAction[i].attackerRole  })
                             }
                         }
                     }
@@ -288,7 +294,9 @@ const Night = () => {
             const alerted = visitAction.filter(visitor => { return visitor.target === veteran[0].playerName })
             if (alerted.length > 0) {
                 for (var i = 0; alerted.length > i; i++) {
-                    dead.push({ killedPlayer: alerted[i].visitor, reason: 'visitou um veterano em alerta.' })
+                    const player = alivePlayers.filter(player => { return player.playerName === alerted[i].visitor })
+
+                    dead.push({ killedPlayer: alerted[i].visitor, killedPlayerRole: player[i].role, attackerRole: "veterano" })
                 };
             };
         };
@@ -311,7 +319,8 @@ const Night = () => {
                             }
                         }
                         else {
-                            dead.push({ killedPlayer: specialAttack[i].target, reason: 'Morto por Arsonista ou amaldiçoadora' })
+                            
+                            dead.push({ killedPlayer: specialAttack[i].target, killedPlayerRole: player[0].role, attackerRole: specialAttack[i].attackerRole })
                         }
                     }
                 }
@@ -370,6 +379,14 @@ const Night = () => {
             await updateDoc(doc(database, "playeradmin", "players", user.email, infoPlayer[0].id), { life: "dead"})
         }
         // Update Arsonist Data
+        const eventsDatabase = collection(database, `playeradmin/playerStatuses/${user.email}/announcements/announcements`)
+        for (let i = 0; i < dead.length; i++){
+            await addDoc(eventsDatabase, {
+                killedPlayer: dead[i].killedPlayer,
+                killedPlayerRole: dead[i].killedPlayerRole,
+                attackerRole: dead[i].attackerRole
+            })
+        }
         navigateToMorning('/day');
     };
     const exportNewDatabase = async () => {
@@ -852,6 +869,7 @@ const Night = () => {
                 writePlayerInformation();
                 writeCovenInformation();
                 if (currentDayTemp[0].currentDay >= 4) {
+                    closeSingleDropDown();
                     setCurrentPlayerDescription('Todos seus parasitas EXPLODEM');
                     const here = [];
                     for (let index = 0; index < parasiteAction.length; index++){
@@ -859,7 +877,6 @@ const Night = () => {
                     }
                     setSpecialAttack(...specialAttack, here);
                     for (let i = 0; i < parasiteAction; i++){
-
                         const parasiteRef = doc(database, `playeradmin/playerStatuses/${user.email}/parasiteTarget/poisonTarget`, parasiteAction[i].id)
                         deleteDoc(parasiteRef);
                     }
@@ -875,7 +892,7 @@ const Night = () => {
                 }
                 if (alivePlayers[controlCounter + 1] === null || alivePlayers[controlCounter + 1].filliation !== 'coven' ) {
                     endCovenNight();
-                    }
+                }
                 incrementCounter();
                 break;
             case 'miragem':
@@ -883,7 +900,6 @@ const Night = () => {
                 writePlayerInformation();
                 if (currentDayTemp[0].currentDay >= 4) {
                     openSingleDropDown();
-                    break;
                 }
                 if (alivePlayers[controlCounter + 1] === null || alivePlayers[controlCounter + 1].filliation !== 'coven') {
                     endCovenNight();

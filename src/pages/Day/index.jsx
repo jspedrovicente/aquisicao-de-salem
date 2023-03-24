@@ -18,6 +18,7 @@ const [neutralRole, setNeutralRole] = useState([]);
 const [allRoles, setAllRoles] = useState([]);
 const [currentDayTemp, setCurrentDayTemp] = useState([]);
 const [currentDay, setCurrentDay] = useState(0);
+const [announcements, setAnnouncements] = useState([]);
 const navigateToNight = useNavigate();
 
     
@@ -175,6 +176,19 @@ const [statusAfliction, setStatusAfliction] = useState([]);
                 })
                 setVisitAction(temp);
             })
+            const annoucedData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/announcements/announcements`), (snapshot) => {
+                let lol = [];
+                snapshot.forEach((doc) => {
+                    lol.push({
+                        killedPlayer: doc.data().killedPlayer,
+                        killedPlayerRole: doc.data().killedPlayerRole,
+                        attackerRole: doc.data().attackerRole,
+                        key: doc.id,
+                        id: doc.id
+                    })
+                })
+                setAnnouncements(lol);
+            })
         }
         importData();
     }, [user.email])
@@ -211,7 +225,10 @@ const [statusAfliction, setStatusAfliction] = useState([]);
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, motivateClear[p].id)
             deleteDoc(theRef)
         }
-
+        for (let i = 0; i < announcements.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/announcements/announcements`, announcements[i].id)
+            deleteDoc(theRef);
+        }
         if (currentDay > 4) {
             for (let p = 0; p < parasiteClear.length; p++) {
                 const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, parasiteClear[p].id)
@@ -237,7 +254,12 @@ const [statusAfliction, setStatusAfliction] = useState([]);
                         <h4>
                         Acontecimentos
                         </h4>
-                        <div className="large-container card-border scrollable">
+                    <div className="large-container card-border scrollable">
+                        {announcements.map((announcement) => (
+                            <p key={announcement.key}>
+                                {announcement.killedPlayer} morreu. Quem o matou foi: {announcement.attackerRole}. Sua função era {announcement.killedPlayerRole}.
+                            </p>
+                        ))}
                         </div>
                 </div>
 
