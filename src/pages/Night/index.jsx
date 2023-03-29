@@ -4,8 +4,34 @@ import { useEffect, useState } from "react";
 import { database } from "../../firebaseConnection";
 import { useNavigate } from "react-router-dom";
 import "./night.css"
+import useSound from "use-sound";
+import nightEffect from "../../assets/night1-soundeffect.mp3"
+import harpEffect from "../../assets/bardo-soundeffect.mp3"
+import assassinoemserieEffect from "../../assets/assassinoemserie-soundeffect.mp3"
+import arsonistaEffect from "../../assets/arsonista-soundeffect.mp3"
+import armadilheiroEffect from "../../assets/armadilheiro-soundeffect.mp3"
+import meretrizEffect from "../../assets/meretriz-soundeffect.mp3"
+import carteiroEffect from "../../assets/carteiro-soundeffect.mp3"
+import ferreiroEffect from "../../assets/ferreiro-soundeffect.mp3"
+import pistoleiroEffect from "../../assets/pistoleiro-soundeffect.mp3"
+import palhacoEffect from "../../assets/palhaco-soundeffect.mp3"
 // SET THE Function wakeup ORDER IN FIREBASE FOR EACH CHARACTER, REMEMBER MERETRIZ IS FIRST IF THE EXECUTOR HAS ALREADY MADE HIS DECISION
 const Night = () => {
+    // SoundEffects for all the characters;
+    const [playNightSound, { stop }] = useSound(nightEffect, { volume: 0.75 });
+    const [playBardoSound] = useSound(harpEffect);
+    const [playAssassinoEmSerieSound] = useSound(assassinoemserieEffect);
+    const [playArsonistaSound] = useSound(arsonistaEffect);
+    const [playArmadilheiroSound] = useSound(armadilheiroEffect);
+    const [playCarteiroSound] = useSound(carteiroEffect);
+    const [playFerreiroSound] = useSound(ferreiroEffect);
+    const [playMeretrizSound] = useSound(meretrizEffect);
+    const [playPistoleiroSound] = useSound(pistoleiroEffect);
+    const [playPalhacoSound] = useSound(palhacoEffect);
+
+
+
+
     const [user, setUser] = useState([]);
     const [players, setPlayers] = useState([]);
     const [alivePlayers, setAlivePlayers] = useState([]);
@@ -233,6 +259,7 @@ const Night = () => {
         loadRememberedData();
     }, [user.email])
     const encerrarNoite = async () => {
+        stop();
         const dead = [];
         const temporaryStatusAfliction = [];
         const allpublicEvents = [];
@@ -519,6 +546,7 @@ const Night = () => {
         switch (alivePlayers[controlCounter].role) {
             case 'meretriz':
                 openSingleDropDown();
+                playMeretrizSound();
                 writePlayerInformation();
                 incrementCounter();
                 break;
@@ -534,6 +562,7 @@ const Night = () => {
                 break;
             case 'bardo':
                 writePlayerInformation();
+                playBardoSound();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -544,6 +573,7 @@ const Night = () => {
                 break;
             case 'armadilheiro':
                 writePlayerInformation();
+                playArmadilheiroSound();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -554,6 +584,7 @@ const Night = () => {
                 break;
             case 'carteiro':
                 writePlayerInformation();
+                playCarteiroSound();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -583,6 +614,7 @@ const Night = () => {
                 break;
             case 'ferreiro':
                 writePlayerInformation();
+                playFerreiroSound();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -757,6 +789,7 @@ const Night = () => {
                 break;
             case 'pistoleiro':
                 writePlayerInformation();
+                playPistoleiroSound();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -768,6 +801,7 @@ const Night = () => {
                 break;
             case 'palhaco':
                 writePlayerInformation();
+                playPalhacoSound();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -798,6 +832,7 @@ const Night = () => {
                 break;
             case 'arsonista':
                 writePlayerInformation();
+                playArsonistaSound();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -809,6 +844,7 @@ const Night = () => {
                 break;
             case 'assassino em serie':
                 writePlayerInformation();
+                playAssassinoEmSerieSound();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -1133,6 +1169,7 @@ const Night = () => {
         closeSecondAttackDropDown();
     }
     const iniciarNoite = () => {
+        playNightSound();
         document.querySelector(".startbutton").classList.add('invisible')
         document.querySelector(".confirmButton").classList.remove('invisible')
         document.querySelector(".skipButton").classList.remove('invisible')
