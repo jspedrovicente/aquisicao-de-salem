@@ -4,9 +4,23 @@ import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc } fro
 import { useEffect, useState } from "react";
 import { database } from "../../firebaseConnection";
 import { useNavigate } from "react-router-dom";
+import useSound from "use-sound";
+import julgamentoSound from "../../assets/julgamento-soundeffect.mp3"
+import morteSound from "../../assets/morte-soundeffect.mp3"
+import bombFizzle from "../../assets/bomb fizzle effect.mp3"
+import bombBoom from "../../assets/bomb effect.mp3"
+import gunSound from "../../assets/gun shot effect.mp3"
+
 
 const Day = () => {
 
+// sound effects
+const [playJulgamentoSound] = useSound(julgamentoSound);
+const [playFizzleSound] = useSound(bombFizzle);
+const [playBombSound] = useSound(bombBoom);
+const [playmorteSound] = useSound(morteSound);
+const [playGunSound] = useSound(gunSound);
+    
 const [user, setUser] = useState([]);
 const [players, setPlayers] = useState([]);
 const [alivePlayers, setAlivePlayers] = useState([]);
@@ -19,29 +33,24 @@ const [allRoles, setAllRoles] = useState([]);
 const [currentDayTemp, setCurrentDayTemp] = useState([]);
 const [currentDay, setCurrentDay] = useState(0);
 const [announcements, setAnnouncements] = useState([]);
+const [allPublicEvents, setAllPublicEvents] = useState([]);
 const navigateToNight = useNavigate();
-
+const [playerKilling, setPlayerKilling] = useState('');
     
     
 
 
 // Night actions that transfers to morning
 const [visitAction, setVisitAction] = useState([]);
-const [executorAction, setExecutorAction] = useState('');
-const [motivateAction, setMotivateAction] = useState('');
-const [armadilheiroAction, setArmadilheiroAction] = useState('');
-const [spyAction, setSpyAction] = useState('');
-const [weaponCreateAction, setWeaponCreateAction] = useState([])
+const [executorAction, setExecutorAction] = useState([]);
+const [poisonAction, setPoisonAction] = useState([]);
+const [armadilheiroInformation, setArmadilheiroInformation] = useState([]);
+const [spyInformation, setSpyInformation] = useState([]);
 const [padeiraHealCount, setPadeiraHealCount] = useState(0)
-const [blackMailAction, setBlackMailAction] = useState('')
-const [cleanUpAction, setCleanUpAction] = useState('')
-const [markAction, setMarkAction] = useState('')
-const [clownBombAction, setClownBombAction] = useState('')
 const [arsonTarget, setArsonTarget] = useState([]);
-const [poisonedTarget, setPoisonedTarget] = useState([]);
-const [newPoisonedTarget, setNewPoisonedTarget] = useState([]);
-const [parasiteAction, setParasiteAction] = useState([]);
-const [statusAfliction, setStatusAfliction] = useState([]);    
+const [statusAfliction, setStatusAfliction] = useState([]);   
+const [parasiteTarget, setParasiteTarget] = useState([]);
+    
     useEffect(() => {
         const loadUserInformation = () => {
             const userDetail = localStorage.getItem("UserLogin");
@@ -164,6 +173,48 @@ const [statusAfliction, setStatusAfliction] = useState([]);
                 })
                 setStatusAfliction(temp)
             })
+            const executorData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/executorTarget/executorTarget`), (snapshot) => {
+                let temp = [];
+                snapshot.forEach((doc) => {
+                    temp.push({ target: doc.data().target, key: doc.id, id: doc.id });
+                })
+                setExecutorAction(temp)
+            })
+            const arsonData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/arsonTarget/arsonTarget`), (snapshot) => {
+                let temp = [];
+                snapshot.forEach((doc) => {
+                    temp.push({ target: doc.data().playerName, key: doc.id, id: doc.id });
+                })
+                setArsonTarget(temp)
+            })
+            const armadilheiroData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/armadilheiroInformation/armadilheiroInformation`), (snapshot) => {
+                let he = [];
+                snapshot.forEach((doc) => {
+                    he.push({ role: doc.data().role, key: doc.id, id: doc.id });
+                })
+                setArmadilheiroInformation(he)
+            })
+            const spyData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/spyInformation/spyInformation`), (snapshot) => {
+                let her = [];
+                snapshot.forEach((doc) => {
+                    her.push({ visited: doc.data().visited, key: doc.id, id: doc.id });
+                })
+                setSpyInformation(her)
+            })
+            const poisonData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/poisonTarget/poisonTarget`), (snapshot) => {
+                let her = [];
+                snapshot.forEach((doc) => {
+                    her.push({ target: doc.data().visited, key: doc.id, id: doc.id });
+                })
+                setPoisonAction(her)
+            })
+            const parasiteData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/parasiteTarget/parasiteTarget`), (snapshot) => {
+                let her = [];
+                snapshot.forEach((doc) => {
+                    her.push({ target: doc.data().playername, key: doc.id, id: doc.id });
+                })
+                setParasiteTarget(her)
+            })
             const visitData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/visitAction/visitAction`), (snapshot) => {
                 let temp = [];
                 snapshot.forEach((doc) => {
@@ -189,6 +240,18 @@ const [statusAfliction, setStatusAfliction] = useState([]);
                 })
                 setAnnouncements(lol);
             })
+            const publicEvents = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/publicEvents/publicEvents`), (snapshot) => {
+                let temp = [];
+                snapshot.forEach((doc) => {
+                    temp.push({
+                        target: doc.data().target,
+                        event: doc.data().event,
+                        id: doc.id,
+                        key: doc.id
+                    })
+                })
+                setAllPublicEvents(temp);
+            })
         }
         importData();
     }, [user.email])
@@ -198,8 +261,60 @@ const [statusAfliction, setStatusAfliction] = useState([]);
             await deleteDoc(theRef)
 
         }
+        for (let i = 0; i < allPublicEvents.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/publicEvents/publicEvents`, allPublicEvents[i].id)
+            await deleteDoc(theRef)
 
-        updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "dayCounter", "dayCounter", "dayCounter"), { currentDay: 1})
+        }
+        for (let i = 0; i < announcements.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/announcements/announcements`, announcements[i].id)
+            await deleteDoc(theRef)
+
+        }
+        for (let i = 0; i < announcements.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/announcements/announcements`, announcements[i].id)
+            await deleteDoc(theRef)
+
+        }
+        for (let i = 0; i < deadPlayers.length; i++){
+            await updateDoc(doc(database, "playeradmin", "players", user.email , deadPlayers[i].id), {life: "none", filliation: "none", role: "none"})
+
+        }
+        for (let i = 0; i < executorAction.length; i++){
+            await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email , "executorTarget", "executorTarget" , "executorTarget"), {target: ''})
+
+        }
+        for (let i = 0; i < arsonTarget.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/arsonTarget/arsonTarget`, arsonTarget[i].id)
+            await deleteDoc(theRef)
+
+        }
+        for (let i = 0; i < poisonAction.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/poisonTarget/poisonTarget`, poisonAction[i].id)
+            await deleteDoc(theRef)
+
+        }
+        for (let i = 0; i < parasiteTarget.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/parasiteTarget/parasiteTarget`, parasiteTarget[i].id)
+            await deleteDoc(theRef)
+
+        }
+        for (let i = 0; i < armadilheiroInformation.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/armadilheiroInformation/armadilheiroInformation`, armadilheiroInformation[i].id)
+            await deleteDoc(theRef)
+
+        }
+        for (let i = 0; i < spyInformation.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/spyInformation/spyInformation`, spyInformation[i].id)
+            await deleteDoc(theRef)
+
+        }
+        clearNeedlessData();
+        await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "dayCounter", "dayCounter", "dayCounter"), { currentDay: 1 })
+        await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "padeiraHeals", "padeiraHeals", "padeiraHeals"), { healCountMax: 4 });
+        await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "weaponChoice", "weaponChoice", "weaponChoice"), { weapon: "none" });
+
+        
         navigateToNight('/playerlist')
     }
     const clearNeedlessData = () => {
@@ -213,8 +328,13 @@ const [statusAfliction, setStatusAfliction] = useState([]);
         const markClear = statusAfliction.filter(status => {return status.status === 'marcado'})
         const motivateClear = statusAfliction.filter(status => { return status.status === 'motivado' })
         const parasiteClear = statusAfliction.filter(status => { return status.status === 'parasita' })
+        const chantagemClear = statusAfliction.filter(status => { return status.status === 'chantageado' })
         for (let p = 0; p < bombClear.length; p++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, bombClear[p].id)
+            deleteDoc(theRef)
+        }
+        for (let p = 0; p < chantagemClear.length; p++) {
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, chantagemClear[p].id)
             deleteDoc(theRef)
         }
         for (let p = 0; p < markClear.length; p++) {
@@ -229,6 +349,21 @@ const [statusAfliction, setStatusAfliction] = useState([]);
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/announcements/announcements`, announcements[i].id)
             deleteDoc(theRef);
         }
+        for (let i = 0; i < allPublicEvents.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/publicEvents/publicEvents`, allPublicEvents[i].id)
+            deleteDoc(theRef)
+
+        }
+        for (let i = 0; i < armadilheiroInformation.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/armadilheiroInformation/armadilheiroInformation`, armadilheiroInformation[i].id)
+            deleteDoc(theRef)
+
+        }
+        for (let i = 0; i < spyInformation.length; i++){
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/spyInformation/spyInformation`, spyInformation[i].id)
+            deleteDoc(theRef)
+
+        }
         if (currentDay > 4) {
             for (let p = 0; p < parasiteClear.length; p++) {
                 const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, parasiteClear[p].id)
@@ -236,19 +371,59 @@ const [statusAfliction, setStatusAfliction] = useState([]);
             }
         }
     }
+    const explodeBomb = () => {
+        for (let i = 0; i < statusAfliction.length; i++) {
 
+            if (statusAfliction[i].status === 'bomba') {
+                let num = Math.random();
+                const targetted = alivePlayers.filter(target => { return target.playerName === statusAfliction[i].target })
+                
+                if (num < 0.6) {
+                    playBombSound();
+                    setTimeout(() => {
+                        updateDoc(doc(database, "playeradmin", "players", user.email, targetted[0].id), { life: "dead" })
+                    }, 7000);
+
+                } else {
+                    playFizzleSound();
+                }
+                const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusAfliction[i].id)
+                deleteDoc(theRef)
+                return;
+            }
+        }
+    }
+    const explodeMark = () => {
+        for (let i = 0; i < statusAfliction.length; i++) {
+            if (statusAfliction[i].status === 'marcado') {
+                const targetted = alivePlayers.filter(target => { return target.playerName === statusAfliction[i].target })
+
+                playGunSound();
+                updateDoc(doc(database, "playeradmin", "players", user.email, targetted[0].id), { life: "dead"})
+                const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusAfliction[i].id)
+                deleteDoc(theRef)
+                return;
+            }
+        }
+    }
     const startNight = () => {
         clearNeedlessData();
         navigateToNight('/night');
     }
+    const killPlayer = () => {
+        playmorteSound();
+        const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
+        updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead" })
 
+    }
     return (
         // The day has to set all the player actions as pending
         <div className="day">
+
             <h3 className="page-title">
                 Dia {currentDay}
             </h3>
-            <button className="button" onClick={endGameCompletely}>Encerrar Jogo</button>
+
             <div className="dayMain">
                 <div className="event-ocurrence event">
                         <h4>
@@ -259,33 +434,58 @@ const [statusAfliction, setStatusAfliction] = useState([]);
                             <p key={announcement.key}>
                                 {announcement.killedPlayer} morreu. Quem o matou foi: {announcement.attackerRole}. Sua função era {announcement.killedPlayerRole}.
                             </p>
+                        
+                        ))}
+                        {allPublicEvents.map((event) => (
+                            <p key={event.key}>
+                                {event.target} está/tem: {event.event}
+                            </p>
+                        ))}
+                        {armadilheiroInformation.map((info) => (
+                            <p key={info.key}>Armadilha ativada: {info.role} visitou seu alvo!</p>
+                        ))}
+                        {spyInformation.map((info) => (
+                            <p key={info.key}>Espião: Seu Alvo visitou: {info.visited}!</p>
                         ))}
                         </div>
                 </div>
 
-                <div className="event-aliveplayers event">
-                        <h4>
-                        Jogadores Vivos
-                        </h4>
-                    <div className="small-container card-border scrollable">
-                    {alivePlayers.map((player) => (
-                                        <p key={player.key + '2'}>
-                            {player.playerName} - {player.role}
-                                        </p>
-                                    ))}
-                        </div>
-                </div>
+
                 <div className="event-hiddenocurrence event">
                         <h4>
                         Ações da Noite
                         </h4>
-                    <div className="small-container card-border scrollable">
+                    <div className="card-border scrollable event-hiddenocurrence-inner">
                         {visitAction.map((visit) => (
                             <p key={visit.key}>
                                 {visit.visitor} visitou {visit.target}
                         </p>
                     ))}    
                     </div>
+                </div>
+                <div className="event-status event">
+                        <h4>
+                        Status
+                        </h4>
+                    <div className="large-container card-border scrollable">
+                    {statusAfliction.map((player) => (
+                                        <p key={player.key + '4'}>
+                            {player.target} - {player.status}
+                                        </p>
+                                    ))}
+                        </div>
+                </div>
+                <div className="event-aliveplayers event">
+                        <h4>
+                        Jogadores Vivos
+                        </h4>
+                    <div className="large-container card-border scrollable">
+                    {alivePlayers.map((player) => (
+                                        <p key={player.key + '2'}>
+                            {player.playerName} - {player.role}
+                                        </p>
+                                    ))}
+                        </div>
                 </div>
                 <div className="event-death event">
                         <h4>
@@ -299,35 +499,32 @@ const [statusAfliction, setStatusAfliction] = useState([]);
                                     ))}
                     </div>
                 </div>
-                <div className="event-status event">
-                        <h4>
-                        Status
-                        </h4>
-                    <div className="small-container card-border scrollable">
-                    {statusAfliction.map((player) => (
-                                        <option key={player.key}>
-                            {player.target} - {player.status}
-                                        </option>
-                                    ))}
-                        </div>
-                </div>
+
+
+
                 <div className="event-killplayer event">
-                        <h4>
-                        Matar Jogador
-                        </h4>
-                    <div className="small-container event-killplayer-inner">
+                    <div className="event-killplayer-inner">
                         <h4>Nome:</h4>
-                        <select name="playerName" id="playerName">
-                            <option value="selena">SelenaGomez</option>
+                        <select name="playerName" id="playerName" value={playerKilling} onChange={(e) => setPlayerKilling(e.target.value)}>
+                            <option value="" defaultValue disabled hidden></option>
+                            {alivePlayers.map(player => (
+                                <option key={player.key}>{player.playerName}</option>
+                            ))}
                         </select>
-                        <button className="button">Matar Jogador</button>
+                        <button className="button" onClick={killPlayer}>Matar Jogador</button>
+                        <button type="button" onClick={playJulgamentoSound} className="button">Iniciar Julgamento</button>
                         <button type="button" onClick={startNight} className="button">Começar Noite</button>
+                        <button className="button" onClick={endGameCompletely}>Encerrar Jogo</button>
+                        <button className="button" onClick={explodeBomb}>Bomba do Palhaço</button>
+                        <button className="button" onClick={explodeMark}>Atirar na Marca</button>
 
                     </div>
+
                 </div>
-
+                                
             </div>
-
+            <div className="upper-page-area">
+            </div>
         </div>
     )
 }

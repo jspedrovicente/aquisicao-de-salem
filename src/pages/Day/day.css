@@ -17,7 +17,7 @@
 
 .dayMain{
     display: grid;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
     grid-template-columns: 2fr 1fr 1fr;
     justify-items: center;    
     justify-content: center;
@@ -31,7 +31,37 @@
     flex-direction: column;
     align-items: center;
 }
+.event-aliveplayers{
+    grid-row: 2/3;
+}
+.event-death{
+    grid-row: 3/4;
 
+}
 .event{
     margin-top: 20px;
+}
+
+.upper-page-area{
+    display: flex;
+    align-items: center;
+}
+.event-killplayer{
+    grid-column: 3/4;
+    grid-row: 2/4;
+}
+.event-hiddenocurrence{
+    grid-row: 2/4;
+    grid-column: 2/3;
+
+}
+.event-hiddenocurrence-inner{
+    width: 200px;
+    height: 350px;
+}
+.event-status{
+    grid-column: 2/4;
+}
+p{
+    margin-left: 10px;
 }
