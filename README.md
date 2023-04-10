@@ -1,5 +1,5 @@
 This project is currently being worked on!
-Last update: 08/03/2023
+Last update: 29/03/2023
 
 
 
@@ -9,6 +9,25 @@ So this project is actually an administrative panel for use in a card game that 
 
 With this administrative panel, there is about 10 pages:
 
+
+MUST FINISH:
+Create a new way to handle mafia kills ()
+Check if there is anything that is not being processed properly for night events ()
+Finish Coven (done)
+Finish Mafia (done)
+Finish All attacking characters (done) 
+Finish vigilante suicide (done)
+Finish Event Cards (done)
+Finish All Neutral cards (done)
+
+Optional Ideas:
+Implement Audio for All the characters (7/39 done)
+Impletement Audio for Night ()
+Impletement Audio for Day ()
+Implement Audio for Clown bomb (done)
+implement Audio for Marksman shot (done)
+implement Expansion "CAVALEIROS DO APOCALIPSE" (probably NOT going to do)
+
 Login page (done)
 Register Page (done)
 Tutorial Page (working on)
@@ -16,6 +35,8 @@ PlayerList Page (done)
 PlayerRole Page (done)
 Day Page (working on)
 Night Page (working on)
+
+OPTIONAL:
 Victory Page (not started)
 
 The idea of the game is applied in real life.
