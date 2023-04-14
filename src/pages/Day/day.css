@@ -65,3 +65,28 @@
 p{
     margin-left: 10px;
 }
+.visitPlace, .announcePlace, .statusPlace, .statusAflictions, .armadilhaPlace{
+    display: flex;
+    flex-wrap: wrap;
+}
+.visitPlace-visitee, .statusPlace-player, .announcePlace-announce, .statusAfliction-player, .armadilhaPlace-visitor{
+    color: #f0f378;
+}
+.announcePlace-function, .statusPlace-evento, .statusAfliction-evento{
+    color: rgb(225, 146, 0)
+}
+.visitPlace-visited, .announcePlace-killer{
+    color: rgb(206, 4, 4);
+}
+.townies{
+    color: rgb(8, 196, 8);
+}
+.mafiaies{
+    color: rgb(222, 6, 6);
+}
+.covenies{
+    color: rgb(4, 4, 188);
+}
+.neutraies{
+    color: rgb(135, 135, 142);
+}

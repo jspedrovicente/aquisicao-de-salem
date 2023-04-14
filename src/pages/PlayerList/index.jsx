@@ -50,6 +50,7 @@ const PlayerList = () => {
             })
         }
     }
+
     console.log(playerList)
 
     return (

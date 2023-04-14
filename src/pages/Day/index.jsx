@@ -10,6 +10,7 @@ import morteSound from "../../assets/morte-soundeffect.mp3"
 import bombFizzle from "../../assets/bomb fizzle effect.mp3"
 import bombBoom from "../../assets/bomb effect.mp3"
 import gunSound from "../../assets/gun shot effect.mp3"
+import arrowSVG from "../../assets/svgs/arrow-svg.svg"
 
 
 const Day = () => {
@@ -25,6 +26,10 @@ const [user, setUser] = useState([]);
 const [players, setPlayers] = useState([]);
 const [alivePlayers, setAlivePlayers] = useState([]);
 const [deadPlayers, setDeadPlayers] = useState([]);
+const [townies, setTownies] = useState([]);
+const [mafiaies, setMafiaies] = useState([]);
+const [covenies, setCovenies] = useState([]);
+const [neutraies, setNeutraies] = useState([]);
 const [townRole, setTownRole] = useState([]);
 const [covenRole, setCovenRole] = useState([]);
 const [mafiaRole, setMafiaRole] = useState([]);
@@ -81,6 +86,11 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                 setPlayers(list);
                 setAlivePlayers(list.sort((a, b) => a.wakeOrder - b.wakeOrder).filter(player => player.life.includes("alive")))
                 setDeadPlayers(list.sort((a, b) => a.wakeOrder - b.wakeOrder).filter(player => player.life.includes("dead")))
+                setTownies(list.filter(player => player.filliation === 'town'))
+                setCovenies(list.filter(player => player.filliation === 'coven'))
+                setMafiaies(list.filter(player => player.filliation === 'mafia'))
+                setNeutraies(list.filter(player => player.filliation === 'neutral'))
+                console.log(townies)
             })
             const townSnapshot = onSnapshot(collection(database, "gamedata/roles/town"), (snapshot) => {
                 let roles = [];
@@ -431,21 +441,27 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                         </h4>
                     <div className="large-container card-border scrollable">
                         {announcements.map((announcement) => (
-                            <p key={announcement.key}>
-                                {announcement.killedPlayer} morreu. Quem o matou foi: {announcement.attackerRole}. Sua função era {announcement.killedPlayerRole}.
-                            </p>
-                        
+                            <span key={announcement.key} className="announcePlace">
+                                <p className="announcePlace-announce"> {announcement.killedPlayer} morreu</p>
+                                <p className="announcePlace-function"> Função: {announcement.killedPlayerRole}</p>
+                                <p className="announcePlace-killer"> Ataque: {announcement.attackerRole}</p>
+                            </span>
                         ))}
                         {allPublicEvents.map((event) => (
-                            <p key={event.key}>
-                                {event.target} está/tem: {event.event}
-                            </p>
+                            <span className="statusPlace" key={event.key}>
+                                <p className="statusPlace-player">{event.target}</p>
+                                <p className="statusPlace-estado">tem o efeito</p>
+                                <p className="statusPlace-evento">{event.event}</p>
+                            </span>
                         ))}
                         {armadilheiroInformation.map((info) => (
-                            <p key={info.key}>Armadilha ativada: {info.role} visitou seu alvo!</p>
+                            <span key={info.key} className="armadilhaPlace">
+                                <p className="armadilhaPlace-visitor">{info.role}</p>
+                                <p className="armadilhaPlace-text">ativou a armadilha!</p>
+                            </span>
                         ))}
                         {spyInformation.map((info) => (
-                            <p key={info.key}>Espião: Seu Alvo visitou: {info.visited}!</p>
+                            <p key={info.key}>O Espião percebeu que seu alvo visitou {info.visited}!</p>
                         ))}
                         </div>
                 </div>
@@ -457,9 +473,11 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                         </h4>
                     <div className="card-border scrollable event-hiddenocurrence-inner">
                         {visitAction.map((visit) => (
-                            <p key={visit.key}>
-                                {visit.visitor} visitou {visit.target}
-                        </p>
+                            <span className="visitPlace" key={visit.key}>
+                            <p className="visitPlace-visitee">{visit.visitor}</p>
+                            <p>V</p>
+                            <p className="visitPlace-visited">{visit.target}</p>
+                            </span>
                     ))}    
                     </div>
                 </div>
@@ -468,23 +486,33 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                         Status
                         </h4>
                     <div className="large-container card-border scrollable">
-                    {statusAfliction.map((player) => (
-                                        <p key={player.key + '4'}>
-                            {player.target} - {player.status}
-                                        </p>
-                                    ))}
-                        </div>
+
+                        {statusAfliction.map((player) => (
+                            <span key={player.key + '4'} className="statusAflictions">
+                                <p className="statusAfliction-player">{player.target}</p>
+                                <p className="statusAfliction-estado">tem o efeito</p>
+                                <p className="statusAfliction-evento">{player.status} </p>
+                            </span>
+                        ))}
+                    </div>
                 </div>
                 <div className="event-aliveplayers event">
                         <h4>
                         Jogadores Vivos
                         </h4>
                     <div className="large-container card-border scrollable">
-                    {alivePlayers.map((player) => (
-                                        <p key={player.key + '2'}>
-                            {player.playerName} - {player.role}
-                                        </p>
-                                    ))}
+                        {townies.map((player => (
+                            <p className="townies" key={player.key}> {player.playerName} - {player.role}</p>
+                        )))}
+                        {covenies.map((player => (
+                            <p className="covenies" key={player.key}> {player.playerName} - {player.role}</p>
+                        )))}
+                        {mafiaies.map((player => (
+                            <p className="mafiaies" key={player.key}> {player.playerName} - {player.role}</p>
+                        )))}
+                        {neutraies.map((player => (
+                            <p className="neutraies" key={player.key}> {player.playerName} - {player.role}</p>
+                        )))}
                         </div>
                 </div>
                 <div className="event-death event">

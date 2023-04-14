@@ -143,7 +143,7 @@ const PlayerRole = () => {
                 await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 35})
                     return;
                 }
-                if ( currentRole === "coveiro" || currentRole === "sobrevivente" || currentRole === "estranho" || currentRole === "prefeito" || currentRole === "bobo da corte") {
+                if ( currentRole === "coveiro" || currentRole === "sobrevivente" || currentRole === "estranho" || currentRole === "prefeito" || currentRole === "bobo da corte" || currentRole === "cidadao") {
                 await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 150})
                     return;
                 }

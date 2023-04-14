@@ -6,7 +6,7 @@ const Form = (props) => {
     return (
         <label>{label}
         
-        <input type={type} value={state} onChange={(e) => props.changeState(e.target.value)}  />
+        <input id="playerNameAdd" type={type} value={state} onChange={(e) => props.changeState(e.target.value)}  />
         </label>
     )
 }
