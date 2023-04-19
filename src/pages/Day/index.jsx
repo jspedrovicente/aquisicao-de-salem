@@ -1,5 +1,4 @@
 import "./day.css"
-import ButtonLink from "../../components/ButtonLink"
 import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { database } from "../../firebaseConnection";
@@ -10,9 +9,10 @@ import morteSound from "../../assets/morte-soundeffect.mp3"
 import bombFizzle from "../../assets/bomb fizzle effect.mp3"
 import bombBoom from "../../assets/bomb effect.mp3"
 import gunSound from "../../assets/gun shot effect.mp3"
-import arrowSVG from "../../assets/svgs/arrow-svg.svg"
-
-
+import dayMusic from "../../assets/daysounds/daymusic.mp3"
+import roosterEffect from "../../assets/daysounds/rooster-soundeffect.mp3"
+import deadEffectMusic from "../../assets/daysounds/sadDeathMusic.mp3"
+import cancelEffectMusic from "../../assets/daysounds/cancelDeathMusic.mp3"
 const Day = () => {
 
 // sound effects
@@ -21,6 +21,10 @@ const [playFizzleSound] = useSound(bombFizzle);
 const [playBombSound] = useSound(bombBoom);
 const [playmorteSound] = useSound(morteSound);
 const [playGunSound] = useSound(gunSound);
+const [playDayMusic, { stop: stopDayMusic }] = useSound(dayMusic);
+const [playRoosterSound] = useSound(roosterEffect);
+const [playDeadEffectMusic, {stop: stopDeadEffectMusic}] = useSound(deadEffectMusic, {volume: 0.60});
+const [playCancelEffectMusic] = useSound(cancelEffectMusic);
     
 const [user, setUser] = useState([]);
 const [players, setPlayers] = useState([]);
@@ -90,7 +94,6 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                 setCovenies(list.filter(player => player.filliation === 'coven'))
                 setMafiaies(list.filter(player => player.filliation === 'mafia'))
                 setNeutraies(list.filter(player => player.filliation === 'neutral'))
-                console.log(townies)
             })
             const townSnapshot = onSnapshot(collection(database, "gamedata/roles/town"), (snapshot) => {
                 let roles = [];
@@ -320,6 +323,8 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
 
         }
         clearNeedlessData();
+        stopDayMusic();
+
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "dayCounter", "dayCounter", "dayCounter"), { currentDay: 1 })
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "padeiraHeals", "padeiraHeals", "padeiraHeals"), { healCountMax: 4 });
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "weaponChoice", "weaponChoice", "weaponChoice"), { weapon: "none" });
@@ -418,13 +423,39 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
     }
     const startNight = () => {
         clearNeedlessData();
+        stopDayMusic();
         navigateToNight('/night');
     }
+    const startDay = () => {
+        playRoosterSound();
+        setTimeout(() => {
+            playDayMusic();
+
+        }, 3000);
+    }
+    const judgement = () => {
+        playJulgamentoSound();
+        stopDayMusic();
+        setTimeout(() => {
+            playDeadEffectMusic()
+        }, 16000)
+    }
     const killPlayer = () => {
+        stopDayMusic();
         playmorteSound();
         const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
-        updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead" })
-
+        updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead", filliation: "none" })
+        setTimeout(() => {
+            stopDeadEffectMusic();
+            playDayMusic();
+        }, 12000);
+    }
+    const savePlayer = () => {
+        playCancelEffectMusic();
+        stopDeadEffectMusic();
+        setTimeout(() => {
+            playDayMusic();
+        }, 2000);
     }
     return (
         // The day has to set all the player actions as pending
@@ -501,17 +532,8 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                         Jogadores Vivos
                         </h4>
                     <div className="large-container card-border scrollable">
-                        {townies.map((player => (
-                            <p className="townies" key={player.key}> {player.playerName} - {player.role}</p>
-                        )))}
-                        {covenies.map((player => (
-                            <p className="covenies" key={player.key}> {player.playerName} - {player.role}</p>
-                        )))}
-                        {mafiaies.map((player => (
-                            <p className="mafiaies" key={player.key}> {player.playerName} - {player.role}</p>
-                        )))}
-                        {neutraies.map((player => (
-                            <p className="neutraies" key={player.key}> {player.playerName} - {player.role}</p>
+                        {alivePlayers.map((player => (
+                            <p key={player.key}> {player.playerName} - {player.role}</p>
                         )))}
                         </div>
                 </div>
@@ -532,6 +554,7 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
 
                 <div className="event-killplayer event">
                     <div className="event-killplayer-inner">
+                            <button type="button" onClick={startDay} className="button">Começar DIA!</button>
                         <h4>Nome:</h4>
                         <select name="playerName" id="playerName" value={playerKilling} onChange={(e) => setPlayerKilling(e.target.value)}>
                             <option value="" defaultValue disabled hidden></option>
@@ -540,7 +563,8 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                             ))}
                         </select>
                         <button className="button" onClick={killPlayer}>Matar Jogador</button>
-                        <button type="button" onClick={playJulgamentoSound} className="button">Iniciar Julgamento</button>
+                        <button type="button" onClick={judgement} className="button">Iniciar Julgamento</button>
+                        <button type="button" onClick={savePlayer} className="button">Cancelar julgamento </button>
                         <button type="button" onClick={startNight} className="button">Começar Noite</button>
                         <button className="button" onClick={endGameCompletely}>Encerrar Jogo</button>
                         <button className="button" onClick={explodeBomb}>Bomba do Palhaço</button>

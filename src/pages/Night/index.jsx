@@ -32,6 +32,8 @@ import parasitaEffect from "../../assets/parasita-soundeffect.mp3"
 import amaldicoadoraEffect from "../../assets/amaldicoadora-soundeffect.mp3"
 import parasitaGrimorioEffect from "../../assets/parasita-grimorio-soundeffect.mp3"
 import grimorioEffect from "../../assets/coven-grimorio-presente.mp3"
+import procuradoraEffect from "../../assets/procuradora-soundeffect.mp3"
+import pesquisadorEffect from "../../assets/pesquisador-soundeffect.mp3"
 import werewolfPresentEffect from "../../assets/werewolf-present-soundeffect.mp3"
 import afilhadoEffect from "../../assets/afilhado-soundeffect.mp3"
 import godfatherEffect from "../../assets/godfather-soundeffect.mp3"
@@ -59,14 +61,14 @@ import nightmusic8 from "../../assets/nightsounds/nightmusic/nightmusic8.mp3"
 // SET THE Function wakeup ORDER IN FIREBASE FOR EACH CHARACTER, REMEMBER MERETRIZ IS FIRST IF THE EXECUTOR HAS ALREADY MADE HIS DECISION
 const Night = () => {
     // SoundEffects for all the characters;
-    const [playNightSound1, { stop: stopNightSound1 }] = useSound(nightmusic1, {volume: 0.50});
-    const [playNightSound2, { stop: stopNightSound2 }] = useSound(nightmusic2, {volume: 0.50});
-    const [playNightSound3, { stop: stopNightSound3 }] = useSound(nightmusic3, {volume: 0.50});
-    const [playNightSound4, { stop: stopNightSound4 }] = useSound(nightmusic4, {volume: 0.50});
-    const [playNightSound5, { stop: stopNightSound5 }] = useSound(nightmusic5, {volume: 0.50});
-    const [playNightSound6, { stop: stopNightSound6 }] = useSound(nightmusic6, {volume: 0.50});
-    const [playNightSound7, { stop: stopNightSound7 }] = useSound(nightmusic7, {volume: 0.50});
-    const [playNightSound8, { stop: stopNightSound8 }] = useSound(nightmusic8, {volume: 0.50});
+    const [playNightSound1, { stop: stopNightSound1 }] = useSound(nightmusic1, {volume: 0.45});
+    const [playNightSound2, { stop: stopNightSound2 }] = useSound(nightmusic2, {volume: 0.45});
+    const [playNightSound3, { stop: stopNightSound3 }] = useSound(nightmusic3, {volume: 0.45});
+    const [playNightSound4, { stop: stopNightSound4 }] = useSound(nightmusic4, {volume: 0.45});
+    const [playNightSound5, { stop: stopNightSound5 }] = useSound(nightmusic5, {volume: 0.45});
+    const [playNightSound6, { stop: stopNightSound6 }] = useSound(nightmusic6, {volume: 0.45});
+    const [playNightSound7, { stop: stopNightSound7 }] = useSound(nightmusic7, {volume: 0.45});
+    const [playNightSound8, { stop: stopNightSound8 }] = useSound(nightmusic8, {volume: 0.45});
     const [playBardoSound] = useSound(harpEffect, {volume: 0.50});
     const [playAssassinoEmSerieSound] = useSound(assassinoemserieEffect);
     const [playArsonistaSound] = useSound(arsonistaEffect);
@@ -86,6 +88,8 @@ const Night = () => {
     const [playPadeiraSound] = useSound(padeiraEffect);
     const [playMedicoDaPesteSound] = useSound(medicodapesteEffect);
     const [playLobisomenSound] = useSound(lobisomenEffect);
+    const [playProcuradoraEffect] = useSound(procuradoraEffect);
+    const [playPesquisadorEffect] = useSound(pesquisadorEffect);
     const [playFeiticeiraSound] = useSound(feiticeirabenevolenteEffect);
     const [playFeiticeiraGrimorioSound] = useSound(feiticeirabenevolenteGrimorioEffect);
     const [playCurandeiraSound] = useSound(curandeiraEffect);
@@ -101,13 +105,13 @@ const Night = () => {
     const [playConselheiraSound] = useSound(conselheiraEffect);
     const [playVigaristaSound] = useSound(vigaristaEffect);
     const [playthunder1] = useSound(thunder1, { volume: 0.50});
-    const [playthunder2] = useSound(thunder2);
+    const [playthunder2] = useSound(thunder2, { volume: 0.50});
     const [playowlhoot] = useSound(owlHoot, { volume: 0.50});
     const [playdog1] = useSound(dog1);
-    const [playwind1] = useSound(howlingwind1);
-    const [playscream1] = useSound(demonicscream1, { volume: 0.50});
+    const [playwind1] = useSound(howlingwind1, { volume: 0.50});
+    const [playscream1] = useSound(demonicscream1, { volume: 0.30});
     const [playfootstep1] = useSound(footstep1);
-    const [playscaryVoice] = useSound(scaryvoice1);
+    const [playscaryVoice] = useSound(scaryvoice1, { volume: 0.50});
 
     const [user, setUser] = useState([]);
     const [players, setPlayers] = useState([]);
@@ -820,7 +824,7 @@ const Night = () => {
                     break;
             case 'pesquisador':
                 writePlayerInformation();
-                playInvestigadorSound();
+                playPesquisadorEffect();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -842,7 +846,7 @@ const Night = () => {
                     break;
             case 'procurador':
                 writePlayerInformation();
-                playXerifeSound();
+                playProcuradoraEffect();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
