@@ -21,12 +21,12 @@ Finish Event Cards (done)
 Finish All Neutral cards (done)
 
 Optional Ideas:
-Implement Audio for All the characters (7/39 done)
-Impletement Audio for Night ()
-Impletement Audio for Day ()
+Implement Audio for All the characters (done)
+Impletement Audio for Night (done)
+Impletement Audio for Day (done)
 Implement Audio for Clown bomb (done)
 implement Audio for Marksman shot (done)
-implement Expansion "CAVALEIROS DO APOCALIPSE" (probably NOT going to do)
+implement Expansion "CAVALEIROS DO APOCALIPSE" ()
 
 Login page (done)
 Register Page (done)
