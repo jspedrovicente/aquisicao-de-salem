@@ -1,57 +1,125 @@
-This project is currently being worked on!
-Last update: 19/04/2023
+# A Aquisição de Salem:
+
+A card-game created by me based on "Cidade Dorme" a childhood game where someone in a group of people is the killer and Town of Salem, a PC game with similar mechanics.
+
+So the card-game itself can be played without any of the online platforms, however, when the game has over 10 players, it starts to become a little overwhelming for whoever is monitoring the game. So I have applied this game over 20 times in different groups of people, and every single time it has been very successful, so the idea is to make it very easy to pick up and just play with your friends.
+
+## Story:
+So the game revolves around the late 1600s, where the salem witch trials occured.
+The townsfolk are trying as hard as they can to lynch every single one of the evil doers, which involves the neutral classes and the evil classes.
+
+## V.2.0 Changes:
+### New Characters :
+ - [ ] Fome
+ - [ ] Guerra
+ - [ ] Morte
+ - [ ] Peste
+ - [ ] Taberneiro
+ - [ ] Fuxiqueira
+
+### REMOVE Characters :
+ - [ ] Carteiro
+ - [ ] Coveiro?
+ - [ ] Xamã
+ - [ ] Pesquisador
+ - [ ] Procuradora
+
+### Rework Characters :
+- [ ] Armadilheiro (small)
+- [ ] Grimorio/Coven (medium)
+- [ ] Mafia in general (small)
+- [ ] Medium (large)
+### Buff Characters :
+ - [ ] Vigarista
+ - [ ] Bardo
+ - [ ] Medium
+ - [ ] Palhaço
+### Nerf Characters :
+ - [ ] Curandeira
+ - [ ] Town in general
+### Bug Fixes:
+ - [ ] Zelador needs to target only the mafia target
+ - [ ] Music playtime
+ - [ ] New music playing feature
+ - [ ] Fix opening page
+ - [ ] DONT ALLOW mafia/Coven picks
+ - [ ] Make the input reset so it doesn't allow confirmation without a target
+### New Feature:
+- [ ] Randomizer button for easier game playthroughs
+- [ ] Action limiter (Investigador, Padeira)
+- [ ] Mobile friedly <3
+- [ ] new MODAL for announcements to prohibit foul admin play.
+### Remove Features :
+ - [ ] Whisper
+ - [ ] Randomly generated sound between track 
 
 
+So these features are what I expect to have finished by the end of June!
+--------------------------------------------------------
+##  V.1.0 Implementations:
 
-Jist of it:
--
-So this project is actually an administrative panel for use in a card game that I created that follows similar logic to the town of salem game.
+### Characters :
+(These characters were created, if the checkbox is checked it's because they were working for the release)
+ - [ ] Fome
+ - [ ] Guerra
+ - [ ] Morte
+ - [ ] Peste
+ - [x] Armadilheiro
+ - [x] Bardo
+ - [x] Carteiro
+ - [x] Cidadão
+ - [x] Coveiro
+ - [x] Curandeira
+ - [x] Espião
+ - [x] Estranho
+ - [x] Ferreiro
+ - [x] Guardião
+ - [x] Investigador
+ - [x] Medium
+ - [x] Meretriz
+ - [x] Padeira
+ - [x] Pesquisador
+ - [x] Prefeito
+ - [x] Procurador
+ - [x] Sobrevivente
+ - [x] Veterano
+ - [x] Vigilante
+ - [x] Xamã
+ - [x] Xerife
+ - [x] Almadiçoadora
+ - [x] Feiticeira Benevolente
+ - [x] Miragem
+ - [x] Parasita
+ - [x] Afilhado
+ - [x] Conselheira
+ - [x] Godfather
+ - [x] Vigarista
+ - [x] Zelador
+ - [x] Arsonista
+ - [x] Assassino em Serie
+ - [x] Bobo da Corte
+ - [x] Executor
+ - [x] Lobisomen
+ - [x] Medico da Peste
+ - [x] Palhaço
+ - [x] Pistoleiro
 
-With this administrative panel, there is about 10 pages:
-
-
-MUST FINISH:
-Create a new way to handle mafia kills ()
-Check if there is anything that is not being processed properly for night events ()
-Finish Coven (done)
-Finish Mafia (done)
-Finish All attacking characters (done) 
-Finish vigilante suicide (done)
-Finish Event Cards (done)
-Finish All Neutral cards (done)
-
-Optional Ideas:
-Implement Audio for All the characters (done)
-Impletement Audio for Night (done)
-Impletement Audio for Day (done)
-Implement Audio for Clown bomb (done)
-implement Audio for Marksman shot (done)
-implement Expansion "CAVALEIROS DO APOCALIPSE" ()
-
-Login page (done)
-Register Page (done)
-Tutorial Page (working on)
-PlayerList Page (done)
-PlayerRole Page (done)
-Day Page (working on)
-Night Page (working on)
-
-OPTIONAL:
-Victory Page (not started)
-
-The idea of the game is applied in real life.
-I recommend about 8-25 players for the gameplay, the more players, the more complex the game gets and more fun.
-
-When I created the card game, I did not intend to have a platform, but every single time I played the game, the amount of people that were interested in participating increased and I realized that doing it all manually on a piece of paper wasn't going to cut it anymore. So since I had gotten into programming a couple of years after version 1.0 was created, I decided to implement a platform for the panel.
-
-V1.0 does not have a platform
-v2.0 does not have a platform
-V3.0 does Have a platform. (written in raw HTML, CSS, JS) - A lot of it has to be watched for manually and one of the characters caused a bug.
-V4.0 is what this platform is going to be used for.
-
-This is written in ReactJs!
-
-I'll get into more intricate details on how the card game works in the future as soon as the platform is ready to be used.
-The game has plans of being released later in the future so watch out for that :)!
-
-
+### Features:
+- [x] Log-in Page
+- [x] Sign-up Page
+- [x] Character Page
+- [x] Player Page
+- [x] Day Page
+- [x] Night Page
+- [ ] Victory Page
+- [ ] Tutorial Page
+- [x] Whisper Mechanic
+- [ ] Automated actions
+- [x] Visually Compact
+- [ ] 100% autonomous
+- [x] Audio for All the characters
+- [x] Audio for Night
+- [x] Audio for Day
+- [x] Implement Audio for Clown bomb
+- [x] implement Audio for Pistoleiro shot
+- [ ] implement Expansion "CAVALEIROS DO APOCALIPSE"
