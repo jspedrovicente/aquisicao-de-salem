@@ -18,8 +18,8 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
  - [ ] Fuxiqueira
 
 ### REMOVE Characters :
- - [ ] Carteiro
- - [ ] Coveiro?
+ - [x] Carteiro
+ - [x] Coveiro
  - [ ] Xamã
  - [ ] Pesquisador
  - [ ] Procuradora
@@ -49,9 +49,10 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 - [ ] Action limiter (Investigador, Padeira)
 - [ ] Mobile friedly <3
 - [ ] new MODAL for announcements to prohibit foul admin play.
+- [x] new MODAL for nightly preparations
 ### Remove Features :
- - [ ] Whisper
- - [ ] Randomly generated sound between track 
+ - [x] Whisper
+ - [x] Randomly generated sound between track 
 
 
 So these features are what I expect to have finished by the end of June!
