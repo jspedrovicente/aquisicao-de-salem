@@ -48,8 +48,13 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 - [ ] Randomizer button for easier game playthroughs
 - [ ] Action limiter (Investigador, Padeira)
 - [ ] Mobile friedly <3
-- [ ] new MODAL for announcements to prohibit foul admin play.
+- [x] new MODAL for announcements to prohibit foul admin play.
 - [x] new MODAL for nightly preparations
+- [x] new Judgement Modal for cleaner view
+- [x] new button for pistoleiro kills
+- [x] new button for clown kills
+- [x] new Admin Panel Modal
+- [ ] 
 ### Remove Features :
  - [x] Whisper
  - [x] Randomly generated sound between track 
