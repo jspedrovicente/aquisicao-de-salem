@@ -3,6 +3,8 @@ import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc } fro
 import { useEffect, useState } from "react";
 import { database } from "../../firebaseConnection";
 import { useNavigate } from "react-router-dom";
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 import "./night.css"
 import useSound from "use-sound";
 import harpEffect from "../../assets/bardo-soundeffect.mp3"
@@ -10,7 +12,6 @@ import assassinoemserieEffect from "../../assets/assassinoemserie-soundeffect.mp
 import arsonistaEffect from "../../assets/arsonista-soundeffect.mp3"
 import armadilheiroEffect from "../../assets/armadilheiro-soundeffect.mp3"
 import meretrizEffect from "../../assets/meretriz-soundeffect.mp3"
-import carteiroEffect from "../../assets/carteiro-soundeffect.mp3"
 import ferreiroEffect from "../../assets/ferreiro-soundeffect.mp3"
 import xerifeEffect from "../../assets/xerife-soundeffect.mp3"
 import pistoleiroEffect from "../../assets/pistoleiro-soundeffect.mp3"
@@ -32,23 +33,13 @@ import parasitaEffect from "../../assets/parasita-soundeffect.mp3"
 import amaldicoadoraEffect from "../../assets/amaldicoadora-soundeffect.mp3"
 import parasitaGrimorioEffect from "../../assets/parasita-grimorio-soundeffect.mp3"
 import grimorioEffect from "../../assets/coven-grimorio-presente.mp3"
-import procuradoraEffect from "../../assets/procuradora-soundeffect.mp3"
-import pesquisadorEffect from "../../assets/pesquisador-soundeffect.mp3"
+
 import werewolfPresentEffect from "../../assets/werewolf-present-soundeffect.mp3"
 import afilhadoEffect from "../../assets/afilhado-soundeffect.mp3"
 import godfatherEffect from "../../assets/godfather-soundeffect.mp3"
 import zeladorEffect from "../../assets/zelador-soundeffect.mp3"
 import conselheiraEffect from "../../assets/conselheira-soundeffect.mp3"
 import vigaristaEffect from "../../assets/vigarista-soundeffect.mp3"
-import owlHoot from "../../assets/nightsounds/owlhoot-1.mp3"
-import thunder1 from "../../assets/nightsounds/thunder-1.mp3"
-import thunder2 from "../../assets/nightsounds/thunder-2.mp3"
-import nightEffect from "../../assets/nightsounds/nightbackground.mp3"
-import howlingwind1 from "../../assets/nightsounds/howlingwind-1.mp3"
-import dog1 from "../../assets/nightsounds/dog-1.mp3"
-import demonicscream1 from "../../assets/nightsounds/demonicscream-1.mp3"
-import footstep1 from "../../assets/nightsounds/foostep-1.mp3"
-import scaryvoice1 from "../../assets/nightsounds/scary-voice1.mp3"
 import nightmusic1 from "../../assets/nightsounds/nightmusic/nightmusic1.mp3"
 import nightmusic2 from "../../assets/nightsounds/nightmusic/nightmusic2.mp3"
 import nightmusic3 from "../../assets/nightsounds/nightmusic/nightmusic3.mp3"
@@ -73,7 +64,6 @@ const Night = () => {
     const [playAssassinoEmSerieSound] = useSound(assassinoemserieEffect);
     const [playArsonistaSound] = useSound(arsonistaEffect);
     const [playArmadilheiroSound] = useSound(armadilheiroEffect);
-    const [playCarteiroSound] = useSound(carteiroEffect);
     const [playFerreiroSound] = useSound(ferreiroEffect);
     const [playXerifeSound] = useSound(xerifeEffect);
     const [playMeretrizSound] = useSound(meretrizEffect);
@@ -88,8 +78,6 @@ const Night = () => {
     const [playPadeiraSound] = useSound(padeiraEffect);
     const [playMedicoDaPesteSound] = useSound(medicodapesteEffect);
     const [playLobisomenSound] = useSound(lobisomenEffect);
-    const [playProcuradoraEffect] = useSound(procuradoraEffect);
-    const [playPesquisadorEffect] = useSound(pesquisadorEffect);
     const [playFeiticeiraSound] = useSound(feiticeirabenevolenteEffect);
     const [playFeiticeiraGrimorioSound] = useSound(feiticeirabenevolenteGrimorioEffect);
     const [playCurandeiraSound] = useSound(curandeiraEffect);
@@ -104,15 +92,10 @@ const Night = () => {
     const [playZeladorSound] = useSound(zeladorEffect);
     const [playConselheiraSound] = useSound(conselheiraEffect);
     const [playVigaristaSound] = useSound(vigaristaEffect);
-    const [playthunder1] = useSound(thunder1, { volume: 0.50});
-    const [playthunder2] = useSound(thunder2, { volume: 0.50});
-    const [playowlhoot] = useSound(owlHoot, { volume: 0.50});
-    const [playdog1] = useSound(dog1);
-    const [playwind1] = useSound(howlingwind1, { volume: 0.50});
-    const [playscream1] = useSound(demonicscream1, { volume: 0.30});
-    const [playfootstep1] = useSound(footstep1);
-    const [playscaryVoice] = useSound(scaryvoice1, { volume: 0.50});
-
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    const [isOpen, setIsOpen] = useState(true);
+    const [investigativeModal, setInvestigativeModal] = useState(false);
+    const [investigativeInfo, setInvestigativeInfo] = useState('');
     const [user, setUser] = useState([]);
     const [players, setPlayers] = useState([]);
     const [alivePlayers, setAlivePlayers] = useState([]);
@@ -341,38 +324,7 @@ const Night = () => {
         loadRememberedData();
     }, [user.email])
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const num = Math.random();
-            if (num < 0.1 && num > 0.0) {
-                playthunder1();
-            } 
-            if (num < 0.2 && num > 0.1) {
-                playowlhoot();
-            }
-            if (num < 0.3 && num > 0.2) {
-                playthunder2();
-            }
-            if (num < 0.4 && num > 0.3) {
-                playdog1();
-            }
-            if (num < 0.5 && num > 0.4) {
-                playwind1();
-            }
-            if (num < 0.6 && num > 0.5) {
-                playscream1();
-            }
-            if (num < 0.7 && num > 0.6) {
-                playfootstep1();
-            }
-            if (num < 0.8 && num > 0.7) {
-                playscaryVoice();
-            }
-        }, 20000);
-        return () => clearInterval(interval);
-      }, [playthunder1, playowlhoot, playthunder2, playwind1, playdog1, playscream1, playfootstep1, playscaryVoice ]);
-
-    const encerrarNoite = async () => {
+    const interruptMusicPlaying = () => {
         stopNightSound1();
         stopNightSound2();
         stopNightSound3();
@@ -381,6 +333,9 @@ const Night = () => {
         stopNightSound6();
         stopNightSound7();
         stopNightSound8();
+    }
+    const encerrarNoite = async () => {
+        interruptMusicPlaying();
         const dead = [];
         const temporaryStatusAfliction = [];
         const allpublicEvents = [];
@@ -695,6 +650,28 @@ const Night = () => {
         setCurrentPlayerName(currentPlayer.playerName);
         setCurrentPlayerDescription(roledetails[0].skill);
     }
+    const writeInvestigativeAction = () => {
+        setInvestigativeModal(true);
+        const investigatedPlayer = alivePlayers.filter(investigated => investigated.playerName === player)
+        if (alivePlayers[controlCounter - 1].role === 'xerife') {
+            if (investigatedPlayer[0].filliation === 'town' || investigatedPlayer[0].role === 'godfather' || investigatedPlayer[0].role === 'miragem') {
+                setInvestigativeInfo(`Esse jogador é Inocente`)
+            }
+            else {
+                setInvestigativeInfo(`Esse jogador é Suspeito`)
+            }
+        }
+        if (alivePlayers[controlCounter - 1].role === 'investigador') {
+            if (investigatedPlayer[0].role === 'miragem') {
+                setInvestigativeInfo(`Esse jogador é a Meretriz`)
+                
+            } else {
+                setInvestigativeInfo(`Esse jogador é a ${investigatedPlayer[0].role}`)
+            }
+        }
+            
+        }
+
     const wakeUpPlayers = () => {
         if (alivePlayers[controlCounter] != null) {
         openConfirmButton();
@@ -738,28 +715,7 @@ const Night = () => {
                 }
                 incrementCounter();
                 break;
-            case 'carteiro':
-                writePlayerInformation();
-                playCarteiroSound();
-                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
-                    setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
-                    closeConfirmButton();
-                } else {
-                }
-                incrementCounter();
-                break;
             case 'curandeira':
-                writePlayerInformation();
-                playCurandeiraSound();
-                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
-                    setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
-                    closeConfirmButton();
-                } else {
-                    openSingleDropDown();
-                }
-                incrementCounter();
-                break;
-            case 'xama':
                 writePlayerInformation();
                 playCurandeiraSound();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
@@ -822,31 +778,9 @@ const Night = () => {
                 }
                 incrementCounter();
                     break;
-            case 'pesquisador':
-                writePlayerInformation();
-                playPesquisadorEffect();
-                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
-                    setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
-                    closeConfirmButton();
-                } else {
-                    openSingleDropDown();
-                }
-                incrementCounter();
-                    break;
             case 'xerife':
                 writePlayerInformation();
                 playXerifeSound();
-                if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
-                    setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
-                    closeConfirmButton();
-                } else {
-                    openSingleDropDown();
-                }
-                incrementCounter();
-                    break;
-            case 'procurador':
-                writePlayerInformation();
-                playProcuradoraEffect();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -917,7 +851,7 @@ const Night = () => {
                 } else {
                     openSingleDropDown();
                 }
-                if (alivePlayers[controlCounter + 1].filliation !== 'mafia' || alivePlayers[controlCounter + 1] === null) {
+                if (alivePlayers[controlCounter + 1] === null || alivePlayers[controlCounter + 1].filliation !== 'mafia') {
                 EndMafiaNight();
                 }
             incrementCounter();
@@ -930,7 +864,22 @@ const Night = () => {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
-                    openSingleDropDown();
+                    if (controlCounter === 0) {
+                        updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
+
+                        setCurrentPlayerDescription('Você foi promovido para Godfather!')
+                        openSingleDropDown();
+                    } else {
+                        if (alivePlayers[controlCounter - 1].role !== 'meretriz') {
+                            openSingleDropDown();
+                            
+                        } else {
+                            updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
+
+                            setCurrentPlayerDescription('Você foi promovido para Godfather!')
+                            openSingleDropDown();
+                        }
+                    }
                 }
                 if (alivePlayers[controlCounter + 1] === null || alivePlayers[controlCounter + 1].filliation !== 'mafia' ) {
                     EndMafiaNight();
@@ -945,7 +894,22 @@ const Night = () => {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
-                    openSingleDropDown();
+                    if (controlCounter === 0) {
+                        updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
+
+                        setCurrentPlayerDescription('Você foi promovido para Godfather!')
+                        openSingleDropDown();
+                    } else {
+                        if (alivePlayers[controlCounter - 1].role !== 'meretriz') {
+                            openSingleDropDown();
+                            
+                        } else {
+                            updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
+
+                            setCurrentPlayerDescription('Você foi promovido para Godfather!')
+                            openSingleDropDown();
+                        }
+                    }
                 }
                 if (alivePlayers[controlCounter + 1] === null || alivePlayers[controlCounter + 1].filliation !== 'mafia' ) {
                     EndMafiaNight();
@@ -959,8 +923,21 @@ const Night = () => {
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
-                } else {
+                }
+                if (controlCounter === 0) {
+                    updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
+
+                    setCurrentPlayerDescription('Você foi promovido para Godfather!')
                     openSingleDropDown();
+                } else {
+                    if (alivePlayers[controlCounter - 1].role !== 'meretriz') {
+                        
+                    } else {
+                        updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
+
+                        setCurrentPlayerDescription('Você foi promovido para Godfather!')
+                        openSingleDropDown();
+                    }
                 }
                 if (alivePlayers[controlCounter + 1] === null || alivePlayers[controlCounter + 1].filliation !== 'mafia' ) {
                     EndMafiaNight();
@@ -976,14 +953,17 @@ const Night = () => {
                     closeConfirmButton();
                 } else {
                     if (controlCounter === 0) {
-                        setCurrentPlayerDescription('O Godfather está morto, esse jogador agora é considerado o Godfather e poderá atacar!')
+                        updateDoc(doc(database, "playeradmin", "players", user.email , alivePlayers[controlCounter].id), {role: "godfather", wakeOrder: 28})
+
+                        setCurrentPlayerDescription('Você foi promovido para Godfather!')
                         openSingleDropDown();
                     } else {
                         if (alivePlayers[controlCounter - 1].role !== "godfather") {
-                        setCurrentPlayerDescription('O Godfather está morto, esse jogador agora é considerado o Godfather e poderá atacar!')
+                        updateDoc(doc(database, "playeradmin", "players", user.email , alivePlayers[controlCounter].id), {role: "godfather"})
+                        setCurrentPlayerDescription('Você foi promovido para Godfather!')
                         openSingleDropDown();
                         } else {
-                        setCurrentPlayerDescription("Esse jogador não tem habilidade noturna enquanto o Godfather estiver vivo. Clique em Confirmar")
+                        setCurrentPlayerDescription("Esse jogador não tem habilidade noturna enquanto tiver outro Godfather em jogo.")
                     }
                     }
                 }
@@ -1174,6 +1154,7 @@ const Night = () => {
                 writePlayerInformation();
                 setCurrentPlayerDescription('Esse personagem não acorda a noite, clique em confirmar');
                 incrementCounter();
+                closeSingleDropDown();
 
         }
         return;
@@ -1184,7 +1165,7 @@ const Night = () => {
     closeConfirmButton();
     return;    
     }
-    const confirmAction = () => {
+    const confirmAction = async () => {
         switch (alivePlayers[controlCounter - 1].role) {
             case 'meretriz':
                 setBlockAction(player);
@@ -1213,11 +1194,6 @@ const Night = () => {
                 closeSingleDropDown();
                 break;
             case 'curandeira':
-                setCureAction([...cureAction, { healer: alivePlayers[controlCounter - 1].playerName, healerRole: alivePlayers[controlCounter - 1].role, target: player }]);
-                setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
-                closeSingleDropDown();
-                break;
-            case 'xama':
                 setCureAction([...cureAction, { healer: alivePlayers[controlCounter - 1].playerName, healerRole: alivePlayers[controlCounter - 1].role, target: player }]);
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
                 closeSingleDropDown();
@@ -1256,19 +1232,15 @@ const Night = () => {
                 break;
             case 'investigador':
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
+                writeInvestigativeAction();
                 closeSingleDropDown();
-                break;
-            case 'pesquisador':
-                setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
-                closeSingleDropDown();
+                await delay(4000)
                 break;
             case 'xerife':
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
+                writeInvestigativeAction();
                 closeSingleDropDown();
-                break;
-            case 'procurador':
-                setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
-                closeSingleDropDown();
+                await delay(4000)
                 break;
             case 'vigilante':
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
@@ -1294,6 +1266,7 @@ const Night = () => {
                 RemoveMafiaInformation();
                 break;
             case 'afilhado':
+                console.log(controlCounter);
                 if (controlCounter === 1) {
                     setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
                     setAttackAction([...attackAction, { attacker: alivePlayers[controlCounter - 1].playerName, attackerRole: alivePlayers[controlCounter - 1].role, target: player }]);
@@ -1323,8 +1296,11 @@ const Night = () => {
                 RemoveMafiaInformation();
                 break;
             case 'zelador':
-                setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
-                setCleanUpAction(player)
+                const mafiaTarget = attackAction.filter(attacker => attacker.attackerRole === 'godfather');
+                if (mafiaTarget.length > 0){
+                setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: mafiaTarget[0].target }]);
+                setCleanUpAction( mafiaTarget[0].target)
+                }
                 closeSingleDropDown();
                 RemoveMafiaInformation();
                 break;
@@ -1430,6 +1406,9 @@ const Night = () => {
     }
     const playNightSounds = () => {
         const num = Math.random();
+        setTimeout(() => {
+
+
         if (num < 0.1 && num > 0.0) {
             playNightSound1();
         } 
@@ -1453,7 +1432,8 @@ const Night = () => {
         }
         if (num > 0.7) {
             playNightSound8();
-        }
+            }
+        }, 4000)
         const witchesInHere = alivePlayers.filter(witch => { return witch.filliation === 'coven'})
         const wolvesInHere = alivePlayers.filter(wolf => { return wolf.role === 'lobisomen'})
         if (currentDayTemp[0].currentDay % 2 === 0 && wolvesInHere.length > 0) {
@@ -1463,14 +1443,12 @@ const Night = () => {
             setTimeout(() => {
                 playGrimorioSound();
 
-            }, 4000);
+            }, 2000);
         }
     }
-    const iniciarNoite = () => {
+    const nightPrompt = () => {
         playNightSounds();
-        document.querySelector(".startbutton").classList.add('invisible')
-        document.querySelector(".confirmButton").classList.remove('invisible')
-        document.querySelector(".skipButton").classList.remove('invisible')
+        setIsOpen(false);
         setPadeiraHealCount(padeiraTemp[0].healCount);
         setCurrentDay(currentDayTemp[0].currentDay)
         if (currentDayTemp[0].currentDay % 2 === 0) {
@@ -1481,6 +1459,11 @@ const Night = () => {
             
         }
 
+    }
+    const acordarJogadores = () => {
+        document.querySelector(".startbutton").classList.add('invisible')
+        document.querySelector(".skipButton").classList.remove('invisible')
+        document.querySelector(".confirmButton").classList.remove('invisible')
         wakeUpPlayers();
     } 
     return (
@@ -1490,6 +1473,24 @@ const Night = () => {
                 Noite {currentDay}
             </h3>
             <div className="nightMain">
+            <Popup open={investigativeModal} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                        <div className="header">Resultado da sua Pesquisa</div>
+                        <div className="content investigativeContent">
+                            <div className="investigativeModalInformation">{investigativeInfo}</div>
+                            <button className="button" onClick={() => {setInvestigativeModal(false)}}>Confirmar</button>
+                        </div>
+                        </div>
+        </Popup>
+            <Popup open={isOpen} modal >
+                    <div className="modalNight">
+                        <div className="header">Para iniciar a noite, clique abaixo </div>
+                        <div className="content">
+
+                            <button className="button" onClick={nightPrompt}>Iniciar Noite</button>
+                        </div>
+                        </div>
+        </Popup>
                 <div className="event-action event">
                         <h4>
                         Ação Noturna
@@ -1540,7 +1541,7 @@ const Night = () => {
                                         Confirmar
                             </button>
                             <button type="button" className="button skipButton invisible" onClick={skipAction}>Pular Vez</button>
-                            <button type="button" className="button startbutton" onClick={iniciarNoite}>Iniciar Noite</button>
+                            <button type="button" className="button startbutton" onClick={acordarJogadores}>Acordar Jogadores</button>
                         </div>
                     </div>
                     
