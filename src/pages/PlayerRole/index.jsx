@@ -184,8 +184,8 @@ const PlayerRole = () => {
                 <div className="playerRole-assign">
                     <form >
                         <label >
-                            Jogador:
                             <select name="player" id="player" value={currentPlayer} onChange={(e) => setCurrentPlayer(e.target.value)}>
+                            Jogador:
                                 {playerList.map((player) => (
                                     <option key={player.key}>{player.playerName}
                                     </option>
