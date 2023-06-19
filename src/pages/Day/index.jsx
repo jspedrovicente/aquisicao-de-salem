@@ -3,6 +3,8 @@ import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc } fro
 import { useEffect, useState } from "react";
 import { database } from "../../firebaseConnection";
 import { useNavigate } from "react-router-dom";
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 import useSound from "use-sound";
 import julgamentoSound from "../../assets/julgamento-soundeffect.mp3"
 import morteSound from "../../assets/morte-soundeffect.mp3"
@@ -13,6 +15,8 @@ import dayMusic from "../../assets/daysounds/daymusic.mp3"
 import roosterEffect from "../../assets/daysounds/rooster-soundeffect.mp3"
 import deadEffectMusic from "../../assets/daysounds/sadDeathMusic.mp3"
 import cancelEffectMusic from "../../assets/daysounds/cancelDeathMusic.mp3"
+import bombSvg from "../../assets/svgs/bomb-svg.svg"
+import bulletSvg from "../../assets/svgs/bullet-svg.svg"
 const Day = () => {
 
 // sound effects
@@ -25,7 +29,12 @@ const [playDayMusic, { stop: stopDayMusic }] = useSound(dayMusic);
 const [playRoosterSound] = useSound(roosterEffect);
 const [playDeadEffectMusic, {stop: stopDeadEffectMusic}] = useSound(deadEffectMusic, {volume: 0.60});
 const [playCancelEffectMusic] = useSound(cancelEffectMusic);
-    
+const [isOpen, setIsOpen] = useState(true);
+const [judgementPanelIsOpen, setJudgementPanelIsOpen] = useState(false);
+const [adminPanelIsOpen, setAdminPanelIsOpen] = useState(false);
+const [is2ModalOpen, setIs2ModalOpen] = useState(false);
+const [posiviteCounter, setPosiviteCounter] = useState(0)
+const [negativeCounter, setNegativeCounter] = useState(0)
 const [user, setUser] = useState([]);
 const [players, setPlayers] = useState([]);
 const [alivePlayers, setAlivePlayers] = useState([]);
@@ -90,10 +99,10 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                 setPlayers(list);
                 setAlivePlayers(list.sort((a, b) => a.wakeOrder - b.wakeOrder).filter(player => player.life.includes("alive")))
                 setDeadPlayers(list.sort((a, b) => a.wakeOrder - b.wakeOrder).filter(player => player.life.includes("dead")))
-                setTownies(list.filter(player => player.filliation === 'town'))
-                setCovenies(list.filter(player => player.filliation === 'coven'))
-                setMafiaies(list.filter(player => player.filliation === 'mafia'))
-                setNeutraies(list.filter(player => player.filliation === 'neutral'))
+                setTownies(list.filter(player => player.filliation === 'town' && player.life === "alive"))
+                setCovenies(list.filter(player => player.filliation === 'coven' && player.life === "alive"))
+                setMafiaies(list.filter(player => player.filliation === 'mafia' && player.life === "alive"))
+                setNeutraies(list.filter(player => player.filliation === 'neutral' && player.life === "alive"))
             })
             const townSnapshot = onSnapshot(collection(database, "gamedata/roles/town"), (snapshot) => {
                 let roles = [];
@@ -404,6 +413,8 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                 }
                 const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusAfliction[i].id)
                 deleteDoc(theRef)
+                document.getElementById('innerbomb').disabled = true;
+
                 return;
             }
         }
@@ -426,14 +437,8 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
         stopDayMusic();
         navigateToNight('/night');
     }
-    const startDay = () => {
-        playRoosterSound();
-        setTimeout(() => {
-            playDayMusic();
-
-        }, 3000);
-    }
     const judgement = () => {
+        setJudgementPanelIsOpen(true);
         playJulgamentoSound();
         stopDayMusic();
         setTimeout(() => {
@@ -441,22 +446,61 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
         }, 16000)
     }
     const killPlayer = () => {
-        stopDayMusic();
-        playmorteSound();
         const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
         updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead", filliation: "none" })
-        setTimeout(() => {
+
+    }
+    const playerjudgementAction = () => {
+        if (posiviteCounter > negativeCounter) {
+            playmorteSound();
+            const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
+            updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead"})
+            setTimeout(() => {
+                stopDeadEffectMusic();
+                playDayMusic();
+            }, 12000);
+            setJudgementPanelIsOpen(false);
+
+        } else {
+            setJudgementPanelIsOpen(false);
+            playCancelEffectMusic();
             stopDeadEffectMusic();
-            playDayMusic();
-        }, 12000);
+            setTimeout(() => {
+                playDayMusic();
+            }, 2000);
+        }
+        setPosiviteCounter(0);
+        setNegativeCounter(0);
     }
     const savePlayer = () => {
-        playCancelEffectMusic();
+        setJudgementPanelIsOpen(false);
         stopDeadEffectMusic();
         setTimeout(() => {
             playDayMusic();
         }, 2000);
     }
+    const dayPrompt = () => {
+        setIsOpen(false);
+        playRoosterSound();
+        setTimeout(() => {
+            playDayMusic();
+
+        }, 3000);
+    }
+    const dayPrompt2 = () => {
+        setIsOpen(false);
+        setIs2ModalOpen(true);
+        playRoosterSound();
+        setTimeout(() => {
+            playDayMusic();
+
+        }, 3000);
+    }
+    const adminPanel = () => {
+        setAdminPanelIsOpen(true);
+    }
+    console.log(alivePlayers)
+    console.log(deadPlayers)
     return (
         // The day has to set all the player actions as pending
         <div className="day">
@@ -466,6 +510,99 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
             </h3>
 
             <div className="dayMain">
+                <Popup open={isOpen} modal closeOnDocumentClick={false}>
+                {currentDay === 1 ? (
+                    <div className="modalNight">
+                    <div className="header">Para iniciar o dia, clique abaixo! </div>
+                    <div className="content">
+
+                        <button className="button" onClick={dayPrompt}>Iniciar Dia</button>
+                        <div className="contentRead">
+
+                        </div>
+                    </div>
+                    </div>
+                    ) : (
+                        <div className="modalNight">
+                        <div className="header">Para começar o dia, clique abaixo! </div>
+                        <div className="content">
+  
+                            <button className="button" onClick={dayPrompt2}>Iniciar Dia</button>
+
+                        </div>
+                        </div>
+                        )}
+                    
+                </Popup>
+                <Popup open={is2ModalOpen} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                    <div className="header">Leia os Acontecimentos e siga a ordem! </div>
+                        <div className="contentRead">
+                            {announcements.length > 0 ? (
+                                <span className="modalNotifier fade-in-text1">
+                                    <h4 className="notifier-title">Mortes esta noite:</h4>
+                                    {announcements.map((announcement) => (
+                                        <span key={announcement.key} className="announcePlace">
+                                            <p className="announcePlace-announce"> O Jogador: {announcement.killedPlayer} morreu</p>
+                                            <p className="announcePlace-function"> Sua Função era: {announcement.killedPlayerRole}</p>
+                                            <p className="announcePlace-killer"> Quem o Matou: {announcement.attackerRole}</p>
+                                        </span>
+                                    ))}
+                                    </span>
+                            ) : (
+                                    <span className="modalNotifier fade-in-text1">
+                                        <h4 className="notifier-title">Mortes esta noite:</h4>
+                                        <p>Não houve mortes essa noite</p>   
+
+                                    </span>
+                            )}
+                            {allPublicEvents.length > 0 ? (
+                                <span className="modalNotifier fade-in-text2 ">
+                                    <h4 className="notifier-title ">Efeitos Públicos:</h4>
+                                    {allPublicEvents.map((event) => (
+                                        <span className="statusPlace statusPlaceModal" key={event.key}>
+                                                <p className="statusPlace-player">{event.target}</p>
+                                                <p className="statusPlace-estado">tem o efeito</p>
+                                                <p className="statusPlace-evento">{event.event}</p>
+                                            {event.event === 'bomba' && (
+                                                <button className="smallButton" id="innerbomb" onClick={explodeBomb}><img src={bombSvg}></img></button>
+
+                                            )}
+                                                </span>      
+                                        ))}
+                                </span>
+                            ): (
+                                    <span className="modalNotifier fade-in-text2">
+                                        <h4 className="notifier-title">Efeitos públicos esta noite:</h4>
+                                        <p>Não há efeitos essa noite.</p>   
+                            </span>
+                            )}
+                            {armadilheiroInformation.length > 0 && 
+                                <span className="modalNotifier fade-in-text2 ">
+                                <h4 className="notifier-title ">Efeito do Armadilheiro:</h4>
+                                {armadilheiroInformation.map((info) => (
+                                <span>
+                                        {info.role !== "armadilheiro" && (
+                            <span key={info.key} className="armadilhaPlace">
+                            <p className="armadilhaPlace-visitor">{info.role}</p>
+                            <p className="armadilhaPlace-text">ativou a armadilha!</p>
+                            </span> )}
+                            </span>                                        
+                                    ))}
+                                </span>
+                            }
+                            {spyInformation.length > 0 && 
+                                <span className="modalNotifier fade-in-text2 ">
+                                <h4 className="notifier-title ">Efeito do Espião:</h4>
+                                {spyInformation.map((info) => (
+                                    <p key={info.key}>Seu alvo visitou {info.visited}!</p>
+                                    ))}
+                                </span>
+                                }
+                            <button className="button" onClick={() => {setIs2ModalOpen(false)}}>Finalizar</button>
+                    </div>    
+                </div>
+                </Popup>
                 <div className="event-ocurrence event">
                         <h4>
                         Acontecimentos
@@ -474,7 +611,7 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                         {announcements.map((announcement) => (
                             <span key={announcement.key} className="announcePlace">
                                 <p className="announcePlace-announce"> {announcement.killedPlayer} morreu</p>
-                                <p className="announcePlace-function"> Função: {announcement.killedPlayerRole}</p>
+                                 <p className="announcePlace-function"> Função: {announcement.killedPlayerRole}</p>
                                 <p className="announcePlace-killer"> Ataque: {announcement.attackerRole}</p>
                             </span>
                         ))}
@@ -523,17 +660,30 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                                 <p className="statusAfliction-player">{player.target}</p>
                                 <p className="statusAfliction-estado">tem o efeito</p>
                                 <p className="statusAfliction-evento">{player.status} </p>
+                                {player.status == 'marcado' && <button className="miniButton trigger" onClick={explodeMark}><img src={bulletSvg} alt="bullet" /></button>}
                             </span>
                         ))}
                     </div>
                 </div>
                 <div className="event-aliveplayers event">
+                    <div className="alivePlayersTitle">
                         <h4>
                         Jogadores Vivos
-                        </h4>
+                    </h4>
+                           
+                    <div className="counterBox townies"> {townies.length}</div>
+                    <div className="counterBox mafiaies"> {mafiaies.length}</div>
+                    <div className="counterBox covenies"> {covenies.length}</div>
+                    <div className="counterBox neutraies" > {neutraies.length}</div>
+                    </div>
                     <div className="large-container card-border scrollable">
                         {alivePlayers.map((player => (
-                            <p key={player.key}> {player.playerName} - {player.role}</p>
+                            <span className="alivePlayersConfig" key={player.key}>
+                                {player.playerName} - {player.filliation == 'town' && <p className="townies">{player.role}</p>}
+                                {player.filliation == 'mafia' && <p className="mafiaies">{player.role}</p>}
+                                {player.filliation == 'coven' && <p className="covenies">{player.role}</p>}
+                                {player.filliation == 'neutral' && <p className="neutraies">{player.role}</p>}
+                            </span>
                         )))}
                         </div>
                 </div>
@@ -543,9 +693,13 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                         </h4>
                     <div className="large-container card-border scrollable">
                         {deadPlayers.map((player) => (
-                            <p key={player.key + '3'}>
-                            {player.playerName} - {player.role}
-                                        </p>
+                            <span className="alivePlayersConfig" key={player.key + '3'}>
+                                {player.playerName} -
+                                {player.filliation == 'town' && <p className="townies">{player.role}</p>}
+                                {player.filliation == 'mafia' && <p className="mafiaies">{player.role}</p>}
+                                {player.filliation == 'coven' && <p className="covenies">{player.role}</p>}
+                                {player.filliation == 'neutral' && <p className="neutraies">{player.role}</p>}
+                            </span>
                                     ))}
                     </div>
                 </div>
@@ -554,21 +708,9 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
 
                 <div className="event-killplayer event">
                     <div className="event-killplayer-inner">
-                            <button type="button" onClick={startDay} className="button">Começar DIA!</button>
-                        <h4>Nome:</h4>
-                        <select name="playerName" id="playerName" value={playerKilling} onChange={(e) => setPlayerKilling(e.target.value)}>
-                            <option value="" defaultValue disabled hidden></option>
-                            {alivePlayers.map(player => (
-                                <option key={player.key}>{player.playerName}</option>
-                            ))}
-                        </select>
-                        <button className="button" onClick={killPlayer}>Matar Jogador</button>
-                        <button type="button" onClick={judgement} className="button">Iniciar Julgamento</button>
-                        <button type="button" onClick={savePlayer} className="button">Cancelar julgamento </button>
+                        <button type="button" onClick={judgement} className="button">Julgamento</button>
                         <button type="button" onClick={startNight} className="button">Começar Noite</button>
-                        <button className="button" onClick={endGameCompletely}>Encerrar Jogo</button>
-                        <button className="button" onClick={explodeBomb}>Bomba do Palhaço</button>
-                        <button className="button" onClick={explodeMark}>Atirar na Marca</button>
+                        <button className="button" onClick={adminPanel}>Administrativo</button>
 
                     </div>
 
@@ -577,6 +719,61 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
             </div>
             <div className="upper-page-area">
             </div>
+
+            <Popup open={adminPanelIsOpen} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                    <div className="header">Painel Administrativo, Use apenas para EMERGENCIAS </div>
+                    <div className="content">
+                    <button className="button" onClick={explodeMark}>Atirar na Marca</button>
+                    <button className="button" onClick={explodeBomb}>Bomba do Palhaço</button>  
+                    <button className="button" onClick={endGameCompletely}>Encerrar Jogo</button>
+                    <button className="button" onClick={() => { setAdminPanelIsOpen(false) }}>Fechar Painel</button>
+                        
+                    </div>
+                    </div>
+                    
+            </Popup>
+            <Popup open={judgementPanelIsOpen} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                    <div className="header">Painel de Julgamento </div>
+                    <div className="content modalNotifier modalkill">
+                    <p>Selecione o jogador para ser julgado:</p>
+                        <select name="playerName" id="playerName" value={playerKilling} onChange={(e) => setPlayerKilling(e.target.value)}>
+                            <option value="" defaultValue disabled hidden></option>
+                            {alivePlayers.map(player => (
+                                <option key={player.key}>{player.playerName}</option>
+                            ))}
+                        </select>
+                        <div className="voteCountMain">
+                        
+                        <div className="voteCountCard">
+
+                            <label htmlFor="posiviteVotes" className="voteCountInput">A Favor</label>
+                                <input name="posiviteVotes" type="number" value={posiviteCounter} onChange={(e) => setPosiviteCounter(e.target.value)} max={40} min={0}/>
+                                <span className="buttoncontainer">
+
+                                <button className="miniButton miniButtonLeft" onClick={() => {setPosiviteCounter(posiviteCounter + 1)}}> + </button>
+                                <button className="miniButton miniButtonRight" onClick={() => {setPosiviteCounter(posiviteCounter - 1)}}> - </button>
+                            </span>
+                        </div>
+                        <div className="voteCountCard">
+
+                            <label htmlFor="negativeVotes" className="voteCountInput">Contra</label>
+                                <input name="negativeVotes" type="number" value={negativeCounter} onChange={(e) => setNegativeCounter(e.target.value)} max={40} min={0}/>
+                                <span className="buttoncontainer">
+
+                                <button className="miniButton miniButtonLeft" onClick={() => {setNegativeCounter(negativeCounter + 1)}}> + </button>
+                                <button className="miniButton miniButtonRight" onClick={() => {setNegativeCounter(negativeCounter - 1)}}> - </button>
+                                </span>
+                            
+                            </div>
+                        </div>
+                        <button className="button" onClick={playerjudgementAction}>Confirmar Votos</button>
+                        <button className="button" onClick={savePlayer}>Cancelar</button>
+                    </div>
+                    </div>
+                    
+            </Popup>
         </div>
     )
 }

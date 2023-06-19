@@ -90,3 +90,73 @@ p{
 .neutraies{
     color: rgb(135, 135, 142);
 }
+.alivePlayersConfig{
+    display: flex;
+    margin-left: 10px;
+}
+.contentRead{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.modalNotifier{
+    margin: 10px 0px;
+    flex-direction: column;
+    display: flex;
+    min-width: 300px;
+}
+.notifier-title{
+    border-bottom: 1px solid #f0f378;
+}
+.statusPlaceModal{
+    align-items: center;
+}
+.modalkill{
+    align-items: center;
+}
+
+.modalkill select{
+    width: 50%;
+    margin: 10px 0px;
+}
+.voteCountCard{
+    display: flex;
+    flex-direction: column;
+}
+.voteCountCard input{
+ width: 30px;
+}
+.voteCountCard .voteCountInput{
+
+}
+.buttoncontainer{
+    display: flex;
+    justify-content: center;
+}
+.voteCountMain{
+    display: flex;
+}
+
+.trigger{
+    border-radius: 10px;
+    margin-left: 5px;
+    animation: glowing 1300ms infinite;
+}
+#innerbomb:enabled{
+    animation: glowing 1300ms infinite;
+}
+@keyframes glowing {
+    0% {
+      background-color: #e6ff04;
+      box-shadow: 0 0 5px #f9f92a;
+    }
+    50% {
+      background-color: #e9f83f;
+      box-shadow: 0 0 20px #eeff00;
+    }
+    100% {
+      background-color: #e6ff04;
+      box-shadow: 0 0 5px #f9f92a;
+    }
+  }
