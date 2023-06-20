@@ -122,6 +122,10 @@ const Night = () => {
     const [executorAction, setExecutorAction] = useState([]);
     const [weaponCreateAction, setWeaponCreateAction] = useState([]);
     const [padeiraHealCount, setPadeiraHealCount] = useState(0);
+    const [investigatorCounter, setInvestigatorCounter] = useState(0);
+    const [veteranCounter, setVeteranCounter] = useState(0);
+    const [conselheiraCounter, setConselheiraCounter] = useState(0);
+    const [zeladorCounter, setZeladorCounter] = useState(0);
     
     const [armadilheiroAction, setArmadilheiroAction] = useState('');
     const [spyAction, setSpyAction] = useState('');
@@ -153,6 +157,10 @@ const Night = () => {
     const [alertAction, setAlertAction] = useState('');
     const [werewolfAlert, setWerewolfAlert] = useState('');
     const [padeiraTemp, setPadeiraTemp] = useState([]);
+    const [investigadorTemp, setInvestigatorTemp] = useState([]);
+    const [veteranTemp, setVeteranTemp] = useState([]);
+    const [conselheiraTemp, setConselheiraTemp] = useState([]);
+    const [zeladorTemp, setZeladorTemp] = useState([]);
     const [currentDayTemp, setCurrentDayTemp] = useState([]);
     const [multipleCharactersPresent, setMultipleCharactersPresent] = useState('')
     const [specialAttack, setSpecialAttack] = useState([]);
@@ -284,6 +292,34 @@ const Night = () => {
                     padeira.push({ healCount: doc.data().healCountMax });
                 })
                 setPadeiraTemp(padeira)
+            })
+            const investigatorData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/investigatorCounter/investigatorCounter`), (snapshot) => {
+                let temp = [];
+                snapshot.forEach((doc) => {
+                    temp.push({ counter: doc.data().counter });
+                })
+                setInvestigatorTemp(temp)
+            })
+            const veteranData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/veteranCounter/veteranCounter`), (snapshot) => {
+                let temp = [];
+                snapshot.forEach((doc) => {
+                    temp.push({ counter: doc.data().counter });
+                })
+                setVeteranTemp(temp)
+            })
+            const conselheiraData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/conselheiraCounter/conselheiraCounter`), (snapshot) => {
+                let temp = [];
+                snapshot.forEach((doc) => {
+                    temp.push({ counter: doc.data().counter });
+                })
+                setConselheiraTemp(temp)
+            })
+            const zeladorData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/zeladorCounter/zeladorCounter`), (snapshot) => {
+                let temp = [];
+                snapshot.forEach((doc) => {
+                    temp.push({ counter: doc.data().counter });
+                })
+                setZeladorTemp(temp)
             })
             const executorData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/executorTarget/executorTarget`), (snapshot) => {
                 let temp = [];
@@ -545,6 +581,10 @@ const Night = () => {
     const minorDatabaseUpdates = async () => {
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "dayCounter", "dayCounter", "dayCounter"), { currentDay: currentDay + 1 });
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "padeiraHeals", "padeiraHeals", "padeiraHeals"), { healCountMax: padeiraHealCount });
+        await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "conselheiraCounter", "conselheiraCounter", "conselheiraCounter"), { counter: conselheiraCounter });
+        await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "investigatorCounter", "investigatorCounter", "investigatorCounter"), { counter: investigatorCounter });
+        await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "zeladorCounter", "zeladorCounter", "zeladorCounter"), { counter: zeladorCounter });
+        await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "veteranCounter", "veteranCounter", "veteranCounter"), { counter: veteranCounter });
     } 
     const exportvisitDatabase = async () => {
         const docRef = collection(database, `playeradmin/playerStatuses/${user.email}/visitAction/visitAction`)
@@ -661,7 +701,7 @@ const Night = () => {
                 setInvestigativeInfo(`Esse jogador é Suspeito`)
             }
         }
-        if (alivePlayers[controlCounter - 1].role === 'investigador') {
+        if (alivePlayers[controlCounter - 1].role === 'investigador' || alivePlayers[controlCounter - 1].role === 'conselheira') {
             if (investigatedPlayer[0].role === 'miragem') {
                 setInvestigativeInfo(`Esse jogador é a Meretriz`)
                 
@@ -675,8 +715,9 @@ const Night = () => {
     const wakeUpPlayers = () => {
         if (alivePlayers[controlCounter] != null) {
         openConfirmButton();
-            
-        switch (alivePlayers[controlCounter].role) {
+            console.log(alivePlayers[controlCounter])
+
+            switch (alivePlayers[controlCounter].role) {
             case 'meretriz':
                 openSingleDropDown();
                 playMeretrizSound();
@@ -687,6 +728,8 @@ const Night = () => {
                 if (currentDayTemp[0].currentDay === 1) {
                     openSingleDropDown();
                     writePlayerInformation();
+                    updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { wakeOrder: 99 });
+
                 } else {
                     writePlayerInformation();
                     setCurrentPlayerDescription(`Não precisa acordar a pessoa, clique em confirmar Ação`);
@@ -770,11 +813,17 @@ const Night = () => {
             case 'investigador':
                 writePlayerInformation();
                 playInvestigadorSound();
+                document.querySelector('.investigatorCounter').classList.remove('invisible');
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
-                    openSingleDropDown();
+                    if (investigatorCounter > 0) {
+                        openSingleDropDown();
+                    } else {
+                    closeConfirmButton();
+                    setCurrentPlayerDescription('Você já consumiu todas suas ações');
+                    }
                 }
                 incrementCounter();
                     break;
@@ -814,10 +863,19 @@ const Night = () => {
             case 'veterano':
                 writePlayerInformation();
                 playVeteranSound();
+                document.querySelector('.veteranCounter').classList.remove('invisible');
+
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
+                    if (veteranCounter > 0) {
+                        
+                    } else {
+                        closeConfirmButton();
+                        setCurrentPlayerDescription('Você já consumiu todas suas ações');
+                        
+                    }
                 }
                 incrementCounter();
                     break;
@@ -825,18 +883,16 @@ const Night = () => {
                 writePlayerInformation();
                 playPadeiraSound();
                 document.querySelector('.padeiraCounter').classList.remove('invisible');
-                const tempheal = padeiraTemp[0].healCount;
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
                 } else {
-                    if (padeiraHealCount === 0) {
-                        closeSingleDropDown();
-                        setCurrentPlayerDescription('Você não tem curas para usar mais!');
-
-                    } if (padeiraHealCount > 0 || tempheal > 0) {
+                    if (padeiraHealCount > 0) {
                         openSingleDropDown();
                         document.querySelector('.padeiraButton').classList.remove('invisible');
+                    } else {
+                        closeSingleDropDown();
+                        setCurrentPlayerDescription('Você não tem curas para usar mais!');
                     }
                 }
                 incrementCounter();
@@ -860,6 +916,8 @@ const Night = () => {
                 writePlayerInformation();
                 writeMafiaInformation();
                 playConselheiraSound();
+                document.querySelector('.conselheiraCounter').classList.remove('invisible');
+
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -871,7 +929,12 @@ const Night = () => {
                         openSingleDropDown();
                     } else {
                         if (alivePlayers[controlCounter - 1].role !== 'meretriz') {
-                            openSingleDropDown();
+                            if (conselheiraCounter > 0) {
+                                openSingleDropDown();
+                            } else {
+                                setCurrentPlayerDescription('Você já consumiu todas suas ações');
+                                closeConfirmButton();
+                            }
                             
                         } else {
                             updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
@@ -919,6 +982,8 @@ const Night = () => {
             case 'zelador':
                 writePlayerInformation();
                 writeMafiaInformation();
+                document.querySelector('.zeladorCounter').classList.remove('invisible');
+
                 playZeladorSound();
                 if (blockAction === alivePlayers[controlCounter].playerName || mirageBlockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
@@ -931,7 +996,12 @@ const Night = () => {
                     openSingleDropDown();
                 } else {
                     if (alivePlayers[controlCounter - 1].role !== 'meretriz') {
-                        
+                        if (zeladorCounter) {
+                            
+                        } else {
+                            closeConfirmButton();
+                            setCurrentPlayerDescription('Você já consumiu todas suas ações');
+                        }
                     } else {
                         updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
 
@@ -1234,13 +1304,20 @@ const Night = () => {
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
                 writeInvestigativeAction();
                 closeSingleDropDown();
+                const newCounterValue = investigatorCounter - 1;
+                setInvestigatorCounter(newCounterValue)
                 await delay(4000)
+                setInvestigativeModal(false)
+                document.querySelector('.investigatorCounter').classList.add('invisible');
+
                 break;
             case 'xerife':
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
                 writeInvestigativeAction();
                 closeSingleDropDown();
                 await delay(4000)
+                setInvestigativeModal(false)
+
                 break;
             case 'vigilante':
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
@@ -1258,6 +1335,10 @@ const Night = () => {
                 break;
             case 'veterano':
                 setAlertAction(alivePlayers[controlCounter - 1].playerName);
+                var newVetCounter = veteranCounter - 1;
+                setVeteranCounter(newVetCounter);
+                document.querySelector('.veteranCounter').classList.add('invisible');
+
                 break;
             case 'godfather':
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
@@ -1285,9 +1366,17 @@ const Night = () => {
                 RemoveMafiaInformation();
                 break;
             case 'conselheira':
+                writeInvestigativeAction();
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
                 closeSingleDropDown();
                 RemoveMafiaInformation();
+                const newConsCounter = conselheiraCounter - 1;
+                setConselheiraCounter(newConsCounter)
+                await delay(4000)
+                setInvestigativeModal(false)
+                document.querySelector('.conselheiraCounter').classList.add('invisible');
+                
+
                 break;
             case 'vigarista':
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
@@ -1299,10 +1388,14 @@ const Night = () => {
                 const mafiaTarget = attackAction.filter(attacker => attacker.attackerRole === 'godfather');
                 if (mafiaTarget.length > 0){
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: mafiaTarget[0].target }]);
-                setCleanUpAction( mafiaTarget[0].target)
+                    setCleanUpAction(mafiaTarget[0].target)
+                    const newZelCounter = zeladorCounter - 1;
+                    setZeladorCounter(newZelCounter)
+                    
                 }
                 closeSingleDropDown();
                 RemoveMafiaInformation();
+                document.querySelector('.zeladorCounter').classList.add('invisible');
                 break;
             case 'pistoleiro':
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
@@ -1388,7 +1481,10 @@ const Night = () => {
                 closeDeadDropDown();
                 document.querySelector('.padeiraButton').classList.add('invisible');
                 document.querySelector('.padeiraCounter').classList.add('invisible');
-
+                document.querySelector('.zeladorCounter').classList.add('invisible');
+                document.querySelector('.veteranCounter').classList.add('invisible');
+                document.querySelector('.conselheiraCounter').classList.add('invisible');
+                document.querySelector('.investigatorCounter').classList.add('invisible');
                 break;
         }        
         wakeUpPlayers();
@@ -1401,6 +1497,11 @@ const Night = () => {
         document.querySelector('.weaponDropDownAction').classList.add('invisible');
         document.querySelector('.padeiraButton').classList.add('invisible');
         document.querySelector('.padeiraCounter').classList.add('invisible');
+        document.querySelector('.zeladorCounter').classList.add('invisible');
+        document.querySelector('.veteranCounter').classList.add('invisible');
+        document.querySelector('.conselheiraCounter').classList.add('invisible');
+        document.querySelector('.investigatorCounter').classList.add('invisible');
+        document.querySelector('.arsonistaButton').classList.add('invisible');
         wakeUpPlayers();
         closeSecondAttackDropDown();
     }
@@ -1450,6 +1551,10 @@ const Night = () => {
         playNightSounds();
         setIsOpen(false);
         setPadeiraHealCount(padeiraTemp[0].healCount);
+        setInvestigatorCounter(investigadorTemp[0].counter);
+        setVeteranCounter(veteranTemp[0].counter);
+        setConselheiraCounter(conselheiraTemp[0].counter);
+        setZeladorCounter(zeladorTemp[0].counter);
         setCurrentDay(currentDayTemp[0].currentDay)
         if (currentDayTemp[0].currentDay % 2 === 0) {
             setNightImmunity(['arsonista', 'assassino em serie', 'lobisomen', 'sobrevivente' ])
@@ -1478,7 +1583,6 @@ const Night = () => {
                         <div className="header">Resultado da sua Pesquisa</div>
                         <div className="content investigativeContent">
                             <div className="investigativeModalInformation">{investigativeInfo}</div>
-                            <button className="button" onClick={() => {setInvestigativeModal(false)}}>Confirmar</button>
                         </div>
                         </div>
         </Popup>
@@ -1521,6 +1625,10 @@ const Night = () => {
                                 <button type="button" className="button arsonistaButton invisible" onClick={ArsonAction}>TACAR FOGO!</button>
                             </div>
                             <div className="padeiraCounter invisible">Quantidade de Curas: {padeiraHealCount}</div>
+                            <div className="investigatorCounter invisible">Quantidade de Investigações: {investigatorCounter}</div>
+                            <div className="conselheiraCounter invisible">Quantidade de Investigações: {conselheiraCounter}</div>
+                            <div className="veteranCounter invisible">Quantidade de Alertas: {veteranCounter}</div>
+                            <div className="zeladorCounter invisible">Quantidade de Limpezas: {zeladorCounter}</div>
                             <div className="deadPlayerDropDownAction invisible">
                                 <select name="deadPlayer" id="deadPlayer" value={player} onChange={(e) => {setPlayer(e.target.value)}}>
                                     {deadPlayers.map((player) => (
