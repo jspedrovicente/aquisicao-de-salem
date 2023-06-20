@@ -56,7 +56,7 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 - [x] new Admin Panel Modal
 - [x] new counter for each filliation
 - [x] color-coded alive and dead characters
-- [ ] new counter for each filliation
+- [x] new counter for each filliation
 ### Remove Features :
  - [x] Whisper
  - [x] Randomly generated sound between track 
