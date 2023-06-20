@@ -20,14 +20,14 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 ### REMOVE Characters :
  - [x] Carteiro
  - [x] Coveiro
- - [ ] Xamã
- - [ ] Pesquisador
- - [ ] Procuradora
+ - [x] Xamã
+ - [x] Pesquisador
+ - [x] Procuradora
 
 ### Rework Characters :
 - [ ] Armadilheiro (small)
 - [ ] Grimorio/Coven (medium)
-- [ ] Mafia in general (small)
+- [x] Mafia in general (large) [now the mafia has a promotion order for each of the characters]
 - [ ] Medium (large)
 ### Buff Characters :
  - [ ] Vigarista
@@ -38,8 +38,8 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
  - [ ] Curandeira
  - [ ] Town in general
 ### Bug Fixes:
- - [ ] Zelador needs to target only the mafia target
- - [ ] Music playtime
+ - [x] Zelador needs to target only the mafia target
+ - [x] Music playtime
  - [ ] New music playing feature
  - [ ] Fix opening page
  - [ ] DONT ALLOW mafia/Coven picks
@@ -54,7 +54,9 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 - [x] new button for pistoleiro kills
 - [x] new button for clown kills
 - [x] new Admin Panel Modal
-- [ ] 
+- [x] new counter for each filliation
+- [x] color-coded alive and dead characters
+- [ ] new counter for each filliation
 ### Remove Features :
  - [x] Whisper
  - [x] Randomly generated sound between track 
