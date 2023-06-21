@@ -25,15 +25,15 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
  - [x] Procuradora
 
 ### Rework Characters :
-- [ ] Armadilheiro (small)
-- [ ] Grimorio/Coven (medium)
+- [x] Armadilheiro (small) [canceled]
+- [x] Grimorio/Coven (medium) [canceled]
 - [x] Mafia in general (large) [now the mafia has a promotion order for each of the characters]
-- [ ] Medium (large)
+- [ ] Medium (large) [maybe remove?]
 ### Buff Characters :
- - [ ] Vigarista
- - [ ] Bardo
- - [ ] Medium
- - [ ] Palhaço
+ - [x] Vigarista
+ - [x] Bardo
+ - [x] Medium
+ - [x] Palhaço
 ### Nerf Characters :
  - [ ] Curandeira
  - [ ] Town in general
