@@ -46,7 +46,7 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
  - [ ] Make the input reset so it doesn't allow confirmation without a target
 ### New Feature:
 - [x] Randomizer button for easier game playthroughs
-- [ ] Action limiter (Investigador, Padeira)
+- [x] Action limiter (Investigador, Padeira, veterano, conselheira, zelador)
 - [ ] Mobile friedly <3
 - [x] new MODAL for announcements to prohibit foul admin play.
 - [x] new MODAL for nightly preparations
