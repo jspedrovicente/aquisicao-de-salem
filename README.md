@@ -45,7 +45,7 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
  - [ ] DONT ALLOW mafia/Coven picks
  - [ ] Make the input reset so it doesn't allow confirmation without a target
 ### New Feature:
-- [ ] Randomizer button for easier game playthroughs
+- [x] Randomizer button for easier game playthroughs
 - [ ] Action limiter (Investigador, Padeira)
 - [ ] Mobile friedly <3
 - [x] new MODAL for announcements to prohibit foul admin play.
