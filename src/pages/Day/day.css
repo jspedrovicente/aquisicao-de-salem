@@ -90,6 +90,9 @@ p{
 .neutraies{
     color: rgb(135, 135, 142);
 }
+.horsies{
+    color: rgb(238, 235, 182);
+}
 .alivePlayersConfig{
     display: flex;
     margin-left: 10px;
@@ -129,6 +132,12 @@ p{
 }
 .voteCountCard .voteCountInput{
 
+}
+.contentDeathAnouncement{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 60%;
 }
 .buttoncontainer{
     display: flex;

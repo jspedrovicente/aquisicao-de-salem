@@ -15,59 +15,75 @@ import dayMusic from "../../assets/daysounds/daymusic.mp3"
 import roosterEffect from "../../assets/daysounds/rooster-soundeffect.mp3"
 import deadEffectMusic from "../../assets/daysounds/sadDeathMusic.mp3"
 import cancelEffectMusic from "../../assets/daysounds/cancelDeathMusic.mp3"
+import pesteDeathMusic from "../../assets/daysounds/pesteDeathlongeffect.mp3"
+import dramaticDeathMusic from "../../assets/daysounds/dramaticMusic.mp3"
+import jesterDeathMusic from "../../assets/daysounds/jesterDeathEffect.mp3"
+import apocalipseMusic from "../../assets/daysounds/ApocalipseVictoryMusic.mp3"
 import bombSvg from "../../assets/svgs/bomb-svg.svg"
 import bulletSvg from "../../assets/svgs/bullet-svg.svg"
 const Day = () => {
 
-// sound effects
-const [playJulgamentoSound] = useSound(julgamentoSound);
-const [playFizzleSound] = useSound(bombFizzle);
-const [playBombSound] = useSound(bombBoom);
-const [playmorteSound] = useSound(morteSound);
-const [playGunSound] = useSound(gunSound);
-const [playDayMusic, { stop: stopDayMusic }] = useSound(dayMusic);
-const [playRoosterSound] = useSound(roosterEffect);
-const [playDeadEffectMusic, {stop: stopDeadEffectMusic}] = useSound(deadEffectMusic, {volume: 0.60});
-const [playCancelEffectMusic] = useSound(cancelEffectMusic);
-const [isOpen, setIsOpen] = useState(true);
-const [judgementPanelIsOpen, setJudgementPanelIsOpen] = useState(false);
-const [adminPanelIsOpen, setAdminPanelIsOpen] = useState(false);
-const [is2ModalOpen, setIs2ModalOpen] = useState(false);
-const [posiviteCounter, setPosiviteCounter] = useState(0)
-const [negativeCounter, setNegativeCounter] = useState(0)
-const [user, setUser] = useState([]);
-const [players, setPlayers] = useState([]);
-const [alivePlayers, setAlivePlayers] = useState([]);
-const [deadPlayers, setDeadPlayers] = useState([]);
-const [townies, setTownies] = useState([]);
-const [mafiaies, setMafiaies] = useState([]);
-const [covenies, setCovenies] = useState([]);
-const [neutraies, setNeutraies] = useState([]);
-const [townRole, setTownRole] = useState([]);
-const [covenRole, setCovenRole] = useState([]);
-const [mafiaRole, setMafiaRole] = useState([]);
-const [neutralRole, setNeutralRole] = useState([]);
-const [allRoles, setAllRoles] = useState([]);
-const [currentDayTemp, setCurrentDayTemp] = useState([]);
-const [currentDay, setCurrentDay] = useState(0);
-const [announcements, setAnnouncements] = useState([]);
-const [allPublicEvents, setAllPublicEvents] = useState([]);
-const navigateToNight = useNavigate();
-const [playerKilling, setPlayerKilling] = useState('');
+    // sound effects
+    const [playJulgamentoSound] = useSound(julgamentoSound);
+    const [playFizzleSound] = useSound(bombFizzle);
+    const [playBombSound] = useSound(bombBoom);
+    const [playmorteSound] = useSound(morteSound);
+    const [playGunSound] = useSound(gunSound);
+    const [playDayMusic, { stop: stopDayMusic }] = useSound(dayMusic);
+    const [playRoosterSound] = useSound(roosterEffect);
+    const [playDeadEffectMusic, { stop: stopDeadEffectMusic }] = useSound(deadEffectMusic, { volume: 0.60 });
+    const [playCancelEffectMusic] = useSound(cancelEffectMusic);
+    const [playPesteDeathMusic] = useSound(pesteDeathMusic);
+    const [playJesterDeathMusic] = useSound(jesterDeathMusic);
+    const [playDramaticDeathMusic, { stop: stopDramaticDeathMusic }] = useSound(dramaticDeathMusic);
+    const [playApocalipseMusic, { stop: stopApocalipseMusic }] = useSound(apocalipseMusic);
+    const [isOpen, setIsOpen] = useState(true);
+    const [judgementPanelIsOpen, setJudgementPanelIsOpen] = useState(false);
+    const [adminPanelIsOpen, setAdminPanelIsOpen] = useState(false);
+    const [plaguePanelIsOpen, setPlaguePanelIsOpen] = useState(false);
+    const [jesterPanelIsOpen, setJesterPanelIsOpen] = useState(false);
+    const [killPanelIsOpen, setKillPanelIsOpen] = useState(false);
+    const [apocalipsePanelIsOpen, setApocalipsePanelIsOpen] = useState(false);
+    const [is2ModalOpen, setIs2ModalOpen] = useState(false);
+    const [posiviteCounter, setPosiviteCounter] = useState(0)
+    const [negativeCounter, setNegativeCounter] = useState(0)
+    const [user, setUser] = useState([]);
+    const [players, setPlayers] = useState([]);
+    const [alivePlayers, setAlivePlayers] = useState([]);
+    const [deadPlayers, setDeadPlayers] = useState([]);
+    const [townies, setTownies] = useState([]);
+    const [mafiaies, setMafiaies] = useState([]);
+    const [covenies, setCovenies] = useState([]);
+    const [neutraies, setNeutraies] = useState([]);
+    const [horsies, setHorsies] = useState([]);
+    const [townRole, setTownRole] = useState([]);
+    const [covenRole, setCovenRole] = useState([]);
+    const [horsemenRole, setHorsemenRole] = useState([]);
+    const [mafiaRole, setMafiaRole] = useState([]);
+    const [neutralRole, setNeutralRole] = useState([]);
+    const [allRoles, setAllRoles] = useState([]);
+    const [currentDayTemp, setCurrentDayTemp] = useState([]);
+    const [currentDay, setCurrentDay] = useState(0);
+    const [announcements, setAnnouncements] = useState([]);
+    const [allPublicEvents, setAllPublicEvents] = useState([]);
+    const navigateToNight = useNavigate();
+    const [playerKilling, setPlayerKilling] = useState('');
+    const [playerKilling2, setPlayerKilling2] = useState('');
+    const [killAnouncementUpdate, setKillAnouncementUpdate] = useState('');
     
     
 
 
-// Night actions that transfers to morning
-const [visitAction, setVisitAction] = useState([]);
-const [executorAction, setExecutorAction] = useState([]);
-const [poisonAction, setPoisonAction] = useState([]);
-const [armadilheiroInformation, setArmadilheiroInformation] = useState([]);
-const [spyInformation, setSpyInformation] = useState([]);
-const [padeiraHealCount, setPadeiraHealCount] = useState(0)
-const [arsonTarget, setArsonTarget] = useState([]);
-const [statusAfliction, setStatusAfliction] = useState([]);   
-const [parasiteTarget, setParasiteTarget] = useState([]);
+    // Night actions that transfers to morning
+    const [visitAction, setVisitAction] = useState([]);
+    const [executorAction, setExecutorAction] = useState([]);
+    const [poisonAction, setPoisonAction] = useState([]);
+    const [armadilheiroInformation, setArmadilheiroInformation] = useState([]);
+    const [spyInformation, setSpyInformation] = useState([]);
+    const [padeiraHealCount, setPadeiraHealCount] = useState(0)
+    const [arsonTarget, setArsonTarget] = useState([]);
+    const [statusAfliction, setStatusAfliction] = useState([]);
+    const [parasiteTarget, setParasiteTarget] = useState([]);
     
     useEffect(() => {
         const loadUserInformation = () => {
@@ -103,6 +119,7 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                 setCovenies(list.filter(player => player.filliation === 'coven' && player.life === "alive"))
                 setMafiaies(list.filter(player => player.filliation === 'mafia' && player.life === "alive"))
                 setNeutraies(list.filter(player => player.filliation === 'neutral' && player.life === "alive"))
+                setHorsies(list.filter(player => player.filliation === 'horsemen' && player.life === "alive"))
             })
             const townSnapshot = onSnapshot(collection(database, "gamedata/roles/town"), (snapshot) => {
                 let roles = [];
@@ -147,6 +164,21 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                 setCovenRole(roles);
                 
             })
+            const horsemenSnapshot = onSnapshot(collection(database, "gamedata/roles/coven"), (snapshot) => {
+                let roles = [];
+                snapshot.forEach((doc) => {
+                    roles.push({
+                        filliation: "horsemen",
+                        role: doc.data().role,
+                        skill: doc.data().skill,
+                        special: doc.data().special,
+                        wakeOrder: doc.data().wakeOrder
+    
+                    })
+                })
+                setHorsemenRole(roles);
+                
+            })
             const neutralSnapshot = onSnapshot(collection(database, "gamedata/roles/neutral"), (snapshot) => {
                 let roles = [];
                 snapshot.forEach((doc) => {
@@ -179,11 +211,11 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
     }, [user.email]);
     useEffect(() => {
     
-        function addAllRoles(townRole, mafiaRole, covenRole, neutralRole) {
-            setAllRoles([...townRole, ...mafiaRole, ...covenRole, ...neutralRole])
+        function addAllRoles(townRole, mafiaRole, covenRole, horsemenRole, neutralRole) {
+            setAllRoles([...townRole, ...mafiaRole, ...covenRole, ...horsemenRole, ...neutralRole])
            
         }
-        addAllRoles(covenRole, mafiaRole, townRole, neutralRole);
+        addAllRoles(covenRole, mafiaRole, townRole, horsemenRole, neutralRole);
     }, [covenRole])
 
     useEffect(() => {
@@ -283,56 +315,57 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < allPublicEvents.length; i++){
+        for (let i = 0; i < allPublicEvents.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/publicEvents/publicEvents`, allPublicEvents[i].id)
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < announcements.length; i++){
+        for (let i = 0; i < announcements.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/announcements/announcements`, announcements[i].id)
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < announcements.length; i++){
+        for (let i = 0; i < announcements.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/announcements/announcements`, announcements[i].id)
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < deadPlayers.length; i++){
-            await updateDoc(doc(database, "playeradmin", "players", user.email , deadPlayers[i].id), {life: "none", filliation: "none", role: "none"})
+        for (let i = 0; i < deadPlayers.length; i++) {
+            await updateDoc(doc(database, "playeradmin", "players", user.email, deadPlayers[i].id), { life: "none", filliation: "none", role: "none" })
 
         }
-        for (let i = 0; i < executorAction.length; i++){
-            await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email , "executorTarget", "executorTarget" , "executorTarget"), {target: ''})
+        for (let i = 0; i < executorAction.length; i++) {
+            await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "executorTarget", "executorTarget", "executorTarget"), { target: '' })
 
         }
-        for (let i = 0; i < arsonTarget.length; i++){
+        for (let i = 0; i < arsonTarget.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/arsonTarget/arsonTarget`, arsonTarget[i].id)
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < poisonAction.length; i++){
+        for (let i = 0; i < poisonAction.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/poisonTarget/poisonTarget`, poisonAction[i].id)
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < parasiteTarget.length; i++){
+        for (let i = 0; i < parasiteTarget.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/parasiteTarget/parasiteTarget`, parasiteTarget[i].id)
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < armadilheiroInformation.length; i++){
+        for (let i = 0; i < armadilheiroInformation.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/armadilheiroInformation/armadilheiroInformation`, armadilheiroInformation[i].id)
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < spyInformation.length; i++){
+        for (let i = 0; i < spyInformation.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/spyInformation/spyInformation`, spyInformation[i].id)
             await deleteDoc(theRef)
 
         }
         clearNeedlessData();
         stopDayMusic();
+        stopDramaticDeathMusic();
 
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "dayCounter", "dayCounter", "dayCounter"), { currentDay: 1 })
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "padeiraHeals", "padeiraHeals", "padeiraHeals"), { healCountMax: 4 });
@@ -346,13 +379,13 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
     }
     const clearNeedlessData = () => {
         // clears visitAction
-        for (let p = 0; p < visitAction.length; p++){
+        for (let p = 0; p < visitAction.length; p++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/visitAction/visitAction`, visitAction[p].id)
             deleteDoc(theRef);
         }
         // clears bomb, marks, motivations and parasites.
         const bombClear = statusAfliction.filter(status => { return status.status === 'bomba' })
-        const markClear = statusAfliction.filter(status => {return status.status === 'marcado'})
+        const markClear = statusAfliction.filter(status => { return status.status === 'marcado' })
         const motivateClear = statusAfliction.filter(status => { return status.status === 'motivado' })
         const parasiteClear = statusAfliction.filter(status => { return status.status === 'parasita' })
         const chantagemClear = statusAfliction.filter(status => { return status.status === 'chantageado' })
@@ -372,21 +405,21 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, motivateClear[p].id)
             deleteDoc(theRef)
         }
-        for (let i = 0; i < announcements.length; i++){
+        for (let i = 0; i < announcements.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/announcements/announcements`, announcements[i].id)
             deleteDoc(theRef);
         }
-        for (let i = 0; i < allPublicEvents.length; i++){
+        for (let i = 0; i < allPublicEvents.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/publicEvents/publicEvents`, allPublicEvents[i].id)
             deleteDoc(theRef)
 
         }
-        for (let i = 0; i < armadilheiroInformation.length; i++){
+        for (let i = 0; i < armadilheiroInformation.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/armadilheiroInformation/armadilheiroInformation`, armadilheiroInformation[i].id)
             deleteDoc(theRef)
 
         }
-        for (let i = 0; i < spyInformation.length; i++){
+        for (let i = 0; i < spyInformation.length; i++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/spyInformation/spyInformation`, spyInformation[i].id)
             deleteDoc(theRef)
 
@@ -405,7 +438,7 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                 let num = Math.random();
                 const targetted = alivePlayers.filter(target => { return target.playerName === statusAfliction[i].target })
                 
-                if (num < 0.6) {
+                if (num < 0.75) {
                     playBombSound();
                     setTimeout(() => {
                         updateDoc(doc(database, "playeradmin", "players", user.email, targetted[0].id), { life: "dead" })
@@ -428,7 +461,7 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                 const targetted = alivePlayers.filter(target => { return target.playerName === statusAfliction[i].target })
 
                 playGunSound();
-                updateDoc(doc(database, "playeradmin", "players", user.email, targetted[0].id), { life: "dead"})
+                updateDoc(doc(database, "playeradmin", "players", user.email, targetted[0].id), { life: "dead" })
                 const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusAfliction[i].id)
                 deleteDoc(theRef)
                 return;
@@ -438,6 +471,7 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
     const startNight = () => {
         clearNeedlessData();
         stopDayMusic();
+        stopDramaticDeathMusic();
         navigateToNight('/night');
     }
     const judgement = () => {
@@ -457,13 +491,33 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
         if (posiviteCounter > negativeCounter) {
             playmorteSound();
             const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
-            updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead"})
-            setTimeout(() => {
-                stopDeadEffectMusic();
-                playDayMusic();
-            }, 12000);
+            updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead" })
             setJudgementPanelIsOpen(false);
-
+            if (target[0].role === 'peste') {
+                setTimeout(() => {
+                    stopDeadEffectMusic();
+                    stopDayMusic();
+                    playPesteDeathMusic();
+                    setPlaguePanelIsOpen(true)
+                }, 5000)
+            } else {
+                if (target[0].role === 'bobodacorte') {
+                    setTimeout(() => {
+                        stopDeadEffectMusic();
+                        stopDayMusic();
+                        playJesterDeathMusic();
+                        setJesterPanelIsOpen(true);
+                    }, 5000)
+                }
+                else {
+                    setKillPanelIsOpen(true);
+                    setKillAnouncementUpdate(`O jogador ${target[0].playerName} foi julgado. Sua função era ${target[0].role}`)
+                    setTimeout(() => {
+                        stopDeadEffectMusic();
+                        playDramaticDeathMusic();
+                    }, 12000);
+                }
+            }
         } else {
             setJudgementPanelIsOpen(false);
             playCancelEffectMusic();
@@ -491,19 +545,48 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
         }, 3000);
     }
     const dayPrompt2 = () => {
-        setIsOpen(false);
-        setIs2ModalOpen(true);
-        playRoosterSound();
-        setTimeout(() => {
-            playDayMusic();
 
-        }, 3000);
+        const horsemen = alivePlayers.filter(player => player.filliation === 'horsemen');
+        if (horsemen.length > 0 && currentDay === 8) {
+            setIsOpen(false);
+            playRoosterSound();
+            setApocalipsePanelIsOpen(true)
+            setTimeout(() => {
+                playApocalipseMusic();
+                
+            }, 3000);
+        } else {
+            setIsOpen(false);
+            setIs2ModalOpen(true);
+            playRoosterSound();
+            setTimeout(() => {
+                playDayMusic();
+                
+            }, 3000);
+        }
     }
     const adminPanel = () => {
         setAdminPanelIsOpen(true);
     }
-    console.log(alivePlayers)
-    console.log(deadPlayers)
+
+    const plagueMurder = () => {
+        setPlaguePanelIsOpen(false);
+        const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
+        const target2 = alivePlayers.filter(player => { return player.playerName === playerKilling2 });
+        updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead" });
+        updateDoc(doc(database, "playeradmin", "players", user.email, target2[0].id), { life: "dead" });
+        setKillPanelIsOpen(true);
+        setKillAnouncementUpdate(`Os jogadores ${target[0].playerName} e ${target2[0].playerName} morreram com a peste bubônica. Suas funções eram: ${target[0].role} e ${target2[0].role} respectivamente.`)
+        playDramaticDeathMusic();
+    }
+    const jesterMurder = () => {
+        setJesterPanelIsOpen(false);
+        const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
+        updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead" });
+        setKillPanelIsOpen(true);
+        setKillAnouncementUpdate(`O jogador ${target[0].playerName} morreu com a brincadeira do Bobo da Corte. Sua função era: ${target[0].role}.`)
+        playDramaticDeathMusic();
+    }
     return (
         // The day has to set all the player actions as pending
         <div className="day">
@@ -663,7 +746,7 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                                 <p className="statusAfliction-player">{player.target}</p>
                                 <p className="statusAfliction-estado">tem o efeito</p>
                                 <p className="statusAfliction-evento">{player.status} </p>
-                                {player.status == 'marcado' && <button className="miniButton trigger" onClick={explodeMark}><img src={bulletSvg} alt="bullet" /></button>}
+                                {player.status === 'marcado' && <button className="miniButton trigger" onClick={explodeMark}><img src={bulletSvg} alt="bullet" /></button>}
                             </span>
                         ))}
                     </div>
@@ -678,14 +761,16 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                     <div className="counterBox mafiaies"> {mafiaies.length}</div>
                     <div className="counterBox covenies"> {covenies.length}</div>
                     <div className="counterBox neutraies" > {neutraies.length}</div>
+                    <div className="counterBox horsies" > {horsies.length}</div>
                     </div>
                     <div className="large-container card-border scrollable">
                         {alivePlayers.map((player => (
                             <span className="alivePlayersConfig" key={player.key}>
-                                {player.playerName} - {player.filliation == 'town' && <p className="townies">{player.role}</p>}
-                                {player.filliation == 'mafia' && <p className="mafiaies">{player.role}</p>}
-                                {player.filliation == 'coven' && <p className="covenies">{player.role}</p>}
-                                {player.filliation == 'neutral' && <p className="neutraies">{player.role}</p>}
+                                {player.playerName} - {player.filliation === 'town' && <p className="townies">{player.role}</p>}
+                                {player.filliation === 'mafia' && <p className="mafiaies">{player.role}</p>}
+                                {player.filliation === 'coven' && <p className="covenies">{player.role}</p>}
+                                {player.filliation === 'neutral' && <p className="neutraies">{player.role}</p>}
+                                {player.filliation === 'horsemen' && <p className="horsies">{player.role}</p>}
                             </span>
                         )))}
                         </div>
@@ -698,10 +783,11 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                         {deadPlayers.map((player) => (
                             <span className="alivePlayersConfig" key={player.key + '3'}>
                                 {player.playerName} -
-                                {player.filliation == 'town' && <p className="townies">{player.role}</p>}
-                                {player.filliation == 'mafia' && <p className="mafiaies">{player.role}</p>}
-                                {player.filliation == 'coven' && <p className="covenies">{player.role}</p>}
-                                {player.filliation == 'neutral' && <p className="neutraies">{player.role}</p>}
+                                {player.filliation === 'town' && <p className="townies">{player.role}</p>}
+                                {player.filliation === 'mafia' && <p className="mafiaies">{player.role}</p>}
+                                {player.filliation === 'coven' && <p className="covenies">{player.role}</p>}
+                                {player.filliation === 'horsemen' && <p className="horsies">{player.role}</p>}
+                                {player.filliation === 'neutral' && <p className="neutraies">{player.role}</p>}
                             </span>
                                     ))}
                     </div>
@@ -731,6 +817,65 @@ const [parasiteTarget, setParasiteTarget] = useState([]);
                     <button className="button" onClick={explodeBomb}>Bomba do Palhaço</button>  
                     <button className="button" onClick={endGameCompletely}>Encerrar Jogo</button>
                     <button className="button" onClick={() => { setAdminPanelIsOpen(false) }}>Fechar Painel</button>
+                        
+                    </div>
+                    </div>
+                    
+            </Popup>
+            <Popup open={plaguePanelIsOpen} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                    <div className="header">Peste morreu no julgamento, mate dois jogadores </div>
+                    <div className="content">
+                    <select name="playerName" id="playerName" value={playerKilling} onChange={(e) => setPlayerKilling(e.target.value)}>
+                            <option value="" defaultValue disabled hidden></option>
+                            {alivePlayers.map(player => (
+                                <option key={player.key}>{player.playerName}</option>
+                            ))}
+                        </select>
+                    <select name="playerName2" id="playerName2" value={playerKilling2} onChange={(e) => setPlayerKilling2(e.target.value)}>
+                            <option value="" defaultValue disabled hidden></option>
+                            {alivePlayers.map(player => (
+                                <option key={player.key}>{player.playerName}</option>
+                            ))}
+                        </select>
+                    <button className="button" onClick={plagueMurder}>Matar os jogadores</button>
+                        
+                    </div>
+                    </div>
+                    
+            </Popup>
+            <Popup open={jesterPanelIsOpen} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                    <div className="header">O Bobo da Corte morreu! Mate 1 jogador </div>
+                    <div className="content">
+                    <select name="playerName" id="playerName" value={playerKilling} onChange={(e) => setPlayerKilling(e.target.value)}>
+                            <option value="" defaultValue disabled hidden></option>
+                            {alivePlayers.map(player => (
+                                <option key={player.key}>{player.playerName}</option>
+                            ))}
+                        </select>
+                    <button className="button" onClick={jesterMurder}>Matar os jogadores</button>
+                        
+                    </div>
+                    </div>
+                    
+            </Popup>
+            <Popup open={killPanelIsOpen} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                    <div className="header">Anúncio de Morte </div>
+                    <div className="contentDeathAnouncement">
+                        <span>{killAnouncementUpdate}</span>
+                    <button className="button" onClick={() => setKillPanelIsOpen(false)}>Ok!</button>
+                        
+                    </div>
+                    </div>
+                    
+            </Popup>
+            <Popup open={apocalipsePanelIsOpen} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                    <div className="header">Vitória dos Cavaleiros do Apocalipse </div>
+                    <div className="contentDeathAnouncement">
+                    <button className="button" onClick={endGameCompletely}>Encerrar Jogo</button>
                         
                     </div>
                     </div>
