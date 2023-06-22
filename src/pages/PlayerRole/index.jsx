@@ -13,6 +13,7 @@ const PlayerRole = () => {
     const [isRandomizerOpen, setIsRandomizerOpen] = useState(false);
     const [townRole, setTownRole] = useState([]);
     const [covenRole, setCovenRole] = useState([]);
+    const [horsemenRole, setHorsemenRole] = useState([]);
     const [mafiaRole, setMafiaRole] = useState([]);
     const [user, setUser] = useState({});
     const [allRoles, setAllRoles] = useState([]);
@@ -89,6 +90,21 @@ const PlayerRole = () => {
                 setCovenRole(roles);
                 
             })
+            const horsemenSnapshot = onSnapshot(collection(database, "gamedata/roles/horsemen"), (snapshot) => {
+                let roles = [];
+                snapshot.forEach((doc) => {
+                    roles.push({
+                        filliation: "horsemen",
+                        role: doc.data().role,
+                        skill: doc.data().skill,
+                        special: doc.data().special,
+                        wakeOrder: doc.data().wakeOrder
+
+                    })
+                })
+                setHorsemenRole(roles);
+                
+            })
             const neutralSnapshot = onSnapshot(collection(database, "gamedata/roles/neutral"), (snapshot) => {
                 let roles = [];
                 snapshot.forEach((doc) => {
@@ -109,51 +125,21 @@ const PlayerRole = () => {
     }, []) 
     useEffect(() => {
 
-        function addAllRoles(townRole, mafiaRole, covenRole, neutralRole) {  
-            setAllRoles([...townRole,...mafiaRole, ...covenRole, ...neutralRole])
+        function addAllRoles(townRole, mafiaRole, covenRole, horsemenRole, neutralRole) {  
+            setAllRoles([...townRole,...mafiaRole, ...covenRole, ...horsemenRole, ...neutralRole])
            
        }
-        addAllRoles(covenRole, mafiaRole, townRole, neutralRole);
+        addAllRoles(covenRole, mafiaRole, townRole, horsemenRole, neutralRole);
     playAmbienceSound();
 
     }, [covenRole])
     const handleConfirm = async (e) => {
         e.preventDefault(); 
-        for (let i = 0; i < playerList.length; i++) {
-            if (playerList[i].playerName === currentPlayer) {
-                const currentId = playerList[i].id;
-                if (currentRole === "meretriz") {
-                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 2})
-                    return;  
-                }
-                if (currentRole === "executor") {
-                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 1})
-                    return;
-                }
-                if (currentRole === "godfather") {
-                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 28})
-                    return;
-                }
-                if (currentRole === "afilhado") {
-                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 29})
-                    return;
-                }
-                if ( currentRole === "conselheira" || currentRole === "vigarista" || currentRole === "zelador") {
-                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 30})
-                    return;
-                }
-                if ( currentRole === "amaldicoadora" || currentRole === "feiticeira benevolente" || currentRole === "ilusionista" || currentRole === "parasita" || currentRole === "miragem") {
-                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 35})
-                    return;
-                }
-                if ( currentRole === "coveiro" || currentRole === "sobrevivente" || currentRole === "estranho" || currentRole === "prefeito" || currentRole === "bobo da corte" || currentRole === "cidadao") {
-                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 150})
-                    return;
-                }
-                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 99})
-                return;
-            }
-        }
+        const chosenPlayer = playerList.filter(player => player.playerName === currentPlayer);
+        const chosenRole = allRoles.filter(role => role.role === currentRole);
+        const chosenPlayerId = chosenPlayer[0].id
+        const chosenRoleWakeOrder = chosenRole[0].wakeOrder
+        await updateDoc(doc(database, "playeradmin", "players", user.email, chosenPlayerId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: chosenRoleWakeOrder})
 
     }
 
@@ -179,10 +165,16 @@ const PlayerRole = () => {
         stop();
         navigate('/day');
     }
-    async function handleRandomizer(enemy){
+    async function handleRandomizer(enemy1, enemy2){
         const players = playerList.slice();
-        console.log(players);
-        const fill = ['town', 'neutral', enemy];
+        var fill = []
+        if (enemy2 === 'none') {
+            fill = ['town', enemy1];
+            
+        } else {
+            fill = ['town', enemy1, enemy2];
+            
+        }
         const roleD = allRoles.slice();
         console.log(fill)
         var randomizedPlayers = []
@@ -218,38 +210,10 @@ const PlayerRole = () => {
         for (let i = 0; i < randomizedPlayers.length; i++) {
             const currentId = randomizedPlayers[i].selectedName.id;
             const currentRole = randomizedPlayers[i].selectedRole.role;
-            console.log(currentRole)
+            const wakeOrder = randomizedPlayers[i].selectedRole.wakeOrder;
+            console.log(randomizedPlayers[i])
             const currentFilliation = randomizedPlayers[i].selectedRole.filliation
-                if (currentRole === "meretriz") {
-                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 2})
-                } else {
-                    
-                if (currentRole === "executor") {
-                    await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 1})
-                } else {
-                    if (currentRole === "godfather") {
-                        await  updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 28})
-                    } else {
-                        if (currentRole === "afilhado") {
-                            await  updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 29})
-                        } else {
-                            if ( currentRole === "conselheira" || currentRole === "vigarista" || currentRole === "zelador") {
-                                await  updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 30})
-                            } else {
-                                if ( currentRole === "amaldicoadora" || currentRole === "feiticeira benevolente" || currentRole === "ilusionista" || currentRole === "parasita" || currentRole === "miragem") {
-                                    await  updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 35})
-                                } else {
-                                    if ( currentRole === "coveiro" || currentRole === "sobrevivente" || currentRole === "estranho" || currentRole === "prefeito" || currentRole === "bobo da corte" || currentRole === "cidadao") {
-                                        await  updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 150})
-                                    } else {
-                                        await  updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: 99})
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: wakeOrder})
         }
     }
     return (
@@ -260,9 +224,18 @@ const PlayerRole = () => {
             <Popup open={isRandomizerOpen} modal closeOnDocumentClick={false}>
                 <div className="modalNight">
                     <div className="header">Randomizador de Funções</div>
-                        <div className="content">
-                            <button className="button" onClick={() => handleRandomizer('mafia')}>Randomizar com Mafia</button>
-                            <button className="button" onClick={() => handleRandomizer('coven')}>Randomizar com Coven</button>
+                    <div className="content modalRandomizerContent">
+                        <span className="bordered">Jogar contra a Mafia
+                            <button className="button" onClick={() => handleRandomizer('mafia', 'neutral')}>VS Mafia</button>
+                        </span>
+                        <span className="bordered">Jogar contra o Coven
+                            <button className="button" onClick={() => handleRandomizer('coven', 'neutral')}>VS Coven</button>
+                        </span>
+                        <span className="bordered">Jogar contra os Cavaleiros
+
+                            <button className="button" onClick={() => handleRandomizer('horsemen', 'none')}>VS Cavaleiros</button>
+                        <span className="smallText">Limite de 21 jogadores!</span>
+                        </span>
                             <button className="button" onClick={() => setIsRandomizerOpen(false)}>Fechar Randomizador</button>
                         </div>
                     </div>
@@ -271,8 +244,8 @@ const PlayerRole = () => {
                 <div className="playerRole-assign">
                     <form >
                         <label >
-                            <select name="player" id="player" value={currentPlayer} onChange={(e) => setCurrentPlayer(e.target.value)}>
                             Jogador:
+                            <select name="player" id="player" value={currentPlayer} onChange={(e) => setCurrentPlayer(e.target.value)}>
                                 {playerList.map((player) => (
                                     <option key={player.key}>{player.playerName}
                                     </option>
@@ -286,7 +259,7 @@ const PlayerRole = () => {
                                     <option value="town" id="town">Cidade</option>
                                     <option value="coven" id="coven" className="coven">Coven</option>
                                     <option value="mafia" className="mafia">Mafia</option>
-                                    <option value="cavaleirosDoApocalipse" className="cavaleirosDoApocalipse">Cavaleiros do Apocalipse</option>
+                                    <option value="horsemen" className="cavaleirosDoApocalipse">Cavaleiros do Apocalipse</option>
                                     <option value="neutral" className="neutral">Neutros</option>
                             </select>
                         </label>
@@ -330,6 +303,9 @@ const PlayerRole = () => {
                             <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role}</p>
                                 ))}
                         {playerList.filter(player => player.filliation.includes("coven")).map(filteredPlayer => (
+                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role}</p>
+                                ))}
+                        {playerList.filter(player => player.filliation.includes("horsemen")).map(filteredPlayer => (
                             <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role}</p>
                                 ))}
                         </div>
