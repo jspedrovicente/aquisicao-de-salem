@@ -25,15 +25,15 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
  - [x] Procuradora
 
 ### Rework Characters :
-- [ ] Armadilheiro (small)
-- [ ] Grimorio/Coven (medium)
+- [x] Armadilheiro (small) [canceled]
+- [x] Grimorio/Coven (medium) [canceled]
 - [x] Mafia in general (large) [now the mafia has a promotion order for each of the characters]
-- [ ] Medium (large)
+- [ ] Medium (large) [maybe remove?]
 ### Buff Characters :
- - [ ] Vigarista
- - [ ] Bardo
- - [ ] Medium
- - [ ] Palhaço
+ - [x] Vigarista
+ - [x] Bardo
+ - [x] Medium
+ - [x] Palhaço
 ### Nerf Characters :
  - [ ] Curandeira
  - [ ] Town in general
@@ -45,8 +45,8 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
  - [ ] DONT ALLOW mafia/Coven picks
  - [ ] Make the input reset so it doesn't allow confirmation without a target
 ### New Feature:
-- [ ] Randomizer button for easier game playthroughs
-- [ ] Action limiter (Investigador, Padeira)
+- [x] Randomizer button for easier game playthroughs
+- [x] Action limiter (Investigador, Padeira, veterano, conselheira, zelador)
 - [ ] Mobile friedly <3
 - [x] new MODAL for announcements to prohibit foul admin play.
 - [x] new MODAL for nightly preparations
