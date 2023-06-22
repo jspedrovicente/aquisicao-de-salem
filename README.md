@@ -10,10 +10,10 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 
 ## V.2.0 Changes:
 ### New Characters :
- - [ ] Fome
- - [ ] Guerra
- - [ ] Morte
- - [ ] Peste
+ - [x] Fome
+ - [x] Guerra
+ - [x] Morte
+ - [x] Peste
  - [ ] Taberneiro
  - [ ] Fuxiqueira
 
@@ -51,12 +51,25 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 - [x] new MODAL for announcements to prohibit foul admin play.
 - [x] new MODAL for nightly preparations
 - [x] new Judgement Modal for cleaner view
+- [x] new Peste post judgement modal for proper gameplay
+- [x] new Bobo da corte modal for proper gameplay
+- [x] new DEATH ANNOUNCEMENT post-kill so the admin doesnt have to think.
 - [x] new button for pistoleiro kills
 - [x] new button for clown kills
 - [x] new Admin Panel Modal
 - [x] new counter for each filliation
 - [x] color-coded alive and dead characters
 - [x] new counter for each filliation
+
+### New Sound Effects:
+- [x] Peste Killing sound effect
+- [x] Jester Killing sound effect
+- [x] Horsemen VICTORY sound effect (probably my favorite to make)
+- [x] Post-Judgement Music (to differ from day music)
+- [ ] Peste Waking up
+- [ ] Morte waking up
+- [ ] Guerra waking up
+- [ ] Fome waking up
 ### Remove Features :
  - [x] Whisper
  - [x] Randomly generated sound between track 
