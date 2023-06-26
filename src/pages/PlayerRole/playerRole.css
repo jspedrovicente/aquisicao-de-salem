@@ -99,3 +99,31 @@
     align-items: center;
     width: 100%;
 }
+
+.selectors{
+    display: flex;
+    justify-content: center;
+}
+.selector-category{
+    display: flex;
+    flex-direction: column;
+    border: #836E00 1px solid;
+    border-radius: 20px;
+    margin: 10px;
+    padding: 10px;
+}
+.manualRandomizerLower{
+    display: flex;
+}
+.eachRole{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.modalRole{
+    background-color: #121212;
+    color: #FFF;
+    display: flex;
+    align-items: center;
+}

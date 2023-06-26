@@ -45,6 +45,7 @@ const Day = () => {
     const [killPanelIsOpen, setKillPanelIsOpen] = useState(false);
     const [apocalipsePanelIsOpen, setApocalipsePanelIsOpen] = useState(false);
     const [is2ModalOpen, setIs2ModalOpen] = useState(false);
+    const [updatePanelInfo, setUpdatePanelInfo] = useState(false);
     const [posiviteCounter, setPosiviteCounter] = useState(0)
     const [negativeCounter, setNegativeCounter] = useState(0)
     const [user, setUser] = useState([]);
@@ -325,11 +326,6 @@ const Day = () => {
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < announcements.length; i++) {
-            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/announcements/announcements`, announcements[i].id)
-            await deleteDoc(theRef)
-
-        }
         for (let i = 0; i < deadPlayers.length; i++) {
             await updateDoc(doc(database, "playeradmin", "players", user.email, deadPlayers[i].id), { life: "none", filliation: "none", role: "none" })
 
@@ -501,7 +497,7 @@ const Day = () => {
                     setPlaguePanelIsOpen(true)
                 }, 5000)
             } else {
-                if (target[0].role === 'bobodacorte') {
+                if (target[0].role === 'bobo da corte') {
                     setTimeout(() => {
                         stopDeadEffectMusic();
                         stopDayMusic();
@@ -544,8 +540,26 @@ const Day = () => {
 
         }, 3000);
     }
-    const dayPrompt2 = () => {
+    const executorCheck = () => {
+        const executor = alivePlayers.filter(player => player.role === 'executor');
+        const executorStatus = statusAfliction.filter(status => status.status === 'executação');
+        if (executorStatus.length > 0) {
+            let execTarget = alivePlayers.filter(player => player.playerName === executorStatus[0].target);
+            if (execTarget.length === 0) {
+                setUpdatePanelInfo('O alvo do executor morreu, ele agora virou Bobo da corte!');
 
+                updateDoc(doc(database, "playeradmin", "players", user.email, executor[0].id), { role: 'bobo da corte' });
+                deleteDoc(doc(database, "playeradmin", "playerStatuses", user.email, "statusAfliction", "statusAfliction", executorStatus[0].id));
+    
+            }
+        };
+        if (executor.length > 0) {
+            updateDoc(doc(database, "playeradmin", "players", user.email, executor[0].id), { wakeOrder: 150 });
+            
+        }
+    }
+    const dayPrompt2 = () => {
+        executorCheck();
         const horsemen = alivePlayers.filter(player => player.filliation === 'horsemen');
         if (horsemen.length > 0 && currentDay === 8) {
             setIsOpen(false);
@@ -588,7 +602,6 @@ const Day = () => {
         playDramaticDeathMusic();
     }
     return (
-        // The day has to set all the player actions as pending
         <div className="day">
 
             <h3 className="page-title">
@@ -642,7 +655,6 @@ const Day = () => {
 
                                     </span>
                             )}
-                            {allPublicEvents.length > 0 ? (
                                 <span className="modalNotifier fade-in-text2 ">
                                     <h4 className="notifier-title ">Efeitos Públicos:</h4>
                                     {allPublicEvents.map((event) => (
@@ -655,14 +667,11 @@ const Day = () => {
 
                                             )}
                                                 </span>      
-                                        ))}
+                                    ))}
+                                <span>
+                                    {updatePanelInfo}
                                 </span>
-                            ): (
-                                    <span className="modalNotifier fade-in-text2">
-                                        <h4 className="notifier-title">Efeitos públicos esta noite:</h4>
-                                        <p>Não há efeitos essa noite.</p>   
-                            </span>
-                            )}
+                                </span>
                             {armadilheiroInformation.length > 0 && 
                                 <span className="modalNotifier fade-in-text2 ">
                                 <h4 className="notifier-title ">Efeito do Armadilheiro:</h4>
@@ -710,8 +719,11 @@ const Day = () => {
                         ))}
                         {armadilheiroInformation.map((info) => (
                             <span key={info.key} className="armadilhaPlace">
-                                <p className="armadilhaPlace-visitor">{info.role}</p>
-                                <p className="armadilhaPlace-text">ativou a armadilha!</p>
+                            {info.role !== "armadilheiro" && (
+                            <span key={info.key} className="armadilhaPlace">
+                            <p className="armadilhaPlace-visitor">{info.role}</p>
+                            <p className="armadilhaPlace-text">ativou a armadilha!</p>
+                            </span> )}
                             </span>
                         ))}
                         {spyInformation.map((info) => (
@@ -871,6 +883,7 @@ const Day = () => {
                     </div>
                     
             </Popup>
+
             <Popup open={apocalipsePanelIsOpen} modal closeOnDocumentClick={false}>
                     <div className="modalNight">
                     <div className="header">Vitória dos Cavaleiros do Apocalipse </div>
