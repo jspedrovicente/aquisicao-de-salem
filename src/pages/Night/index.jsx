@@ -1147,7 +1147,7 @@ const Night = () => {
                     if (specialGroupWakeCounter) {
                         setGroupInfo('Mafia Acorda');
                         setSpecialGroupWakeCounter(false);
-                        groupWakeModalIsOpen(true);
+                        setGroupWakeModalIsOpen(true);
                     }
                 writePlayerInformation();
                 document.querySelector('.zeladorCounter').classList.remove('invisible');
