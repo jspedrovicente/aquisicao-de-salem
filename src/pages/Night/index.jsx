@@ -33,6 +33,9 @@ import parasitaEffect from "../../assets/parasita-soundeffect.mp3"
 import amaldicoadoraEffect from "../../assets/amaldicoadora-soundeffect.mp3"
 import parasitaGrimorioEffect from "../../assets/parasita-grimorio-soundeffect.mp3"
 import grimorioEffect from "../../assets/coven-grimorio-presente.mp3"
+import horsemenSound from "../../assets/horsemen-soundeffect.mp3"
+import fuxiqueiraSound from "../../assets/fuxiqueira-soundeffect.mp3"
+import taberneiroSound from "../../assets/taberneiro-soundeffect.mp3"
 
 import werewolfPresentEffect from "../../assets/werewolf-present-soundeffect.mp3"
 import afilhadoEffect from "../../assets/afilhado-soundeffect.mp3"
@@ -70,13 +73,16 @@ const Night = () => {
     const [playPistoleiroSound] = useSound(pistoleiroEffect);
     const [playPalhacoSound] = useSound(palhacoEffect, {volume: 0.50});
     const [playEspiaoSound] = useSound(espiaoEffect);
+    const [playTaberneiroSound] = useSound(taberneiroSound);
     const [playInvestigadorSound] = useSound(investigadorEffect);
     const [playVigilanteSound] = useSound(vigilanteEffect);
     const [playVeteranSound] = useSound(veteranEffect);
     const [playMediumSound] = useSound(mediumEffect);
+    const [playFuxiqueiraSound] = useSound(fuxiqueiraSound);
     const [playGuardiaoSound] = useSound(guardiaoEffect);
     const [playPadeiraSound] = useSound(padeiraEffect);
     const [playMedicoDaPesteSound] = useSound(medicodapesteEffect);
+    const [playHorsemenSound] = useSound(horsemenSound, {volume: 0.50});
     const [playLobisomenSound] = useSound(lobisomenEffect);
     const [playFeiticeiraSound] = useSound(feiticeirabenevolenteEffect);
     const [playFeiticeiraGrimorioSound] = useSound(feiticeirabenevolenteGrimorioEffect);
@@ -116,9 +122,11 @@ const Night = () => {
     const [currentPlayerTitle, setCurrentPlayerTitle] = useState('');
     const [currentPlayerDescription, setCurrentPlayerDescription] = useState('');
     const [currentPlayerName, setCurrentPlayerName] = useState('');
+    const [notifierModalContent, setNotifierModalContent] = useState('');
     const [specialGroupWakeCounter, setSpecialGroupWakeCounter] = useState(true);
     const [groupInfo, setGroupInfo] = useState('true');
     const [groupWakeModalIsOpen, setGroupWakeModalIsOpen] = useState(false);
+    const [isNotifierModal, setIsNotifierModal] = useState(false);
     // Night actions that transfers to morning
 
     // Information that is transfered solo
@@ -133,6 +141,7 @@ const Night = () => {
     
     const [armadilheiroAction, setArmadilheiroAction] = useState('');
     const [spyAction, setSpyAction] = useState('');
+    const [fuxiqueiraAction, setFuxiqueiraAction] = useState('');
     // Information that gets processed together
     const [motivateAction, setMotivateAction] = useState('');
     const [blackMailAction, setBlackMailAction] = useState('');
@@ -379,7 +388,6 @@ const Night = () => {
         }
         loadRememberedData();
     }, [user.email])
-
     const interruptMusicPlaying = () => {
         stopNightSound1();
         stopNightSound2();
@@ -391,21 +399,24 @@ const Night = () => {
         stopNightSound8();
     }
     const encerrarNoite = async () => {
-        console.log(visitAction)
         interruptMusicPlaying();
         const dead = [];
         const temporaryStatusAfliction = [];
         const allpublicEvents = [];
         const attackingAction = attackAction;
         const specialAttackingAction = specialAttack;
+        const taberneiroTargetRole = alivePlayers.filter(targeted => targeted.playerName === taberneiroDodge);
+
         for (var i = 0; i < attackingAction.length; i++) {
-            if (attackingAction[i].target === taberneiroDodge) {
+            if (attackingAction[i].target === taberneiroDodge && taberneiroTargetRole[0].role !== 'lobisomen') {
                 attackingAction.splice(i, 1);
+                i--
             }
         }
-        for (var i = 0; i < specialAttackingAction.length; i++) {
-            if (specialAttackingAction[i].target === taberneiroDodge) {
-                specialAttackingAction.splice(i, 1);
+        for (var n = 0; n < specialAttackingAction.length; n++) {
+            if (specialAttackingAction[n].target === taberneiroDodge && taberneiroTargetRole[0].role !== 'lobisomen') {
+                specialAttackingAction.splice(n, 1);
+                n--
             }
         }
 
@@ -466,7 +477,6 @@ const Night = () => {
                 };
             };
         };
-
         if (specialAttackingAction.length > 0) {
             for (let i = 0; i < specialAttackingAction.length; i++) {
                 const player = alivePlayers.filter(player => { return player.playerName === specialAttackingAction[i].target })
@@ -489,7 +499,6 @@ const Night = () => {
 
             }
         };
-
         if (blackMailAction !== '') {
             temporaryStatusAfliction.push({ target: blackMailAction, status: 'chantageado' });
             allpublicEvents.push({target: blackMailAction , event: 'chantageado' })
@@ -539,8 +548,17 @@ const Night = () => {
         if (temporaryStatusAfliction.length > 0) {
             const temporaryref = collection(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`)
             for (let k = 0; k < temporaryStatusAfliction.length; k++){
-                if (temporaryStatusAfliction[i].target === taberneiroDodge) {
+                if (temporaryStatusAfliction[k].target === taberneiroDodge) {
+                    if (currentDayTemp[0].currentDay % 2 === 0 && taberneiroTargetRole[0].role === 'lobisomen') {
+                        await addDoc(temporaryref, {
+                            target: temporaryStatusAfliction[k].target,
+                            status: temporaryStatusAfliction[k].status
+                        })
+                    }
                 } else {
+                    if (temporaryStatusAfliction[k].target === alertAction) {
+                        
+                    }
                     await addDoc(temporaryref, {
                         target: temporaryStatusAfliction[k].target,
                         status: temporaryStatusAfliction[k].status
@@ -551,7 +569,13 @@ const Night = () => {
         if (allpublicEvents.length > 0) {
             const ref = collection(database, `playeradmin/playerStatuses/${user.email}/publicEvents/publicEvents`)
             for (let i = 0; i < allpublicEvents.length; i++){
-                if (allpublicEvents[i].target === allpublicEvents) {
+                if (allpublicEvents[i].target === taberneiroDodge) {
+                    if (currentDayTemp[0].currentDay % 2 === 0 && taberneiroTargetRole[0].role === 'lobisomen') {
+                        await addDoc(ref, {
+                            target: allpublicEvents[i].target,
+                            status: allpublicEvents[i].status
+                        })
+                    }
                 } else {
                     await addDoc(ref, {
                         target: allpublicEvents[i].target,
@@ -581,6 +605,41 @@ const Night = () => {
                 addDoc(ref, {
                     visited: visitee[i].target
                 })
+            }
+        }
+        if (fuxiqueiraAction !== '') {
+            if (alivePlayers.length > 5) {
+            const ref = collection(database, `playeradmin/playerStatuses/${user.email}/fuxiqueiraInformation/fuxiqueiraInformation`)
+            console.log(visitAction);
+            const visitors = visitAction.filter(visit => { return visit.target === fuxiqueiraAction })
+            const fuxiqueira = alivePlayers.filter(player => player.role === 'fuxiqueira');
+            for (let i = 0; i < visitors.length; i++){
+                if (visitors[i].visitor === fuxiqueira[0].playerName) {
+                    visitors.splice(i, 1);
+                    i--;
+                }
+            }
+
+            if (visitors.length > 0) {
+                const temporaryVisitors = []
+                    temporaryVisitors.push(visitors[0].visitor)
+                console.log('Primeira pessoa que visitou:' + temporaryVisitors)
+                for (var x = 0; x < 2; x++){
+                    var roleIndex = Math.floor(Math.random() * alivePlayers.length)
+                    if (temporaryVisitors.includes(alivePlayers[roleIndex].playerName) || alivePlayers[roleIndex].playerName === fuxiqueira[0].playerName || alivePlayers[roleIndex].playerName === fuxiqueiraAction) {
+                        x--
+                    } else {
+                        temporaryVisitors.push(alivePlayers[roleIndex].playerName)
+                        console.log('2nd & 3rd randoms?:' + temporaryVisitors)
+                    }
+                }
+                temporaryVisitors.sort()
+                for (let i = 0; i < temporaryVisitors.length; i++){
+                    addDoc(ref, {
+                        visited: temporaryVisitors[i]
+                    })
+                }
+                }
             }
         }
         exportvisitDatabase();
@@ -758,7 +817,8 @@ const Night = () => {
                 writePlayerInformation();
                 incrementCounter();
                     break;
-            case 'taberneiro':
+                case 'taberneiro':
+                    playTaberneiroSound();
                     openSingleDropDown();
                     writePlayerInformation();
                     incrementCounter();
@@ -773,7 +833,12 @@ const Night = () => {
                     setCurrentPlayerDescription(`Não precisa acordar a pessoa, clique em confirmar Ação`);
                 }
                 incrementCounter();
-                break;
+                    break;
+                case 'executor vitorioso':
+                    setCurrentPlayerName(atualJogador.playerName);
+                    setCurrentPlayerDescription(`Executor Vitorioso, NÃO PRECISA ACORDAR!`);
+                    incrementCounter();
+                    break;
             case 'bardo':
                 writePlayerInformation();
                 playBardoSound();
@@ -791,6 +856,7 @@ const Night = () => {
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
+                    closeSingleDropDown();
                 } else {
                     openSingleDropDown();
                 }
@@ -802,6 +868,7 @@ const Night = () => {
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
+                    closeSingleDropDown();
                 } else {
                     openSingleDropDown();
                 }
@@ -813,6 +880,7 @@ const Night = () => {
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
+                    closeSingleDropDown();
                 } else {
                     openSingleDropDown();
                 }
@@ -824,15 +892,19 @@ const Night = () => {
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
-                }
-                if (weaponCreateAction[0].weaponChoice === 'none') {
-                    document.querySelector('.weaponDropDownAction').classList.remove('invisible');
-                }
-                if (weaponCreateAction[0].weaponChoice === 'espada') {
-                    openSingleDropDown();
-                }
-                if (weaponCreateAction[0].weaponChoice === 'escudo') {
-                    setCurrentPlayerDescription('Você está protegido esta noite!');
+                    closeSingleDropDown();
+
+                } else {
+                    
+                    if (weaponCreateAction[0].weaponChoice === 'none') {
+                        document.querySelector('.weaponDropDownAction').classList.remove('invisible');
+                    }
+                    if (weaponCreateAction[0].weaponChoice === 'espada') {
+                        openSingleDropDown();
+                    }
+                    if (weaponCreateAction[0].weaponChoice === 'escudo') {
+                        setCurrentPlayerDescription('Você está protegido esta noite!');
+                    }
                 }
                 incrementCounter();
                 break;
@@ -855,6 +927,8 @@ const Night = () => {
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
+                    closeSingleDropDown();
+
                 } else {
                     if (investigatorCounter > 0) {
                         openSingleDropDown();
@@ -871,6 +945,8 @@ const Night = () => {
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
+                    closeSingleDropDown();
+
                 } else {
                     openSingleDropDown();
                 }
@@ -882,6 +958,8 @@ const Night = () => {
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
+                    closeDeadDropDown();
+
                 } else {
                     openDeadDropDown();
                 }
@@ -893,6 +971,7 @@ const Night = () => {
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
+                    closeSingleDropDown();
                 } else {
                     openSingleDropDown();
                 }
@@ -923,6 +1002,7 @@ const Night = () => {
                 document.querySelector('.padeiraCounter').classList.remove('invisible');
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
                     closeConfirmButton();
                 } else {
                     if (padeiraHealCount > 0) {
@@ -935,6 +1015,18 @@ const Night = () => {
                 }
                 incrementCounter();
                 break;
+            case 'fuxiqueira':
+                    writePlayerInformation();
+                    playFuxiqueiraSound();
+                    if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
+                        setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
+                    closeConfirmButton();
+                    } else {
+                        openSingleDropDown();
+                    }
+                    incrementCounter();
+                    break;
             case 'godfather':
                 writePlayerInformation();
                 if (specialGroupWakeCounter) {
@@ -942,9 +1034,11 @@ const Night = () => {
                     setSpecialGroupWakeCounter(false);
                     setGroupWakeModalIsOpen(true);
                     }
-                playGodfatherSound();
+                    playGodfatherSound();
+                    console.log(blockAction2)
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
                     closeConfirmButton();
                 } else {
                     openSingleDropDown();
@@ -967,6 +1061,7 @@ const Night = () => {
 
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
                     closeConfirmButton();
                 } else {
                     if (controlCounter === 0) {
@@ -975,12 +1070,20 @@ const Night = () => {
                         setCurrentPlayerDescription('Você foi promovido para Godfather!')
                         openSingleDropDown();
                     } else {
-                        if (alivePlayers[controlCounter - 1].role !== 'meretriz') {
-                            if (conselheiraCounter > 0) {
-                                openSingleDropDown();
+                        if (alivePlayers[controlCounter - 1].role !== 'meretriz' ) {
+                            if (alivePlayers[controlCounter - 1].role !== 'taberneiro') {
+                                
+                                if (conselheiraCounter > 0) {
+                                    openSingleDropDown();
+                                } else {
+                                    setCurrentPlayerDescription('Você já consumiu todas suas ações');
+                                    closeConfirmButton();
+                                }
                             } else {
-                                setCurrentPlayerDescription('Você já consumiu todas suas ações');
-                                closeConfirmButton();
+                                updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
+
+                                setCurrentPlayerDescription('Você foi promovido para Godfather!')
+                                openSingleDropDown(); 
                             }
                             
                         } else {
@@ -1007,6 +1110,7 @@ const Night = () => {
                 playVigaristaSound();
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
                     closeConfirmButton();
                 } else {
                     if (controlCounter === 0) {
@@ -1016,7 +1120,14 @@ const Night = () => {
                         openSingleDropDown();
                     } else {
                         if (alivePlayers[controlCounter - 1].role !== 'meretriz') {
-                            openSingleDropDown();
+                            if (alivePlayers[controlCounter - 1].role !== 'taberneiro') {
+                                openSingleDropDown();
+                            } else {
+                                updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
+
+                                setCurrentPlayerDescription('Você foi promovido para Godfather!')
+                                openSingleDropDown();
+                            }
                             
                         } else {
                             updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
@@ -1053,11 +1164,19 @@ const Night = () => {
                     openSingleDropDown();
                 } else {
                     if (alivePlayers[controlCounter - 1].role !== 'meretriz') {
-                        if (zeladorCounter) {
+                        if (alivePlayers[controlCounter - 1].role !== 'taberneiro') {
                             
+                            if (zeladorCounter) {
+                                
+                            } else {
+                                closeConfirmButton();
+                                setCurrentPlayerDescription('Você já consumiu todas suas ações');
+                            }
                         } else {
-                            closeConfirmButton();
-                            setCurrentPlayerDescription('Você já consumiu todas suas ações');
+                            updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
+
+                            setCurrentPlayerDescription('Você foi promovido para Godfather!')
+                            openSingleDropDown();
                         }
                     } else {
                         updateDoc(doc(database, "playeradmin", "players", user.email, alivePlayers[controlCounter].id), { role: "godfather", wakeOrder: 28 })
@@ -1082,6 +1201,7 @@ const Night = () => {
                 playAfilhadoSound();
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
                     closeConfirmButton();
                 } else {
                     if (controlCounter === 0) {
@@ -1110,6 +1230,7 @@ const Night = () => {
                 playPistoleiroSound();
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
                     closeConfirmButton();
                 } else {
                     openSingleDropDown();
@@ -1122,6 +1243,7 @@ const Night = () => {
                 playPalhacoSound();
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
                     closeConfirmButton();
                 } else {
                     openSingleDropDown();
@@ -1134,6 +1256,7 @@ const Night = () => {
                 playMedicoDaPesteSound();
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
                     closeConfirmButton();
                 } else {
                     openSingleDropDown();
@@ -1155,6 +1278,7 @@ const Night = () => {
                 playArsonistaSound();
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
                     closeConfirmButton();
                 } else {
                     document.querySelector('.arsonistaButton').classList.remove('invisible');
@@ -1167,6 +1291,7 @@ const Night = () => {
                 playAssassinoEmSerieSound();
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
+                    closeSingleDropDown();
                     closeConfirmButton();
                 } else {
                     openSingleDropDown();
@@ -1185,9 +1310,10 @@ const Night = () => {
                 } else {
                     playFeiticeiraSound();
                 };
-                    if (blockAction === alivePlayers[controlCounter].playerName || blockAction2 === alivePlayers[controlCounter].playerName) {
+                    if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                         setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
-                        closeConfirmButton();
+                    closeSingleDropDown();
+                    closeConfirmButton();
                     }
                     else {
                         openSingleDropDown()
@@ -1206,27 +1332,14 @@ const Night = () => {
                     }
                 writePlayerInformation();
                 playAmaldicoadoraSound();
-                if (poisonedTarget.length > 0) {
-                    let temp = [];
-                    for (var i = 0; poisonedTarget.length > i; i++){
-                        temp.push({ attacker: alivePlayers[controlCounter].playerName, attackerRole: 'amaldicoadora', target: poisonedTarget[i].playerName })
-                    } 
 
-                    setSpecialAttack(...specialAttack, temp);
-                    for (let p = 0; p < poisonedTarget.length; p++){
-                        const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/poisonTarget/poisonTarget`, poisonedTarget[p].id)
-                        deleteDoc(theRef);
-                    }
-                    const statusPoisoned = inGameStatusAfliction.filter(status => { return status.status === 'amaldiçoado' });
-                    
-                    for (let p = 0; p < statusPoisoned.length; p++){
-                        const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusPoisoned[p].id)
-                        deleteDoc(theRef);
-                    }
-                }
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
+                    closeSingleDropDown();
+                    closeSecondAttackDropDown();
+
+
                 }
                 else {
                     if (currentDayTemp[0].currentDay >= 4) {
@@ -1270,6 +1383,8 @@ const Night = () => {
                     if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                         setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                         closeConfirmButton();
+                    closeSingleDropDown();
+
                     }
                     else {
                         openSingleDropDown();
@@ -1292,13 +1407,7 @@ const Night = () => {
                 }
                 if (currentDayTemp[0].currentDay >= 4) {
                     playMiragemGrimorioSound();
-                    if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
-                        setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
-                        closeConfirmButton();
-                        
-                    } else {
-                        openSingleDropDown();
-                    }
+                    openSingleDropDown();
                 } else {
                 closeSingleDropDown();
                 }
@@ -1313,12 +1422,13 @@ const Night = () => {
                     setGroupInfo('Cavaleiros Acordam');
                     setSpecialGroupWakeCounter(false);
                     setGroupWakeModalIsOpen(true);
+                    playHorsemenSound();
                 }
                 openSecondAttackDropDown();
                 openSingleDropDown();
                 writePlayerInformation();
                 if (alivePlayers[controlCounter + 1].filliation !== 'horsemen') {
-                    setGroupInfo('Coven Dorme depois dessa ação');
+                    setGroupInfo('Caveleiros dormen depois dessa ação');
                     setGroupWakeModalIsOpen(true);
                 }
                 incrementCounter();
@@ -1328,6 +1438,7 @@ const Night = () => {
                     setGroupInfo('Cavaleiros Acordam');
                     setSpecialGroupWakeCounter(false);
                     setGroupWakeModalIsOpen(true);
+                    playHorsemenSound();
                 }    
                 writePlayerInformation();
                     if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
@@ -1338,7 +1449,7 @@ const Night = () => {
                         openSingleDropDown();
                     }
                 if (alivePlayers[controlCounter + 1].filliation !== 'horsemen') {
-                    setGroupInfo('Coven Dorme depois dessa ação');
+                    setGroupInfo('Caveleiros dormen depois dessa ação');
                     setGroupWakeModalIsOpen(true);
                 }
                 incrementCounter();
@@ -1349,15 +1460,17 @@ const Night = () => {
                     setGroupInfo('Cavaleiros Acordam');
                     setSpecialGroupWakeCounter(false);
                     setGroupWakeModalIsOpen(true);
+                    playHorsemenSound();
                 }  
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
+                    closeSingleDropDown();
                 } else {
                     openSingleDropDown();
                 }
                 if (alivePlayers[controlCounter + 1].filliation !== 'horsemen') {
-                    setGroupInfo('Coven Dorme depois dessa ação');
+                    setGroupInfo('Caveleiros dormen depois dessa ação');
                     setGroupWakeModalIsOpen(true);
                 }
                 incrementCounter();
@@ -1368,13 +1481,15 @@ const Night = () => {
                     setGroupInfo('Cavaleiros Acordam');
                     setSpecialGroupWakeCounter(false);
                     setGroupWakeModalIsOpen(true);
+                    playHorsemenSound();
                 }         
                 if (alivePlayers[controlCounter + 1].filliation !== 'horsemen') {
-                    setGroupInfo('Coven Dorme depois dessa ação');
+                    setGroupInfo('Caveleiros dormen depois dessa ação');
                     setGroupWakeModalIsOpen(true);
                 }
                 incrementCounter();
                 break;
+                
             default:
                 writePlayerInformation();
                 setCurrentPlayerDescription('Esse personagem não acorda a noite, clique em confirmar');
@@ -1394,16 +1509,32 @@ const Night = () => {
     return;    
     }
     const confirmAction = async () => {
-        console.log(attackAction)
+        const targetedPlayerRole = alivePlayers.filter(target => target.playerName === player);
         switch (alivePlayers[controlCounter - 1].role) {
             case 'meretriz':
                 setBlockAction([...blockAction, player]);
                 blockAction2 = [player];
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
+                if (targetedPlayerRole[0].role === 'feiticeira benevolente' && currentDayTemp[0].currentDay > 3) {
+                    setAttackAction([...attackAction, { attacker: targetedPlayerRole[0].playerName, attackerRole: targetedPlayerRole[0].role, target: alivePlayers[controlCounter - 1].playerName}]);
+                    
+                }
+                if (targetedPlayerRole[0].role === 'godfather' || targetedPlayerRole[0].role === 'assassino em serie' || targetedPlayerRole[0].role === 'morte') {
+                    setAttackAction([...attackAction, { attacker: targetedPlayerRole[0].playerName, attackerRole: targetedPlayerRole[0].role, target: alivePlayers[controlCounter - 1].playerName}]);
+                }
                 closeSingleDropDown();
                 break;
             case 'taberneiro':
+                setBlockAction([...blockAction, player]);
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
+                blockAction2 = [player];
+                if (targetedPlayerRole[0].role === 'feiticeira benevolente' && currentDayTemp[0].currentDay > 3) {
+                    setAttackAction([...attackAction, { attacker: targetedPlayerRole[0].playerName, attackerRole: targetedPlayerRole[0].role, target: alivePlayers[controlCounter - 1].playerName}]);
+                }
+                if (targetedPlayerRole[0].role === 'godfather' || targetedPlayerRole[0].role === 'assassino em serie' || targetedPlayerRole[0].role === 'morte') {
+                    setAttackAction([...attackAction, { attacker: targetedPlayerRole[0].playerName, attackerRole: targetedPlayerRole[0].role, target: alivePlayers[controlCounter - 1].playerName}]);
+                }
+
                 setTaberneiroDodge(player);
                 closeSingleDropDown();
                 break;
@@ -1416,6 +1547,9 @@ const Night = () => {
                 } else {
                     closeSingleDropDown();
                 }
+                break;
+            case 'executor vitorioso':
+                closeSingleDropDown();
                 break;
             case 'bardo':
                 setMotivateAction(player);
@@ -1483,6 +1617,10 @@ const Night = () => {
                 setInvestigativeModal(false)
 
                 break;
+            case 'fuxiqueira':
+                setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
+                setFuxiqueiraAction(player);
+                break;
             case 'vigilante':
                 setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
                 const checktargetfilliation = alivePlayers.filter(aliver => { return aliver.playerName === player });
@@ -1510,7 +1648,6 @@ const Night = () => {
                 closeSingleDropDown();
                 break;
             case 'afilhado':
-                console.log(controlCounter);
                 if (controlCounter === 1) {
                     setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
                     setAttackAction([...attackAction, { attacker: alivePlayers[controlCounter - 1].playerName, attackerRole: alivePlayers[controlCounter - 1].role, target: player }]);
@@ -1627,6 +1764,9 @@ const Night = () => {
                     setBlockAction([...blockAction, player]);
                     blockAction2 = [player];
                     setVisitAction([...visitAction, { visitor: alivePlayers[controlCounter - 1].playerName, target: player }]);
+                    if (targetedPlayerRole[0].role === 'assassino em serie' || targetedPlayerRole[0].role === 'morte') {
+                        setAttackAction([...attackAction, { attacker: targetedPlayerRole[0].playerName, attackerRole: targetedPlayerRole[0].role, target: alivePlayers[controlCounter - 1].playerName}]);
+                    }
                 }
                 closeSingleDropDown();
 
@@ -1662,8 +1802,14 @@ const Night = () => {
                 document.querySelector('.veteranCounter').classList.add('invisible');
                 document.querySelector('.conselheiraCounter').classList.add('invisible');
                 document.querySelector('.investigatorCounter').classList.add('invisible');
+                document.querySelector('.weaponDropDownAction').classList.add('invisible');
+                document.querySelector('.arsonistaButton').classList.add('invisible');
+
+
                 break;
-        }        
+        }
+        setPlayer('')
+        setPlayer2('')
         wakeUpPlayers();
     }
     const skipAction = () => {
@@ -1711,21 +1857,49 @@ const Night = () => {
             }
         }, 4000)
         const witchesInHere = alivePlayers.filter(witch => { return witch.filliation === 'coven'})
-        const wolvesInHere = alivePlayers.filter(wolf => { return wolf.role === 'lobisomen'})
+        const wolvesInHere = alivePlayers.filter(wolf => { return wolf.role === 'lobisomen' })
+        let text = '';
         if (currentDayTemp[0].currentDay % 2 === 0 && wolvesInHere.length > 0) {
             playWerewolfPresentSound();
+            setIsNotifierModal(true)
+            text = text + 'O Lobisomen transformou essa noite.'
         }
         if (currentDayTemp[0].currentDay > 3 && witchesInHere.length > 0) {
+            text = text + 'As bruxas possuem o Grimorio!'
+            setIsNotifierModal(true)
             setTimeout(() => {
                 playGrimorioSound();
 
             }, 2000);
         }
+        setNotifierModalContent(text)
+
+    }
+
+    const morteDosEnvenenados = () => {
+        if (poisonedTarget.length > 0) {
+            let temp = [];
+            for (var i = 0; poisonedTarget.length > i; i++){
+                temp.push({ attacker: alivePlayers[controlCounter].playerName, attackerRole: 'amaldicoadora', target: poisonedTarget[i].playerName })
+            } 
+
+            setSpecialAttack(...specialAttack, temp);
+            for (let p = 0; p < poisonedTarget.length; p++){
+                const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/poisonTarget/poisonTarget`, poisonedTarget[p].id)
+                deleteDoc(theRef);
+            }
+            const statusPoisoned = inGameStatusAfliction.filter(status => { return status.status === 'amaldiçoado' });
+            
+            for (let p = 0; p < statusPoisoned.length; p++){
+                const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusPoisoned[p].id)
+                deleteDoc(theRef);
+            }
+        }
     }
     const nightPrompt = () => {
         playNightSounds();
         setIsOpen(false);
-        console.log(allRoles)
+        morteDosEnvenenados();
         setPadeiraHealCount(padeiraTemp[0].healCount);
         setInvestigatorCounter(investigadorTemp[0].counter);
         setVeteranCounter(veteranTemp[0].counter);
@@ -1872,6 +2046,15 @@ const Night = () => {
                         <div className="header">{groupInfo}</div>
                         <div className="content">
                         <button className="button" onClick={() => setGroupWakeModalIsOpen(false)}>Okay</button>
+                    </div>
+                    
+                        </div>
+        </Popup>
+            <Popup open={isNotifierModal} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                        <div className="header">{notifierModalContent}</div>
+                        <div className="content">
+                        <button className="button" onClick={() => setIsNotifierModal(false)}>Okay</button>
                     </div>
                     
                         </div>
