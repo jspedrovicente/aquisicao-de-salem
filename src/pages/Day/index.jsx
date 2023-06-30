@@ -526,7 +526,7 @@ const Day = () => {
     }
     const killPlayer = () => {
         const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
-        updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead", filliation: "none" })
+        updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead" })
 
     }
     const playerjudgementAction = () => {
@@ -897,6 +897,14 @@ const Day = () => {
                     <div className="modalNight">
                     <div className="header">Painel Administrativo, Use apenas para EMERGENCIAS </div>
                     <div className="content">
+                    <select name="playerName" id="playerName" value={playerKilling} onChange={(e) => setPlayerKilling(e.target.value)}>
+                            <option value="" defaultValue disabled></option>
+                            {alivePlayers.map(player => (
+                                <option key={player.key}>{player.playerName}</option>
+                            ))}
+                        </select>
+                        <button className="button" onClick={killPlayer}>Matar o Jogador</button>
+                        <hr />
                     <button className="button" onClick={explodeMark}>Atirar na Marca</button>
                     <button className="button" onClick={explodeBomb}>Bomba do Palhaço</button>  
                     <button className="button" onClick={endGameCompletely}>Encerrar Jogo</button>
