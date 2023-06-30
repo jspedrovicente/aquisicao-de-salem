@@ -3,7 +3,6 @@ import "./playerRole.css"
 import ButtonLink from "../../components/ButtonLink"
 import { database } from "../../firebaseConnection";
 import useSound from "use-sound";
-import ambienceSound from "../../assets/ambience-soundeffect.mp3"
 import { useNavigate } from "react-router-dom";
 import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc } from "firebase/firestore";
 import Popup from 'reactjs-popup';
@@ -29,7 +28,6 @@ const PlayerRole = () => {
     const [currentPlayer, setCurrentPlayer] = useState('');
     const [currentRole, setCurrentRole] = useState('');
     const navigate = useNavigate();
-    const [playAmbienceSound, { stop }] = useSound(ambienceSound);
     useEffect(() => {
         async function loadInfo() {
             const userDetail = localStorage.getItem("UserLogin");
@@ -133,7 +131,6 @@ const PlayerRole = () => {
            
         }
         addAllRoles(covenRole, mafiaRole, townRole, horsemenRole, neutralRole);
-        playAmbienceSound();
 
     }, [covenRole])
     const handleConfirm = async (e) => {
@@ -151,6 +148,10 @@ const PlayerRole = () => {
             const currentId = playerList[i].id;
             await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: "none", filliation: "none", life: "none", action: "none", wakeOrder: 0 })
         }
+    }
+    const handleEraseSpecificPlayer = (playerId) => {
+        updateDoc(doc(database, "playeradmin", "players", user.email, playerId), { role: "none", filliation: "none", life: "none", action: "none", wakeOrder: 0 })
+
     }
     function mafiaFill() {
         document.querySelector('.coven').classList.add('invisible');
@@ -175,7 +176,6 @@ const PlayerRole = () => {
         return checkboxCounter !== playerList.length;
     }
     const startGame = () => {
-        stop();
         navigate('/day');
     }
     async function handleManualRandomizer() {
@@ -199,8 +199,8 @@ const PlayerRole = () => {
             var selectedIndex = Math.floor(Math.random() * players.length);
             var selectedName = players.splice(selectedIndex, 1)[0];
             var selectedRole = chosenRoles[roleIndex];
-            var usedRole = chosenRoles.filter(role => role.role === selectedRole.role)
-            var roleToFind = usedRole[0]
+            var usedRole = chosenRoles.filter(role => role.role === selectedRole.role);
+            var roleToFind = usedRole[0];
             var index = chosenRoles.findIndex(function (obj) {
                 return obj.role === roleToFind.role;
             })
@@ -239,7 +239,7 @@ const PlayerRole = () => {
             var selectedFill = fill[selectedFillIndex]
             var filteredRoles = roleD.filter(role => role.filliation === selectedFill);
             if (filteredRoles.length === 0) {
-                const fact = fill.splice(selectedFillIndex, 1)[0]
+                const fact = fill.splice(selectedFillIndex, 1)[0];
             } else {
                 var selectedIndex = Math.floor(Math.random() * players.length);
 
@@ -247,10 +247,9 @@ const PlayerRole = () => {
             var roleIndex = Math.floor(Math.random() * filteredRoles.length)
             var selectedRole = filteredRoles[roleIndex];
             console.log(selectedRole);
-            var usedRole = roleD.filter(role => role.role === selectedRole.role)
-            var roleToFind = usedRole[0]
+                var usedRole = roleD.filter(role => role.role === selectedRole.role);
             var index = roleD.findIndex(function (obj) {
-                return obj.role === roleToFind.role;
+                return obj.role === usedRole[0].role;
             })
             const deletedRole = roleD.splice(index, 1)[0];
             randomizedPlayers.push({ selectedName, selectedRole })
@@ -416,7 +415,7 @@ const PlayerRole = () => {
                         </h4>
                         <div className="playerRole-town card-border scrollable">
                             {playerList.filter(player => player.filliation.includes("town")).map(filteredPlayer => (
-                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role}</p>
+                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role} <button className="delete-button" onClick={() => handleEraseSpecificPlayer(filteredPlayer.id)}>x</button></p>
                                 ))}
                         </div>
                     </div>
@@ -426,13 +425,13 @@ const PlayerRole = () => {
                         </h4>
                         <div className="playerRole-evil card-border scrollable">
                         {playerList.filter(player => player.filliation.includes("mafia")).map(filteredPlayer => (
-                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role}</p>
+                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role} <button className="delete-button" onClick={() => handleEraseSpecificPlayer(filteredPlayer.id)}>x</button></p>
                                 ))}
                         {playerList.filter(player => player.filliation.includes("coven")).map(filteredPlayer => (
-                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role}</p>
+                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role} <button className="delete-button" onClick={() => handleEraseSpecificPlayer(filteredPlayer.id)}>x</button></p>
                                 ))}
                         {playerList.filter(player => player.filliation.includes("horsemen")).map(filteredPlayer => (
-                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role}</p>
+                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role} <button className="delete-button" onClick={() => handleEraseSpecificPlayer(filteredPlayer.id)}>x</button></p>
                                 ))}
                         </div>
                     </div>
@@ -442,7 +441,7 @@ const PlayerRole = () => {
                         </h4>
                         <div className="playerRole-neutral card-border scrollable">
                         {playerList.filter(player => player.filliation.includes("neutral")).map(filteredPlayer => (
-                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role}</p>
+                            <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role} <button className="delete-button" onClick={() => handleEraseSpecificPlayer(filteredPlayer.id)}>x</button></p>
                                 ))}
                         </div>
                     </div>
