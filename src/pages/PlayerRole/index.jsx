@@ -282,7 +282,7 @@ const PlayerRole = () => {
                         <span className="bordered">Jogar contra os Cavaleiros
 
                             <button className="button" onClick={() => handleRandomizer('horsemen', 'none')}>VS Cavaleiros</button>
-                        <span className="smallText">Limite de 21 jogadores!</span>
+                        <span className="smallText">Limite de 24 jogadores!</span>
                         </span>
                             <button className="button" onClick={() => setIsRandomizerOpen(false)}>Fechar Randomizador</button>
                     </div>
