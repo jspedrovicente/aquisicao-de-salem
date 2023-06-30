@@ -35,7 +35,6 @@ const PlayerList = () => {
         loadInfo();
     }, [])
 
-
     const handleRegister = async (e) => {
         e.preventDefault();
 
@@ -49,9 +48,8 @@ const PlayerList = () => {
                 life: "none"
             })
         }
+        setPlayerName('')
     }
-
-    console.log(playerList)
 
     return (
             <div className="logIn">
@@ -60,8 +58,13 @@ const PlayerList = () => {
             </h3>
             <div className="playerlist-main">
                 <div className="playerlist-register">
-                    <Form label="Nome do Jogador" type="text" state={playerName} changeState={setPlayerName}></Form>
-                    <button className="button" onClick={handleRegister}>Adicionar Jogador</button>
+
+                <form onSubmit={handleRegister}>
+                <label>Nome do Jogador
+                <input id="playerNameAdd" type="text" value={playerName} onChange={(e) => setPlayerName(e.target.value)}  />
+                </label>    
+                    <button type="submit" className="button" onClick={handleRegister}>Adicionar Jogador</button>
+                        </form> 
                 </div>
                 <div className="playerlist-container">
                 <h4> Lista de Jogadores</h4>
@@ -69,7 +72,7 @@ const PlayerList = () => {
                         {playerList.map((player) => (
                             <PlayerListing key={player.id} playerName={player.playerName}  id={player.id} />
                             )
-                        )}
+                            )}
                 </div>
                 <ButtonLink destination="/playerrole" buttonText="Começar Partida" />
                 </div>
