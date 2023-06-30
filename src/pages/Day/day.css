@@ -152,6 +152,9 @@ p{
     margin-left: 5px;
     animation: glowing 1300ms infinite;
 }
+.direto{
+    display: flex;
+}
 #innerbomb:enabled{
     animation: glowing 1300ms infinite;
 }

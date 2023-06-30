@@ -19,14 +19,19 @@ import pesteDeathMusic from "../../assets/daysounds/pesteDeathlongeffect.mp3"
 import dramaticDeathMusic from "../../assets/daysounds/dramaticMusic.mp3"
 import jesterDeathMusic from "../../assets/daysounds/jesterDeathEffect.mp3"
 import apocalipseMusic from "../../assets/daysounds/ApocalipseVictoryMusic.mp3"
+import revivalCallEffect from "../../assets/daysounds/revivalCallEffect.mp3"
+import ActiveRevivalEffect from "../../assets/daysounds/ActiveRevivalEffect.mp3"
+import boneBreakSoundEffect from "../../assets/daysounds/boneBreakSoundEffect.mp3"
 import bombSvg from "../../assets/svgs/bomb-svg.svg"
 import bulletSvg from "../../assets/svgs/bullet-svg.svg"
+import wingSvg from "../../assets/svgs/wing-svg.svg"
 const Day = () => {
 
     // sound effects
     const [playJulgamentoSound] = useSound(julgamentoSound);
     const [playFizzleSound] = useSound(bombFizzle);
     const [playBombSound] = useSound(bombBoom);
+    const [PlayboneBreakSoundEffect] = useSound(boneBreakSoundEffect);
     const [playmorteSound] = useSound(morteSound);
     const [playGunSound] = useSound(gunSound);
     const [playDayMusic, { stop: stopDayMusic }] = useSound(dayMusic);
@@ -35,6 +40,8 @@ const Day = () => {
     const [playCancelEffectMusic] = useSound(cancelEffectMusic);
     const [playPesteDeathMusic] = useSound(pesteDeathMusic);
     const [playJesterDeathMusic] = useSound(jesterDeathMusic);
+    const [playRevivalCallEffect] = useSound(revivalCallEffect, { volume: 0.60 });
+    const [playActiveRevivalEffect] = useSound(ActiveRevivalEffect, { volume: 0.60 });
     const [playDramaticDeathMusic, { stop: stopDramaticDeathMusic }] = useSound(dramaticDeathMusic);
     const [playApocalipseMusic, { stop: stopApocalipseMusic }] = useSound(apocalipseMusic);
     const [isOpen, setIsOpen] = useState(true);
@@ -45,9 +52,12 @@ const Day = () => {
     const [killPanelIsOpen, setKillPanelIsOpen] = useState(false);
     const [apocalipsePanelIsOpen, setApocalipsePanelIsOpen] = useState(false);
     const [is2ModalOpen, setIs2ModalOpen] = useState(false);
+    const [isReviveModalOpen, setIsReviveModalOpen] = useState(false);
+    const [notifierNewsIsOpen, setNotifierNewsIsOpen] = useState(false);
     const [updatePanelInfo, setUpdatePanelInfo] = useState(false);
     const [posiviteCounter, setPosiviteCounter] = useState(0)
     const [negativeCounter, setNegativeCounter] = useState(0)
+    const [notifierNews, setNotifierNews] = useState('')
     const [user, setUser] = useState([]);
     const [players, setPlayers] = useState([]);
     const [alivePlayers, setAlivePlayers] = useState([]);
@@ -81,6 +91,7 @@ const Day = () => {
     const [poisonAction, setPoisonAction] = useState([]);
     const [armadilheiroInformation, setArmadilheiroInformation] = useState([]);
     const [spyInformation, setSpyInformation] = useState([]);
+    const [fuxiqueiraInformation, setFuxiqueiraInformation] = useState([]);
     const [padeiraHealCount, setPadeiraHealCount] = useState(0)
     const [arsonTarget, setArsonTarget] = useState([]);
     const [statusAfliction, setStatusAfliction] = useState([]);
@@ -256,6 +267,13 @@ const Day = () => {
                 })
                 setSpyInformation(her)
             })
+            const fuxiqueiraData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/fuxiqueiraInformation/fuxiqueiraInformation`), (snapshot) => {
+                let ter = [];
+                snapshot.forEach((doc) => {
+                    ter.push({ visited: doc.data().visited, key: doc.id, id: doc.id });
+                })
+                setFuxiqueiraInformation(ter)
+            })
             const poisonData = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/poisonTarget/poisonTarget`), (snapshot) => {
                 let her = [];
                 snapshot.forEach((doc) => {
@@ -359,6 +377,12 @@ const Day = () => {
             await deleteDoc(theRef)
 
         }
+        
+        for (let i = 0; i < fuxiqueiraInformation.length; i++) {
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/fuxiqueiraInformation/fuxiqueiraInformation`, fuxiqueiraInformation[i].id)
+            await deleteDoc(theRef)
+
+        }
         clearNeedlessData();
         stopDayMusic();
         stopDramaticDeathMusic();
@@ -420,6 +444,11 @@ const Day = () => {
             deleteDoc(theRef)
 
         }
+        for (let i = 0; i < fuxiqueiraInformation.length; i++) {
+            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/fuxiqueiraInformation/fuxiqueiraInformation`, fuxiqueiraInformation[i].id)
+            deleteDoc(theRef)
+
+        }
         if (currentDay > 4) {
             for (let p = 0; p < parasiteClear.length; p++) {
                 const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, parasiteClear[p].id)
@@ -437,8 +466,11 @@ const Day = () => {
                 if (num < 0.75) {
                     playBombSound();
                     setTimeout(() => {
+                        setKillPanelIsOpen(true);
                         updateDoc(doc(database, "playeradmin", "players", user.email, targetted[0].id), { life: "dead" })
-                    }, 7000);
+
+                    }, 9000);
+                    setKillAnouncementUpdate(`O jogador ${targetted[0].playerName} explodiu. Sua função era ${targetted[0].role}`)
 
                 } else {
                     playFizzleSound();
@@ -464,6 +496,23 @@ const Day = () => {
             }
         }
     }
+    const revivePlayer = () => {
+        setIsReviveModalOpen(false);
+        const target = deadPlayers.filter(player => { return player.playerName === playerKilling });
+        const martir = alivePlayers.filter(player => player.role === 'martir')
+        updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "alive" });
+        updateDoc(doc(database, "playeradmin", "players", user.email, martir[0].id), { life: "dead" });
+        setKillPanelIsOpen(true);
+        setKillAnouncementUpdate(`O jogador ${target[0].playerName} foi ressucitado, o mártir ${martir[0].playerName} se sacrificou por essa troca.`)
+
+        playActiveRevivalEffect();
+    }
+    const revivePopup = () => {
+        playRevivalCallEffect();
+        setIsReviveModalOpen(true)
+        stopDayMusic();
+        stopDramaticDeathMusic();
+    }
     const startNight = () => {
         clearNeedlessData();
         stopDayMusic();
@@ -474,9 +523,6 @@ const Day = () => {
         setJudgementPanelIsOpen(true);
         playJulgamentoSound();
         stopDayMusic();
-        setTimeout(() => {
-            playDeadEffectMusic()
-        }, 16000)
     }
     const killPlayer = () => {
         const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
@@ -489,9 +535,9 @@ const Day = () => {
             const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
             updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead" })
             setJudgementPanelIsOpen(false);
+            stopDeadEffectMusic();
             if (target[0].role === 'peste') {
                 setTimeout(() => {
-                    stopDeadEffectMusic();
                     stopDayMusic();
                     playPesteDeathMusic();
                     setPlaguePanelIsOpen(true)
@@ -499,7 +545,6 @@ const Day = () => {
             } else {
                 if (target[0].role === 'bobo da corte') {
                     setTimeout(() => {
-                        stopDeadEffectMusic();
                         stopDayMusic();
                         playJesterDeathMusic();
                         setJesterPanelIsOpen(true);
@@ -509,9 +554,21 @@ const Day = () => {
                     setKillPanelIsOpen(true);
                     setKillAnouncementUpdate(`O jogador ${target[0].playerName} foi julgado. Sua função era ${target[0].role}`)
                     setTimeout(() => {
-                        stopDeadEffectMusic();
                         playDramaticDeathMusic();
-                    }, 12000);
+                    }, 5000);
+                }
+            }
+            const executorStatus = statusAfliction.filter(status => status.status === 'executação');
+
+            if (executorStatus.length > 0) {
+            let execTarget = alivePlayers.filter(player => player.playerName === executorStatus[0].target);
+                if (execTarget[0].playerName === target[0].playerName) {
+                    const executor = alivePlayers.filter(player => player.role === 'executor');
+
+                    setNotifierNews('O Alvo do executor acabou de ser executado. Executor ganhou sua parte do jogo!')
+                    setNotifierNewsIsOpen(true);
+                    deleteDoc(doc(database, "playeradmin", "playerStatuses", user.email, "statusAfliction", "statusAfliction", executorStatus[0].id));
+                    updateDoc(doc(database, "playeradmin", "players", user.email, executor[0].id), { role: 'executor vitorioso' });
                 }
             }
         } else {
@@ -598,6 +655,7 @@ const Day = () => {
         const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
         updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead" });
         setKillPanelIsOpen(true);
+        PlayboneBreakSoundEffect();
         setKillAnouncementUpdate(`O jogador ${target[0].playerName} morreu com a brincadeira do Bobo da Corte. Sua função era: ${target[0].role}.`)
         playDramaticDeathMusic();
     }
@@ -686,14 +744,35 @@ const Day = () => {
                                     ))}
                                 </span>
                             }
-                            {spyInformation.length > 0 && 
+                            {spyInformation.length > 0 ? (
                                 <span className="modalNotifier fade-in-text2 ">
                                 <h4 className="notifier-title ">Efeito do Espião:</h4>
                                 {spyInformation.map((info) => (
                                     <p key={info.key}>Seu alvo visitou {info.visited}!</p>
                                     ))}
                                 </span>
-                                }
+
+                            ) : (
+                                <span className="modalNotifier fade-in-text2 ">
+                                </span>
+                            )
+                            }
+                            {fuxiqueiraInformation.length > 0 ? (
+
+                                <span className="modalNotifier fade-in-text2 ">
+                                    <h4 className="notifier-title ">Efeito da Fuxiqueira:</h4>
+                                    <span className="direto">
+                                    <p>Os Jogadores: </p>
+                                {fuxiqueiraInformation.map((info) => (
+                                    <p key={info.key}> {info.visited} </p>
+                                ))}
+                                        <p>possivelmente visitaram seu alvo!</p>
+                                    </span>
+                                </span>
+                            ) : (
+                                <span className="modalNotifier fade-in-text2 ">
+                                </span>
+                                )}
                             <button className="button" onClick={() => {setIs2ModalOpen(false)}}>Finalizar</button>
                     </div>    
                 </div>
@@ -731,8 +810,6 @@ const Day = () => {
                         ))}
                         </div>
                 </div>
-
-
                 <div className="event-hiddenocurrence event">
                         <h4>
                         Ações da Noite
@@ -778,8 +855,8 @@ const Day = () => {
                     <div className="large-container card-border scrollable">
                         {alivePlayers.map((player => (
                             <span className="alivePlayersConfig" key={player.key}>
-                                {player.playerName} - {player.filliation === 'town' && <p className="townies">{player.role}</p>}
-                                {player.filliation === 'mafia' && <p className="mafiaies">{player.role}</p>}
+                                {player.playerName} - {player.filliation === 'town' && <p className="townies">{player.role} </p>} {player.role === 'martir' && <button className="miniButton trigger" onClick={revivePopup}><img src={wingSvg} alt="Wings" /></button>}
+                                {player.filliation === 'mafia' && <p className="mafiaies">{player.role} </p>}
                                 {player.filliation === 'coven' && <p className="covenies">{player.role}</p>}
                                 {player.filliation === 'neutral' && <p className="neutraies">{player.role}</p>}
                                 {player.filliation === 'horsemen' && <p className="horsies">{player.role}</p>}
@@ -795,7 +872,7 @@ const Day = () => {
                         {deadPlayers.map((player) => (
                             <span className="alivePlayersConfig" key={player.key + '3'}>
                                 {player.playerName} -
-                                {player.filliation === 'town' && <p className="townies">{player.role}</p>}
+                                {player.filliation === 'town' && <p className="townies">{player.role} </p>}
                                 {player.filliation === 'mafia' && <p className="mafiaies">{player.role}</p>}
                                 {player.filliation === 'coven' && <p className="covenies">{player.role}</p>}
                                 {player.filliation === 'horsemen' && <p className="horsies">{player.role}</p>}
@@ -804,9 +881,6 @@ const Day = () => {
                                     ))}
                     </div>
                 </div>
-
-
-
                 <div className="event-killplayer event">
                     <div className="event-killplayer-inner">
                         <button type="button" onClick={judgement} className="button">Julgamento</button>
@@ -815,12 +889,10 @@ const Day = () => {
 
                     </div>
 
-                </div>
-                                
+                </div>                   
             </div>
             <div className="upper-page-area">
             </div>
-
             <Popup open={adminPanelIsOpen} modal closeOnDocumentClick={false}>
                     <div className="modalNight">
                     <div className="header">Painel Administrativo, Use apenas para EMERGENCIAS </div>
@@ -861,12 +933,28 @@ const Day = () => {
                     <div className="header">O Bobo da Corte morreu! Mate 1 jogador </div>
                     <div className="content">
                     <select name="playerName" id="playerName" value={playerKilling} onChange={(e) => setPlayerKilling(e.target.value)}>
-                            <option value="" defaultValue disabled hidden></option>
+                            <option value="" defaultValue disabled></option>
                             {alivePlayers.map(player => (
                                 <option key={player.key}>{player.playerName}</option>
                             ))}
                         </select>
                     <button className="button" onClick={jesterMurder}>Matar os jogadores</button>
+                        
+                    </div>
+                    </div>
+                    
+            </Popup>
+            <Popup open={isReviveModalOpen} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                    <div className="header">O Mártir está se sacrificando por um jogador. Seleciona alguém morto: </div>
+                    <div className="content">
+                    <select name="playerName" id="playerName" value={playerKilling} onChange={(e) => setPlayerKilling(e.target.value)}>
+                            <option value="" defaultValue disabled></option>
+                            {deadPlayers.map(player => (
+                                <option key={player.key}>{player.playerName}</option>
+                            ))}
+                        </select>
+                    <button className="button" onClick={revivePlayer}>Reviver Jogador</button>
                         
                     </div>
                     </div>
@@ -883,7 +971,6 @@ const Day = () => {
                     </div>
                     
             </Popup>
-
             <Popup open={apocalipsePanelIsOpen} modal closeOnDocumentClick={false}>
                     <div className="modalNight">
                     <div className="header">Vitória dos Cavaleiros do Apocalipse </div>
@@ -931,6 +1018,16 @@ const Day = () => {
                         </div>
                         <button className="button" onClick={playerjudgementAction}>Confirmar Votos</button>
                         <button className="button" onClick={savePlayer}>Cancelar</button>
+                    </div>
+                    </div>
+                    
+            </Popup>
+            <Popup open={notifierNewsIsOpen} modal closeOnDocumentClick={false}>
+                    <div className="modalNight">
+                    <div className="header">{notifierNews}</div>
+                    <div className="content">
+                    <button className="button" onClick={() => setNotifierNewsIsOpen(false)}>Okay</button>
+                        
                     </div>
                     </div>
                     
