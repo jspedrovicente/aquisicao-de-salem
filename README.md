@@ -9,6 +9,8 @@ So the game revolves around the late 1600s, where the salem witch trials occured
 The townsfolk are trying as hard as they can to lynch every single one of the evil doers, which involves the neutral classes and the evil classes.
 
 ## V.2.0 Changes:
+### Minor Alterations :
+ - [x] PlayerList on enter adds players
 ### New Characters :
  - [x] Fome
  - [x] Guerra
