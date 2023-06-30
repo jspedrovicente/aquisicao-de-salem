@@ -9,13 +9,15 @@ So the game revolves around the late 1600s, where the salem witch trials occured
 The townsfolk are trying as hard as they can to lynch every single one of the evil doers, which involves the neutral classes and the evil classes.
 
 ## V.2.0 Changes:
+### Minor Alterations :
+ - [x] PlayerList on enter adds players
 ### New Characters :
  - [x] Fome
  - [x] Guerra
  - [x] Morte
  - [x] Peste
- - [ ] Taberneiro
- - [ ] Fuxiqueira
+ - [x] Taberneiro
+ - [x] Fuxiqueira
 
 ### REMOVE Characters :
  - [x] Carteiro
@@ -28,22 +30,22 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 - [x] Armadilheiro (small) [canceled]
 - [x] Grimorio/Coven (medium) [canceled]
 - [x] Mafia in general (large) [now the mafia has a promotion order for each of the characters]
-- [ ] Medium (large) [maybe remove?]
+- [x] Medium (large) [Actually found something for her lol]
 ### Buff Characters :
  - [x] Vigarista
  - [x] Bardo
  - [x] Medium
  - [x] Palhaço
 ### Nerf Characters :
- - [ ] Curandeira
- - [ ] Town in general
+ - [x] Curandeira (this aint happening, people lover her)
+ - [x] Town in general (town got a big nerf cause of the mafia buffs)
 ### Bug Fixes:
  - [x] Zelador needs to target only the mafia target
  - [x] Music playtime
- - [ ] New music playing feature
- - [ ] Fix opening page
- - [ ] DONT ALLOW mafia/Coven picks
- - [ ] Make the input reset so it doesn't allow confirmation without a target
+ - [x] New music playing feature
+ - [x] Fix opening page
+ - [x] DONT ALLOW mafia/Coven picks
+ - [x] Make the input reset so it doesn't allow confirmation without a target
 ### New Feature:
 - [x] Randomizer button for easier game playthroughs
 - [x] Action limiter (Investigador, Padeira, veterano, conselheira, zelador)
@@ -66,10 +68,13 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 - [x] Jester Killing sound effect
 - [x] Horsemen VICTORY sound effect (probably my favorite to make)
 - [x] Post-Judgement Music (to differ from day music)
-- [ ] Peste Waking up
-- [ ] Morte waking up
-- [ ] Guerra waking up
-- [ ] Fome waking up
+- [x] Peste Waking up
+- [x] Morte waking up
+- [x] Guerra waking up
+- [x] Fome waking up
+- [x] Fuxiqueira waking up
+- [x] Taberneiro waking up
+- [x] Martir Revival
 ### Remove Features :
  - [x] Whisper
  - [x] Randomly generated sound between track 
