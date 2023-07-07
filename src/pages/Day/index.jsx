@@ -36,14 +36,13 @@ const Day = () => {
     const [playGunSound] = useSound(gunSound);
     const [playDayMusic, { stop: stopDayMusic }] = useSound(dayMusic);
     const [playRoosterSound] = useSound(roosterEffect);
-    const [playDeadEffectMusic, { stop: stopDeadEffectMusic }] = useSound(deadEffectMusic, { volume: 0.60 });
     const [playCancelEffectMusic] = useSound(cancelEffectMusic);
     const [playPesteDeathMusic] = useSound(pesteDeathMusic);
     const [playJesterDeathMusic] = useSound(jesterDeathMusic);
     const [playRevivalCallEffect] = useSound(revivalCallEffect, { volume: 0.60 });
     const [playActiveRevivalEffect] = useSound(ActiveRevivalEffect, { volume: 0.60 });
     const [playDramaticDeathMusic, { stop: stopDramaticDeathMusic }] = useSound(dramaticDeathMusic);
-    const [playApocalipseMusic, { stop: stopApocalipseMusic }] = useSound(apocalipseMusic);
+    const [playApocalipseMusic] = useSound(apocalipseMusic);
     const [isOpen, setIsOpen] = useState(true);
     const [judgementPanelIsOpen, setJudgementPanelIsOpen] = useState(false);
     const [adminPanelIsOpen, setAdminPanelIsOpen] = useState(false);
@@ -535,7 +534,6 @@ const Day = () => {
             const target = alivePlayers.filter(player => { return player.playerName === playerKilling });
             updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "dead" })
             setJudgementPanelIsOpen(false);
-            stopDeadEffectMusic();
             if (target[0].role === 'peste') {
                 setTimeout(() => {
                     stopDayMusic();
@@ -574,7 +572,6 @@ const Day = () => {
         } else {
             setJudgementPanelIsOpen(false);
             playCancelEffectMusic();
-            stopDeadEffectMusic();
             setTimeout(() => {
                 playDayMusic();
             }, 2000);
@@ -584,7 +581,6 @@ const Day = () => {
     }
     const savePlayer = () => {
         setJudgementPanelIsOpen(false);
-        stopDeadEffectMusic();
         setTimeout(() => {
             playDayMusic();
         }, 2000);
@@ -808,6 +804,9 @@ const Day = () => {
                         {spyInformation.map((info) => (
                             <p key={info.key}>O Espião percebeu que seu alvo visitou {info.visited}!</p>
                         ))}
+                        {fuxiqueiraInformation.map((info) =>(
+                                    <p key={info.key}> {info.visited} pode ter visitado o alvo da fuxiqueira </p>
+                        ))}
                         </div>
                 </div>
                 <div className="event-hiddenocurrence event">
@@ -826,7 +825,7 @@ const Day = () => {
                 </div>
                 <div className="event-status event">
                         <h4>
-                        Status
+                        Informações Secretas
                         </h4>
                     <div className="large-container card-border scrollable">
 

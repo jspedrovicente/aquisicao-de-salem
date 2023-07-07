@@ -36,34 +36,15 @@ import grimorioEffect from "../../assets/coven-grimorio-presente.mp3"
 import horsemenSound from "../../assets/horsemen-soundeffect.mp3"
 import fuxiqueiraSound from "../../assets/fuxiqueira-soundeffect.mp3"
 import taberneiroSound from "../../assets/taberneiro-soundeffect.mp3"
-
+import mafiaWakeupSoundEffect from "../../assets/mafia-wakeup-soundeffect.mp3"
 import werewolfPresentEffect from "../../assets/werewolf-present-soundeffect.mp3"
-import afilhadoEffect from "../../assets/afilhado-soundeffect.mp3"
-import godfatherEffect from "../../assets/godfather-soundeffect.mp3"
-import zeladorEffect from "../../assets/zelador-soundeffect.mp3"
-import conselheiraEffect from "../../assets/conselheira-soundeffect.mp3"
-import vigaristaEffect from "../../assets/vigarista-soundeffect.mp3"
-import nightmusic1 from "../../assets/nightsounds/nightmusic/nightmusic1.mp3"
-import nightmusic2 from "../../assets/nightsounds/nightmusic/nightmusic2.mp3"
-import nightmusic3 from "../../assets/nightsounds/nightmusic/nightmusic3.mp3"
-import nightmusic4 from "../../assets/nightsounds/nightmusic/nightmusic4.mp3"
-import nightmusic5 from "../../assets/nightsounds/nightmusic/nightmusic5.mp3"
-import nightmusic6 from "../../assets/nightsounds/nightmusic/nightmusic6.mp3"
-import nightmusic7 from "../../assets/nightsounds/nightmusic/nightmusic7.mp3"
-import nightmusic8 from "../../assets/nightsounds/nightmusic/nightmusic8.mp3"
+import nightmusic from "../../assets/nightsounds/nightmusic/nightMusic.mp3"
 
 // SET THE Function wakeup ORDER IN FIREBASE FOR EACH CHARACTER, REMEMBER MERETRIZ IS FIRST IF THE EXECUTOR HAS ALREADY MADE HIS DECISION
 const Night = () => {
     // SoundEffects for all the characters;
-    const [playNightSound1, { stop: stopNightSound1 }] = useSound(nightmusic1, {volume: 0.45});
-    const [playNightSound2, { stop: stopNightSound2 }] = useSound(nightmusic2, {volume: 0.45});
-    const [playNightSound3, { stop: stopNightSound3 }] = useSound(nightmusic3, {volume: 0.45});
-    const [playNightSound4, { stop: stopNightSound4 }] = useSound(nightmusic4, {volume: 0.45});
-    const [playNightSound5, { stop: stopNightSound5 }] = useSound(nightmusic5, {volume: 0.45});
-    const [playNightSound6, { stop: stopNightSound6 }] = useSound(nightmusic6, {volume: 0.45});
-    const [playNightSound7, { stop: stopNightSound7 }] = useSound(nightmusic7, {volume: 0.45});
-    const [playNightSound8, { stop: stopNightSound8 }] = useSound(nightmusic8, {volume: 0.45});
-    const [playBardoSound] = useSound(harpEffect, {volume: 0.50});
+    const [playNightSound, { stop: stopNightSound }] = useSound(nightmusic, {volume: 0.50});
+    const [playBardoSound] = useSound(harpEffect);
     const [playAssassinoEmSerieSound] = useSound(assassinoemserieEffect);
     const [playArsonistaSound] = useSound(arsonistaEffect);
     const [playArmadilheiroSound] = useSound(armadilheiroEffect);
@@ -93,11 +74,7 @@ const Night = () => {
     const [playParasitaGrimorioSound] = useSound(parasitaGrimorioEffect);
     const [playGrimorioSound] = useSound(grimorioEffect);
     const [playWerewolfPresentSound] = useSound(werewolfPresentEffect);
-    const [playAfilhadoSound] = useSound(afilhadoEffect);
-    const [playGodfatherSound] = useSound(godfatherEffect);
-    const [playZeladorSound] = useSound(zeladorEffect);
-    const [playConselheiraSound] = useSound(conselheiraEffect);
-    const [playVigaristaSound] = useSound(vigaristaEffect);
+    const [playMafiaWakeupSoundEffect] = useSound(mafiaWakeupSoundEffect);
     const delay = ms => new Promise(res => setTimeout(res, ms));
     const [isOpen, setIsOpen] = useState(true);
     const [investigativeModal, setInvestigativeModal] = useState(false);
@@ -389,14 +366,7 @@ const Night = () => {
         loadRememberedData();
     }, [user.email])
     const interruptMusicPlaying = () => {
-        stopNightSound1();
-        stopNightSound2();
-        stopNightSound3();
-        stopNightSound4();
-        stopNightSound5();
-        stopNightSound6();
-        stopNightSound7();
-        stopNightSound8();
+        stopNightSound();
     }
     const encerrarNoite = async () => {
         interruptMusicPlaying();
@@ -807,7 +777,6 @@ const Night = () => {
 
     const wakeUpPlayers = () => {
         if (alivePlayers[controlCounter] != null) {
-            console.log(alivePlayers[controlCounter])
         openConfirmButton();
             const atualJogador = alivePlayers[controlCounter];
             switch (atualJogador.role) {
@@ -1033,9 +1002,8 @@ const Night = () => {
                     setGroupInfo('Mafia Acorda');
                     setSpecialGroupWakeCounter(false);
                     setGroupWakeModalIsOpen(true);
+                    playMafiaWakeupSoundEffect();
                     }
-                    playGodfatherSound();
-                    console.log(blockAction2)
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeSingleDropDown();
@@ -1054,11 +1022,10 @@ const Night = () => {
                     setGroupInfo('Mafia Acorda');
                     setSpecialGroupWakeCounter(false);
                     setGroupWakeModalIsOpen(true);
+                    playMafiaWakeupSoundEffect();
                 }
                 writePlayerInformation();
-                playConselheiraSound();
                 document.querySelector('.conselheiraCounter').classList.remove('invisible');
-
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeSingleDropDown();
@@ -1105,9 +1072,9 @@ const Night = () => {
                         setGroupInfo('Mafia Acorda');
                         setSpecialGroupWakeCounter(false);
                         setGroupWakeModalIsOpen(true);
+                        playMafiaWakeupSoundEffect();
                     }
                 writePlayerInformation();
-                playVigaristaSound();
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeSingleDropDown();
@@ -1148,11 +1115,11 @@ const Night = () => {
                         setGroupInfo('Mafia Acorda');
                         setSpecialGroupWakeCounter(false);
                         setGroupWakeModalIsOpen(true);
+                        playMafiaWakeupSoundEffect();
+
                     }
                 writePlayerInformation();
                 document.querySelector('.zeladorCounter').classList.remove('invisible');
-
-                playZeladorSound();
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeConfirmButton();
@@ -1196,9 +1163,9 @@ const Night = () => {
                         setGroupInfo('Mafia Acorda');
                         setSpecialGroupWakeCounter(false);
                         setGroupWakeModalIsOpen(true);
+                        playMafiaWakeupSoundEffect();
                     }
                 writePlayerInformation();
-                playAfilhadoSound();
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeSingleDropDown();
@@ -1827,35 +1794,7 @@ const Night = () => {
         wakeUpPlayers();
     }
     const playNightSounds = () => {
-        const num = Math.random();
-        setTimeout(() => {
-
-
-        if (num < 0.1 && num > 0.0) {
-            playNightSound1();
-        } 
-        if (num < 0.2 && num > 0.1) {
-            playNightSound2();
-        }
-        if (num < 0.3 && num > 0.2) {
-            playNightSound3();
-        }
-        if (num < 0.4 && num > 0.3) {
-            playNightSound4();
-        }
-        if (num < 0.5 && num > 0.4) {
-            playNightSound5();
-        }
-        if (num < 0.6 && num > 0.5) {
-            playNightSound6();
-        }
-        if (num < 0.7 && num > 0.6) {
-            playNightSound7();
-        }
-        if (num > 0.7) {
-            playNightSound8();
-            }
-        }, 4000)
+        playNightSound()
         const witchesInHere = alivePlayers.filter(witch => { return witch.filliation === 'coven'})
         const wolvesInHere = alivePlayers.filter(wolf => { return wolf.role === 'lobisomen' })
         let text = '';
