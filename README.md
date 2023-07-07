@@ -12,14 +12,14 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 ### Minor Alterations :
  - [x] PlayerList on enter adds players
  - [x] Change all mafia soundeffects to just one
- - [ ] Check the morning song
- - [ ] Change Serial Killer sound effect
- - [ ] Change bard sound effect
- - [ ] Fix clown soundeffect
+ - [x] Check the morning song
+ - [x] Change Serial Killer sound effect
+ - [x] Change bard sound effect
+ - [x] Fix clown soundeffect
  - [ ] change curandeira sound effect
- - [ ] change the night music
- - [ ] Make the status say hidden info
- - [ ] make the fuxiqueira information show up on the acontecimentos
+ - [x] change the night music
+ - [x] Make the status say hidden info
+ - [x] make the fuxiqueira information show up on the acontecimentos
  - [ ] 
 ### New Characters :
  - [x] Fome
