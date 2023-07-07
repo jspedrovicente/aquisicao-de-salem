@@ -11,6 +11,16 @@ The townsfolk are trying as hard as they can to lynch every single one of the ev
 ## V.2.0 Changes:
 ### Minor Alterations :
  - [x] PlayerList on enter adds players
+ - [x] Change all mafia soundeffects to just one
+ - [ ] Check the morning song
+ - [ ] Change Serial Killer sound effect
+ - [ ] Change bard sound effect
+ - [ ] Fix clown soundeffect
+ - [ ] change curandeira sound effect
+ - [ ] change the night music
+ - [ ] Make the status say hidden info
+ - [ ] make the fuxiqueira information show up on the acontecimentos
+ - [ ] 
 ### New Characters :
  - [x] Fome
  - [x] Guerra
