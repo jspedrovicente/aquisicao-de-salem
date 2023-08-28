@@ -1,0 +1,22 @@
+.main{
+    display: flex;
+    justify-content: space-around;
+}
+
+.HUGE{
+    justify-content: center;
+    display: flex;
+    font-size: 100px;
+}
+.statusnoted{
+    font-size: 35px;
+}
+
+.rowinStatus{
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+align-items: center;
+align-content: space-around;
+}

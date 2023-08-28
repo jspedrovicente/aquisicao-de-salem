@@ -3,7 +3,7 @@ import "./playerRole.css"
 import ButtonLink from "../../components/ButtonLink"
 import { database } from "../../firebaseConnection";
 import useSound from "use-sound";
-import { useNavigate } from "react-router-dom";
+import { Link, redirect, useNavigate } from "react-router-dom";
 import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc } from "firebase/firestore";
 import Popup from 'reactjs-popup';
 
@@ -295,7 +295,12 @@ const PlayerRole = () => {
                     <div className="selectors">
                         <div className="selector-category">
                             <h4>Cidade</h4>
-                            <hr />
+                                <hr />
+                                <span className="eachRole townies">
+                                <label >cidadao
+                                </label>
+                                <input type="checkbox" value='cidadao' onChange={handleCheckboxChange} />
+                            </span>
                         {townRole.map(role => (
                             <span className="eachRole townies">
                                 <label >{role.role}
@@ -406,6 +411,8 @@ const PlayerRole = () => {
                         <button type="button" className="button" onClick={handleReset}>Resetar Todos</button>
                         <button type="button" className="button" onClick={() => setIsRandomizerOpen(true)}>Gerador Aleatorio Automatico</button>
                         <button type="button" className="button" onClick={() => setIsManualRandomizerOpen(true)}>Gerador Aleatorio Manual</button>
+                        <Link to='/statuses' target='_blank' rel='noopener noreferrer' />
+                        <a className="button "target="_blank" href="/statuses">Status de Telão</a>
                     </form>
                 </div>
                 <div className="playerRole-roles">

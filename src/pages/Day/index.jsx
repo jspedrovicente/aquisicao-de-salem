@@ -35,7 +35,7 @@ const Day = () => {
     const [playmorteSound] = useSound(morteSound);
     const [playGunSound] = useSound(gunSound);
     const [playDayMusic, { stop: stopDayMusic }] = useSound(dayMusic);
-    const [playRoosterSound] = useSound(roosterEffect);
+    const [playRoosterSound] = useSound(roosterEffect, { volume: 0.60 });
     const [playCancelEffectMusic] = useSound(cancelEffectMusic);
     const [playPesteDeathMusic] = useSound(pesteDeathMusic);
     const [playJesterDeathMusic] = useSound(jesterDeathMusic);
@@ -328,6 +328,7 @@ const Day = () => {
         importData();
     }, [user.email])
     const endGameCompletely = async () => {
+        updateDoc(doc(database, "playeradmin", "blackout", user.email, 'blackout'), { blackout: 'false' })
         for (let p = 0; p < statusAfliction.length; p++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusAfliction[p].id)
             await deleteDoc(theRef)
@@ -343,10 +344,10 @@ const Day = () => {
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < deadPlayers.length; i++) {
-            await updateDoc(doc(database, "playeradmin", "players", user.email, deadPlayers[i].id), { life: "none", filliation: "none", role: "none" })
+        // for (let i = 0; i < deadPlayers.length; i++) {
+        //     await updateDoc(doc(database, "playeradmin", "players", user.email, deadPlayers[i].id), { life: "none", filliation: "none", role: "none" })
 
-        }
+        // }
         for (let i = 0; i < executorAction.length; i++) {
             await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "executorTarget", "executorTarget", "executorTarget"), { target: '' })
 
@@ -516,6 +517,7 @@ const Day = () => {
         clearNeedlessData();
         stopDayMusic();
         stopDramaticDeathMusic();
+        updateDoc(doc(database, "playeradmin", "blackout", user.email, 'blackout'), { blackout: 'sleep' })
         navigateToNight('/night');
     }
     const judgement = () => {
@@ -655,6 +657,10 @@ const Day = () => {
         setKillAnouncementUpdate(`O jogador ${target[0].playerName} morreu com a brincadeira do Bobo da Corte. Sua função era: ${target[0].role}.`)
         playDramaticDeathMusic();
     }
+    const finalizeReadings = () => {
+        updateDoc(doc(database, "playeradmin", "blackout", user.email, 'blackout'), { blackout: 'false' })
+        setIs2ModalOpen(false)
+    }
     return (
         <div className="day">
 
@@ -769,7 +775,7 @@ const Day = () => {
                                 <span className="modalNotifier fade-in-text2 ">
                                 </span>
                                 )}
-                            <button className="button" onClick={() => {setIs2ModalOpen(false)}}>Finalizar</button>
+                            <button className="button" onClick={() => finalizeReadings()}>Finalizar</button>
                     </div>    
                 </div>
                 </Popup>
