@@ -1,0 +1,12 @@
+.pointPageMain{
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    align-items: center;
+}
+
+.victoryPage{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}

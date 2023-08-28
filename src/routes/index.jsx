@@ -9,7 +9,7 @@ import Day from '../pages/Day'
 import Night from '../pages/Night'
 import Victory from '../pages/Victory'
 import Private from './Private'
-
+import Statuses from '../pages/Statuses'
 
 
 const RoutesApp = () => {
@@ -26,6 +26,7 @@ const RoutesApp = () => {
             <Route path='day' element={<Private><Day/></Private> } />
             <Route path='night' element={<Private><Night/></Private> } />
             <Route path='victory' element={<Private><Victory/></Private> } />
+            <Route path='statuses' element={<Private><Statuses/></Private> } />
         </Routes>        
     )
 } 

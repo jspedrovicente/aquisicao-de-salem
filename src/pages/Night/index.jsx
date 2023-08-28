@@ -46,7 +46,7 @@ const Night = () => {
     const [playNightSound, { stop: stopNightSound }] = useSound(nightmusic, {volume: 0.50});
     const [playBardoSound] = useSound(harpEffect);
     const [playAssassinoEmSerieSound] = useSound(assassinoemserieEffect);
-    const [playArsonistaSound] = useSound(arsonistaEffect);
+    const [playArsonistaSound] = useSound(arsonistaEffect, {volume: 0.70});
     const [playArmadilheiroSound] = useSound(armadilheiroEffect);
     const [playFerreiroSound] = useSound(ferreiroEffect);
     const [playXerifeSound] = useSound(xerifeEffect);
@@ -376,6 +376,7 @@ const Night = () => {
         const attackingAction = attackAction;
         const specialAttackingAction = specialAttack;
         const taberneiroTargetRole = alivePlayers.filter(targeted => targeted.playerName === taberneiroDodge);
+        updateDoc(doc(database, "playeradmin", "blackout", user.email, 'blackout'), { blackout: 'true' })
 
         for (var i = 0; i < attackingAction.length; i++) {
             if (attackingAction[i].target === taberneiroDodge && taberneiroTargetRole[0].role !== 'lobisomen') {
@@ -580,7 +581,6 @@ const Night = () => {
         if (fuxiqueiraAction !== '') {
             if (alivePlayers.length > 5) {
             const ref = collection(database, `playeradmin/playerStatuses/${user.email}/fuxiqueiraInformation/fuxiqueiraInformation`)
-            console.log(visitAction);
             const visitors = visitAction.filter(visit => { return visit.target === fuxiqueiraAction })
             const fuxiqueira = alivePlayers.filter(player => player.role === 'fuxiqueira');
             for (let i = 0; i < visitors.length; i++){
@@ -1255,7 +1255,11 @@ const Night = () => {
                 break;
             case 'assassino em serie':
                 writePlayerInformation();
-                playAssassinoEmSerieSound();
+                if (currentDayTemp[0].currentDay === 1) {
+                setCurrentPlayerDescription('Não precisa acordar o assassino no primeiro dia, ele não mata');
+                } else {
+                    playAssassinoEmSerieSound();
+                }
                 if (blockAction.includes(atualJogador.playerName) || blockAction2.includes(atualJogador.playerName)) {
                     setCurrentPlayerDescription('Jogador Bloqueado, clique em pular a vez');
                     closeSingleDropDown();
