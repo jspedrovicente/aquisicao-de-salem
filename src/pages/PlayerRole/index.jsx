@@ -4,7 +4,7 @@ import ButtonLink from "../../components/ButtonLink"
 import { database } from "../../firebaseConnection";
 import useSound from "use-sound";
 import { Link, redirect, useNavigate } from "react-router-dom";
-import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc } from "firebase/firestore";
+import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc, deleteField } from "firebase/firestore";
 import Popup from 'reactjs-popup';
 
 
@@ -43,6 +43,8 @@ const PlayerRole = () => {
                         victoryPoints: doc.data().victoryPoints,
                         role: doc.data().role,
                         filliation: doc.data().filliation,
+                        actionForRoleCounter: doc.data()?.actionForRoleCounter,
+                        
                     })
                 })
                 setPlayerList(list);
@@ -56,22 +58,23 @@ const PlayerRole = () => {
                         role: doc.data().role,
                         skill: doc.data().skill,
                         special: doc.data().special,
-                        wakeOrder: doc.data().wakeOrder
+                        wakeOrder: doc.data().wakeOrder,
+                        actionforRoleCounter: doc.data()?.actionforRoleCounter
                     })
                 })
                 setTownRole(roles)
 
             })
-            const mafiaSnapshot = onSnapshot(collection(database, "gamedata/roles/mafia"), (snapshot) => {
+            const mafiaSnapshot = onSnapshot(collection(database, "gamedata/roles/the family"), (snapshot) => {
                 let roles = [];
                 snapshot.forEach((doc) => {
                     roles.push({
-                        filliation: "mafia",
+                        filliation: "the family",
                         role: doc.data().role,
                         skill: doc.data().skill,
                         special: doc.data().special,
-                        wakeOrder: doc.data().wakeOrder
-
+                        wakeOrder: doc.data().wakeOrder,
+                        actionforRoleCounter: doc.data()?.actionforRoleCounter
                     })
                 })
                 setMafiaRole(roles);
@@ -84,8 +87,8 @@ const PlayerRole = () => {
                         role: doc.data().role,
                         skill: doc.data().skill,
                         special: doc.data().special,
-                        wakeOrder: doc.data().wakeOrder
-
+                        wakeOrder: doc.data().wakeOrder,
+                        actionforRoleCounter: doc.data()?.actionforRoleCounter
                     })
                 })
                 setCovenRole(roles);
@@ -99,7 +102,8 @@ const PlayerRole = () => {
                         role: doc.data().role,
                         skill: doc.data().skill,
                         special: doc.data().special,
-                        wakeOrder: doc.data().wakeOrder
+                        wakeOrder: doc.data().wakeOrder,
+                        actionforRoleCounter: doc.data()?.actionforRoleCounter
 
                     })
                 })
@@ -114,7 +118,8 @@ const PlayerRole = () => {
                         role: doc.data().role,
                         skill: doc.data().skill,
                         special: doc.data().special,
-                        wakeOrder: doc.data().wakeOrder
+                        wakeOrder: doc.data().wakeOrder,
+                        actionforRoleCounter: doc.data()?.actionforRoleCounter
 
                     })
                 })
@@ -139,15 +144,19 @@ const PlayerRole = () => {
         const chosenRole = allRoles.filter(role => role.role === currentRole);
         const chosenPlayerId = chosenPlayer[0].id
         const chosenRoleWakeOrder = chosenRole[0].wakeOrder
-        await updateDoc(doc(database, "playeradmin", "players", user.email, chosenPlayerId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: chosenRoleWakeOrder })
+        await updateDoc(doc(database, "playeradmin", "players", user.email, chosenPlayerId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: chosenRoleWakeOrder, actionforRoleCounter: chosenRole[0].actionforRoleCounter? chosenRole[0].actionforRoleCounter : deleteField() })
 
     }
 
     const handleReset = async (e) => {
+        e.preventDefault();
         for (let i = 0; i < playerList.length; i++) {
             const currentId = playerList[i].id;
-            await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: "none", filliation: "none", life: "none", action: "none", wakeOrder: 0 })
+            const ref = doc(database, "playeradmin", "players", user.email, currentId)
+
+            await updateDoc(ref, { role: "none", filliation: "none", life: "none", action: "none", wakeOrder: 0, actionforRoleCounter: 0})
         }
+        updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "gameState", "gameState", "gameState"), { gameState: "inicio"})
     }
     const handleEraseSpecificPlayer = (playerId) => {
         updateDoc(doc(database, "playeradmin", "players", user.email, playerId), { role: "none", filliation: "none", life: "none", action: "none", wakeOrder: 0 })
@@ -177,6 +186,8 @@ const PlayerRole = () => {
     }
     const startGame = () => {
         navigate('/day');
+        updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "gameState", "gameState", "gameState"), { gameState: "dia"})
+
     }
     async function handleManualRandomizer() {
         var randomizedPlayers = []
@@ -212,7 +223,7 @@ const PlayerRole = () => {
             const currentRole = randomizedPlayers[i].selectedRole.role;
             const wakeOrder = randomizedPlayers[i].selectedRole.wakeOrder;
             const currentFilliation = randomizedPlayers[i].selectedRole.filliation
-            await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: wakeOrder })
+            await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: wakeOrder, willText: "none", actionforRoleCounter: randomizedPlayers[i].selectedRole.actionforRoleCounter? randomizedPlayers[i].selectedRole.actionforRoleCounter : deleteField()})
         }
 
         setCheckboxCounter(0);
@@ -221,73 +232,15 @@ const PlayerRole = () => {
         })
         setIsManualRandomizerOpen(false);
     }
+    const handleCardDelivery = () => {
+        updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "gameState", "gameState", "gameState"), { gameState: "entregueCartas"})
 
-    async function handleRandomizer(enemy1, enemy2){
-        const players = playerList.slice();
-        var fill = []
-        if (enemy2 === 'none') {
-            fill = ['town', enemy1];
-            
-        } else {
-            fill = ['town', enemy1, enemy2];
-            
-        }
-        const roleD = allRoles.slice();
-        var randomizedPlayers = []
-        for (var i = 0; players.length > 0; i++) {
-            var selectedFillIndex = Math.floor(Math.random() * fill.length);
-            var selectedFill = fill[selectedFillIndex]
-            var filteredRoles = roleD.filter(role => role.filliation === selectedFill);
-            if (filteredRoles.length === 0) {
-                const fact = fill.splice(selectedFillIndex, 1)[0];
-            } else {
-                var selectedIndex = Math.floor(Math.random() * players.length);
-
-                var selectedName = players.splice(selectedIndex, 1)[0];    
-            var roleIndex = Math.floor(Math.random() * filteredRoles.length)
-            var selectedRole = filteredRoles[roleIndex];
-            console.log(selectedRole);
-                var usedRole = roleD.filter(role => role.role === selectedRole.role);
-            var index = roleD.findIndex(function (obj) {
-                return obj.role === usedRole[0].role;
-            })
-            const deletedRole = roleD.splice(index, 1)[0];
-            randomizedPlayers.push({ selectedName, selectedRole })
-        }
-            
-        }
-        for (let i = 0; i < randomizedPlayers.length; i++) {
-            const currentId = randomizedPlayers[i].selectedName.id;
-            const currentRole = randomizedPlayers[i].selectedRole.role;
-            const wakeOrder = randomizedPlayers[i].selectedRole.wakeOrder;
-            const currentFilliation = randomizedPlayers[i].selectedRole.filliation
-                await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: wakeOrder})
-        }
     }
     return (
         <div className="playerRole">
             <h3 className="page-title">
             Seleciona a função de cada jogador
             </h3>
-            <Popup open={isRandomizerOpen} modal closeOnDocumentClick={false}>
-                    <div className="header">Randomizador de Funções</div>
-                <div className="modalRole">
-                    <div className="content modalRandomizerContent">
-                        <span className="bordered">Jogar contra a Mafia
-                            <button className="button" onClick={() => handleRandomizer('mafia', 'neutral')}>VS Mafia</button>
-                        </span>
-                        <span className="bordered">Jogar contra o Coven
-                            <button className="button" onClick={() => handleRandomizer('coven', 'neutral')}>VS Coven</button>
-                        </span>
-                        <span className="bordered">Jogar contra os Cavaleiros
-
-                            <button className="button" onClick={() => handleRandomizer('horsemen', 'none')}>VS Cavaleiros</button>
-                        <span className="smallText">Limite de 24 jogadores!</span>
-                        </span>
-                            <button className="button" onClick={() => setIsRandomizerOpen(false)}>Fechar Randomizador</button>
-                    </div>
-                    </div>
-            </Popup>
             <Popup open={isManualRandomizerOpen} modal closeOnDocumentClick={false}>
                     <div className="header">Randomizador de Funções</div>
                 <div className="modalRole">
@@ -312,7 +265,7 @@ const PlayerRole = () => {
                             <div>
 
                         <div className="selector-category">
-                            <h4>Mafia</h4>
+                            <h4>A Familia</h4>
                             <hr />
                             {mafiaRole.map(role => (
                                 <span className="eachRole mafiaies">
@@ -392,7 +345,7 @@ const PlayerRole = () => {
                             <select name="affiliation" id="affiliation" value={currentFilliation} onChange={(e) => setCurrentFilliation(e.target.value)} >
                                     <option value="town" id="town">Cidade</option>
                                     <option value="coven" id="coven" className="coven">Coven</option>
-                                    <option value="mafia" className="mafia">Mafia</option>
+                                    <option value="the family" className="mafia">A Familia</option>
                                     <option value="horsemen" className="cavaleirosDoApocalipse">Cavaleiros do Apocalipse</option>
                                     <option value="neutral" className="neutral">Neutros</option>
                             </select>
@@ -409,10 +362,10 @@ const PlayerRole = () => {
                         </label>
                         <button type="submit" className="button" onClick={handleConfirm}>Confirmar</button>
                         <button type="button" className="button" onClick={handleReset}>Resetar Todos</button>
-                        <button type="button" className="button" onClick={() => setIsRandomizerOpen(true)}>Gerador Aleatorio Automatico</button>
                         <button type="button" className="button" onClick={() => setIsManualRandomizerOpen(true)}>Gerador Aleatorio Manual</button>
                         <Link to='/statuses' target='_blank' rel='noopener noreferrer' />
-                        <a className="button "target="_blank" href="/statuses">Status de Telão</a>
+                        <a className="button " target="_blank" href="/statuses">Status de Telão</a>
+                        <button type="button" className="button" onClick={handleCardDelivery}>Entregar Cartas</button>
                     </form>
                 </div>
                 <div className="playerRole-roles">
@@ -428,10 +381,10 @@ const PlayerRole = () => {
                     </div>
                     <div className="evil">
                         <h4>
-                        Mafia/Coven/Cavaleiros
+                        A Familia/Coven/Cavaleiros
                         </h4>
                         <div className="playerRole-evil card-border scrollable">
-                        {playerList.filter(player => player.filliation.includes("mafia")).map(filteredPlayer => (
+                        {playerList.filter(player => player.filliation.includes("the family")).map(filteredPlayer => (
                             <p key={filteredPlayer.id}>{filteredPlayer.playerName} - {filteredPlayer.role} <button className="delete-button" onClick={() => handleEraseSpecificPlayer(filteredPlayer.id)}>x</button></p>
                                 ))}
                         {playerList.filter(player => player.filliation.includes("coven")).map(filteredPlayer => (

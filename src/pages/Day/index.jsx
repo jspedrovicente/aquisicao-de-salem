@@ -72,7 +72,6 @@ const Day = () => {
     const [mafiaRole, setMafiaRole] = useState([]);
     const [neutralRole, setNeutralRole] = useState([]);
     const [allRoles, setAllRoles] = useState([]);
-    const [currentDayTemp, setCurrentDayTemp] = useState([]);
     const [currentDay, setCurrentDay] = useState(0);
     const [announcements, setAnnouncements] = useState([]);
     const [allPublicEvents, setAllPublicEvents] = useState([]);
@@ -107,7 +106,7 @@ const Day = () => {
         loadUserInformation();
     }, [])
     useEffect(() => {
-        const loadPlayers = () => {
+        const loadPlayers = async () => {
             const x = onSnapshot(collection(database, `playeradmin/players/${user.email}`), (snapshot) => {
                 let list = [];
                 snapshot.forEach((doc) => {
@@ -120,7 +119,13 @@ const Day = () => {
                         filliation: doc.data().filliation,
                         life: doc.data().life,
                         action: doc.data().action,
-                        wakeOrder: doc.data().wakeOrder
+                        wakeOrder: doc.data().wakeOrder,    
+                        willText: doc.data().willText,
+                        clownBomb: doc.data().clownBomb,
+                        pistoleiroMark: doc.data().pistoleiroMark,
+                        buff: doc.data().buff,
+                        debuff: doc.data().debuff,
+                        executorTarget: doc.data().executorTarget
                     })
                 })
                 setPlayers(list);
@@ -128,7 +133,7 @@ const Day = () => {
                 setDeadPlayers(list.sort((a, b) => a.wakeOrder - b.wakeOrder).filter(player => player.life.includes("dead")))
                 setTownies(list.filter(player => player.filliation === 'town' && player.life === "alive"))
                 setCovenies(list.filter(player => player.filliation === 'coven' && player.life === "alive"))
-                setMafiaies(list.filter(player => player.filliation === 'mafia' && player.life === "alive"))
+                setMafiaies(list.filter(player => player.filliation === 'the family' && player.life === "alive"))
                 setNeutraies(list.filter(player => player.filliation === 'neutral' && player.life === "alive"))
                 setHorsies(list.filter(player => player.filliation === 'horsemen' && player.life === "alive"))
             })
@@ -146,11 +151,11 @@ const Day = () => {
                 setTownRole(roles)
     
             })
-            const mafiaSnapshot = onSnapshot(collection(database, "gamedata/roles/mafia"), (snapshot) => {
+            const mafiaSnapshot = onSnapshot(collection(database, "gamedata/roles/the family"), (snapshot) => {
                 let roles = [];
                 snapshot.forEach((doc) => {
                     roles.push({
-                        filliation: "mafia",
+                        filliation: "the family",
                         role: doc.data().role,
                         skill: doc.data().skill,
                         special: doc.data().special,
@@ -205,16 +210,12 @@ const Day = () => {
                 setNeutralRole(roles);
                 
             })
-            const dayCounterSnapshot = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/dayCounter/dayCounter`), (snapshot) => {
-                const currentDayx = [];
+             const dayCounterSnapshot = onSnapshot(collection(database, `playeradmin/playerStatuses/${user.email}/dayCounter/dayCounter`), (snapshot) => {
+                let currentDayx = [];
                 snapshot.forEach((doc) => {
-
-                    currentDayx.push({ currentDay: doc.data().currentDay })
-
+                    currentDayx = ({ currentDay: doc.data().currentDay })
                 })
-                
-                setCurrentDay(currentDayx[0].currentDay)
-                setCurrentDayTemp(currentDayx)
+                setCurrentDay(currentDayx.currentDay)
             })
         }
     
@@ -292,7 +293,7 @@ const Day = () => {
                 snapshot.forEach((doc) => {
                     temp.push({
                         visitor: doc.data().visitor,
-                        target: doc.data().target,
+                        visited: doc.data().visited,
                         id: doc.id,
                         key: doc.id
                     })
@@ -329,6 +330,8 @@ const Day = () => {
     }, [user.email])
     const endGameCompletely = async () => {
         updateDoc(doc(database, "playeradmin", "blackout", user.email, 'blackout'), { blackout: 'false' })
+        updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "gameState", "gameState", "gameState"), { gameState: "inicio"})
+
         for (let p = 0; p < statusAfliction.length; p++) {
             const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusAfliction[p].id)
             await deleteDoc(theRef)
@@ -387,6 +390,11 @@ const Day = () => {
         stopDayMusic();
         stopDramaticDeathMusic();
 
+
+        // Limpando o NewResponse, o buff e o Debuff
+        for (let i = 0; i < players.length; i++){
+            updateDoc(doc(database, `playeradmin/players/${user.email}/${players[i].id}`), { newResponse: "", buff: "", debuff: "", clownBomb: false, pistoleiroMark: false });
+        }
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "dayCounter", "dayCounter", "dayCounter"), { currentDay: 1 })
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "padeiraHeals", "padeiraHeals", "padeiraHeals"), { healCountMax: 4 });
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "weaponChoice", "weaponChoice", "weaponChoice"), { weapon: "none" });
@@ -457,43 +465,26 @@ const Day = () => {
         }
     }
     const explodeBomb = () => {
-        for (let i = 0; i < statusAfliction.length; i++) {
-
-            if (statusAfliction[i].status === 'bomba') {
-                let num = Math.random();
-                const targetted = alivePlayers.filter(target => { return target.playerName === statusAfliction[i].target })
-                
-                if (num < 0.75) {
-                    playBombSound();
-                    setTimeout(() => {
-                        setKillPanelIsOpen(true);
-                        updateDoc(doc(database, "playeradmin", "players", user.email, targetted[0].id), { life: "dead" })
-
-                    }, 9000);
-                    setKillAnouncementUpdate(`O jogador ${targetted[0].playerName} explodiu. Sua função era ${targetted[0].role}`)
-
-                } else {
-                    playFizzleSound();
-                }
-                const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusAfliction[i].id)
-                deleteDoc(theRef)
-                document.getElementById('innerbomb').disabled = true;
-
-                return;
+        const playerbombed = alivePlayers.filter((player) => player.clownBomb === true);
+        for (let i = 0; i < playerbombed.length; i++){
+            let num = Math.random();
+            if (num < 0.75) {
+                playBombSound();
+                setTimeout(() => {
+                    setKillPanelIsOpen(true);
+                    updateDoc(doc(database, "playeradmin", "players", user.email, playerbombed[0].id), { life: "dead", clownBomb: false })
+                }, 9000);
+                setKillAnouncementUpdate(`O jogador ${playerbombed[0].playerName} explodiu. Sua função era ${playerbombed[0].role}`)
+            } else {
+                playFizzleSound();
             }
         }
     }
     const explodeMark = () => {
-        for (let i = 0; i < statusAfliction.length; i++) {
-            if (statusAfliction[i].status === 'marcado') {
-                const targetted = alivePlayers.filter(target => { return target.playerName === statusAfliction[i].target })
-
-                playGunSound();
-                updateDoc(doc(database, "playeradmin", "players", user.email, targetted[0].id), { life: "dead" })
-                const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/statusAfliction/statusAfliction`, statusAfliction[i].id)
-                deleteDoc(theRef)
-                return;
-            }
+        const markedPlayer = alivePlayers.filter((player) => player.pistoleiroMark === true);
+        for (let i = 0; i < markedPlayer.length; i++) {
+            playGunSound();
+            updateDoc(doc(database, "playeradmin", "players", user.email, markedPlayer[0].id), { life: "dead", pistoleiroMark: false });
         }
     }
     const revivePlayer = () => {
@@ -513,11 +504,47 @@ const Day = () => {
         stopDayMusic();
         stopDramaticDeathMusic();
     }
+
+    const filliationChecks = () => {
+        const mafiaCheck = alivePlayers.filter((player) => player.filliation === 'the family')
+        // Do same thing for coven in chase you want to program it in man.
+
+        if (mafiaCheck.length > 0) {
+            // Check if the godfather is alive, if yes, then nothing happens
+            // If the godfather is dead, then promote the afilhado to godfather, if the afilhado is dead, promote the Conselheira
+            // If conselheira is dead promote the Vigarista
+            // if vigarista is dead promote the Zelador
+            const godfatherPresent = mafiaCheck.filter((player) => player.role === 'mestre')
+            if (godfatherPresent.length === 0) {
+                const afilhadoPresent = mafiaCheck.filter((player) => player.role === 'patriarca');
+                if (afilhadoPresent.length > 0) {
+                    updateDoc(doc(database, `playeradmin/players/jspedrogarcia@gmail.com/${afilhadoPresent[0].id}`), {role: 'mestre'});
+                } else {
+                    const conselheiraPresent = mafiaCheck.filter((player) => player.role === 'matriarca');
+                    if (conselheiraPresent.length > 0) {
+                    updateDoc(doc(database, `playeradmin/players/jspedrogarcia@gmail.com/${conselheiraPresent[0].id}`), {role: 'mestre'});
+                    } else {
+                        const vigaristaPresent = mafiaCheck.filter((player) => player.role === 'mordomo');
+                        if (vigaristaPresent.length > 0) {
+                        updateDoc(doc(database, `playeradmin/players/jspedrogarcia@gmail.com/${vigaristaPresent[0].id}`), {role: 'mestre'});
+                        } else {
+                        const zeladorPresent = mafiaCheck.filter((player) => player.role === 'zelador');
+                            if (zeladorPresent.length > 0) {
+                                updateDoc(doc(database, `playeradmin/players/jspedrogarcia@gmail.com/${zeladorPresent[0].id}`), {role: 'mestre'});
+                            }
+                        }
+                    }
+                }
+            } else {
+            }
+        }
+    } 
     const startNight = () => {
         clearNeedlessData();
         stopDayMusic();
         stopDramaticDeathMusic();
         updateDoc(doc(database, "playeradmin", "blackout", user.email, 'blackout'), { blackout: 'sleep' })
+        filliationChecks();
         navigateToNight('/night');
     }
     const judgement = () => {
@@ -615,6 +642,10 @@ const Day = () => {
     }
     const dayPrompt2 = () => {
         executorCheck();
+        updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "gameState", "gameState", "gameState"), { gameState: "dia" })
+        for (let i = 0; i < alivePlayers.length; i++){
+            updateDoc(doc(database, "playeradmin", "players", "jspedrogarcia@gmail.com", alivePlayers[i].id), { action: "pending" } )
+        }
         const horsemen = alivePlayers.filter(player => player.filliation === 'horsemen');
         if (horsemen.length > 0 && currentDay === 8) {
             setIsOpen(false);
@@ -716,65 +747,19 @@ const Day = () => {
                                     </span>
                             )}
                                 <span className="modalNotifier fade-in-text2 ">
-                                    <h4 className="notifier-title ">Efeitos Públicos:</h4>
-                                    {allPublicEvents.map((event) => (
-                                        <span className="statusPlace statusPlaceModal" key={event.key}>
-                                                <p className="statusPlace-player">{event.target}</p>
-                                                <p className="statusPlace-estado">tem o efeito</p>
-                                                <p className="statusPlace-evento">{event.event}</p>
-                                            {event.event === 'bomba' && (
+                                <h4 className="notifier-title ">Efeitos Públicos:</h4>
+                                {alivePlayers.filter((player) => player.clownBomb === true).map(player => (
+                                    <span className="statusPlace statusPlaceModal">
+                                                <p className="statusPlace-player">{player.playerName}</p>
+                                                <p className="statusPlace-estado">tem </p>
+                                                <p className="statusPlace-evento">uma bomba!</p>
                                                 <button className="smallButton" id="innerbomb" onClick={explodeBomb}><img src={bombSvg}></img></button>
-
-                                            )}
-                                                </span>      
-                                    ))}
+                                    </span>
+                                ))}
                                 <span>
                                     {updatePanelInfo}
                                 </span>
                                 </span>
-                            {armadilheiroInformation.length > 0 && 
-                                <span className="modalNotifier fade-in-text2 ">
-                                <h4 className="notifier-title ">Efeito do Armadilheiro:</h4>
-                                {armadilheiroInformation.map((info) => (
-                                <span>
-                                        {info.role !== "armadilheiro" && (
-                            <span key={info.key} className="armadilhaPlace">
-                            <p className="armadilhaPlace-visitor">{info.role}</p>
-                            <p className="armadilhaPlace-text">ativou a armadilha!</p>
-                            </span> )}
-                            </span>                                        
-                                    ))}
-                                </span>
-                            }
-                            {spyInformation.length > 0 ? (
-                                <span className="modalNotifier fade-in-text2 ">
-                                <h4 className="notifier-title ">Efeito do Espião:</h4>
-                                {spyInformation.map((info) => (
-                                    <p key={info.key}>Seu alvo visitou {info.visited}!</p>
-                                    ))}
-                                </span>
-
-                            ) : (
-                                <span className="modalNotifier fade-in-text2 ">
-                                </span>
-                            )
-                            }
-                            {fuxiqueiraInformation.length > 0 ? (
-
-                                <span className="modalNotifier fade-in-text2 ">
-                                    <h4 className="notifier-title ">Efeito da Fuxiqueira:</h4>
-                                    <span className="direto">
-                                    <p>Os Jogadores: </p>
-                                {fuxiqueiraInformation.map((info) => (
-                                    <p key={info.key}> {info.visited} </p>
-                                ))}
-                                        <p>possivelmente visitaram seu alvo!</p>
-                                    </span>
-                                </span>
-                            ) : (
-                                <span className="modalNotifier fade-in-text2 ">
-                                </span>
-                                )}
                             <button className="button" onClick={() => finalizeReadings()}>Finalizar</button>
                     </div>    
                 </div>
@@ -791,40 +776,18 @@ const Day = () => {
                                 <p className="announcePlace-killer"> Ataque: {announcement.attackerRole}</p>
                             </span>
                         ))}
-                        {allPublicEvents.map((event) => (
-                            <span className="statusPlace" key={event.key}>
-                                <p className="statusPlace-player">{event.target}</p>
-                                <p className="statusPlace-estado">tem o efeito</p>
-                                <p className="statusPlace-evento">{event.event}</p>
-                            </span>
-                        ))}
-                        {armadilheiroInformation.map((info) => (
-                            <span key={info.key} className="armadilhaPlace">
-                            {info.role !== "armadilheiro" && (
-                            <span key={info.key} className="armadilhaPlace">
-                            <p className="armadilhaPlace-visitor">{info.role}</p>
-                            <p className="armadilhaPlace-text">ativou a armadilha!</p>
-                            </span> )}
-                            </span>
-                        ))}
-                        {spyInformation.map((info) => (
-                            <p key={info.key}>O Espião percebeu que seu alvo visitou {info.visited}!</p>
-                        ))}
-                        {fuxiqueiraInformation.map((info) =>(
-                                    <p key={info.key}> {info.visited} pode ter visitado o alvo da fuxiqueira </p>
-                        ))}
                         </div>
                 </div>
                 <div className="event-hiddenocurrence event">
                         <h4>
-                        Ações da Noite
+                        Visitas que ocorreram
                         </h4>
                     <div className="card-border scrollable event-hiddenocurrence-inner">
                         {visitAction.map((visit) => (
                             <span className="visitPlace" key={visit.key}>
                             <p className="visitPlace-visitee">{visit.visitor}</p>
                             <p>V</p>
-                            <p className="visitPlace-visited">{visit.target}</p>
+                            <p className="visitPlace-visited">{visit.visited}</p>
                             </span>
                     ))}    
                     </div>
@@ -834,15 +797,14 @@ const Day = () => {
                         Informações Secretas
                         </h4>
                     <div className="large-container card-border scrollable">
-
-                        {statusAfliction.map((player) => (
-                            <span key={player.key + '4'} className="statusAflictions">
-                                <p className="statusAfliction-player">{player.target}</p>
-                                <p className="statusAfliction-estado">tem o efeito</p>
-                                <p className="statusAfliction-evento">{player.status} </p>
-                                {player.status === 'marcado' && <button className="miniButton trigger" onClick={explodeMark}><img src={bulletSvg} alt="bullet" /></button>}
+                        {alivePlayers.filter((player) => player.pistoleiroMark === true).map((player) => (
+                            <span className="statusAflictions">
+                                <p className="statusAfliction-player">{player.playerName}</p>
+                                <p className="statusAfliction-estado">está</p>
+                                <p className="statusAfliction-evento">Marcado... </p>
+                                <button className="miniButton trigger" onClick={explodeMark}><img src={bulletSvg} alt="bullet" /></button>
                             </span>
-                        ))}
+                    ))}
                     </div>
                 </div>
                 <div className="event-aliveplayers event">
@@ -861,7 +823,7 @@ const Day = () => {
                         {alivePlayers.map((player => (
                             <span className="alivePlayersConfig" key={player.key}>
                                 {player.playerName} - {player.filliation === 'town' && <p className="townies">{player.role} </p>} {player.role === 'martir' && <button className="miniButton trigger" onClick={revivePopup}><img src={wingSvg} alt="Wings" /></button>}
-                                {player.filliation === 'mafia' && <p className="mafiaies">{player.role} </p>}
+                                {player.filliation === 'the family' && <p className="mafiaies">{player.role} </p>}
                                 {player.filliation === 'coven' && <p className="covenies">{player.role}</p>}
                                 {player.filliation === 'neutral' && <p className="neutraies">{player.role}</p>}
                                 {player.filliation === 'horsemen' && <p className="horsies">{player.role}</p>}
@@ -878,7 +840,7 @@ const Day = () => {
                             <span className="alivePlayersConfig" key={player.key + '3'}>
                                 {player.playerName} -
                                 {player.filliation === 'town' && <p className="townies">{player.role} </p>}
-                                {player.filliation === 'mafia' && <p className="mafiaies">{player.role}</p>}
+                                {player.filliation === 'the family' && <p className="mafiaies">{player.role}</p>}
                                 {player.filliation === 'coven' && <p className="covenies">{player.role}</p>}
                                 {player.filliation === 'horsemen' && <p className="horsies">{player.role}</p>}
                                 {player.filliation === 'neutral' && <p className="neutraies">{player.role}</p>}

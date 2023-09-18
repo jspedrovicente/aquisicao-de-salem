@@ -1,0 +1,188 @@
+.cardImg{
+    width: 100%;
+    
+}
+
+.cardDetailedInformation{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mainMobilePage{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+.nightAction{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+}
+.actualAction{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.interactiveButtons{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+.intButton{
+    margin-right: 10px;
+    background-color: #B0B159;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+.waitingForMatch{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+.cardDelivered{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+.chatMortosTextType{
+  display: flex;
+  height: 5vh;
+  align-items: center;
+  
+}
+.chatMortosLogMsg{
+  margin-left: 10px;
+  
+}
+.chatMortosLog{
+  display: flex;
+  flex-direction: column;
+
+}
+.playerInfo, .mafiaInfo, .playerNotice, .chatMortos{
+    border: 1px solid #B0B159;
+    width: 90vw;
+    min-height: 10vh;
+    border-radius: 10px; 
+}
+.playerInfoBox, .mafiaInfoBox, .playerNoticeBox, .chatMortosBox{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+}
+.eyeButton{
+    padding-top: 0px;
+}
+.mafiaBoxInfo{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+.eyeButton img{
+    vertical-align: text-bottom;    
+}
+
+
+.modalMobile-content{
+  width: 90vw;
+  height: 70vh;
+}
+.testamentTextArea{
+  width: 80vw;
+  height: 40vh;
+  background-color: #424320;
+  font-size: 20px;
+  border-radius: 10px;
+  color: white;
+
+}
+.testamentInformation p{
+  font-size: 20px;
+  text-align: center;
+}
+.testamentInformation, .modal-testatamentcontent{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+}
+.fadeMe {
+    animation:fadeIn 1s linear;
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity:0
+    }
+    100% {
+      opacity:1;
+    }
+  }
+  .fadeMe.none {
+    display:none
+  }
+  .loading {
+    margin: 20px;
+    width: 100px;
+    height: 100px;
+    -webkit-animation-name: spin;
+    -webkit-animation-duration: 2000ms;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-name: spin;
+    -moz-animation-duration: 2000ms;
+    -moz-animation-iteration-count: infinite;
+    -moz-animation-timing-function: linear;
+    -ms-animation-name: spin;
+    -ms-animation-duration: 2000ms;
+    -ms-animation-iteration-count: infinite;
+    -ms-animation-timing-function: linear;
+    animation-name: spin;
+    animation-duration: 2000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+  @-ms-keyframes spin {
+    from {
+      -ms-transform: rotate(0deg);
+    }
+    to {
+      -ms-transform: rotate(360deg);
+    }
+  }
+  @-moz-keyframes spin {
+    from {
+      -moz-transform: rotate(0deg);
+    }
+    to {
+      -moz-transform: rotate(360deg);
+    }
+  }
+  @-webkit-keyframes spin {
+    from {
+      -webkit-transform: rotate(0deg);
+    }
+    to {
+      -webkit-transform: rotate(360deg);
+    }
+  }
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }

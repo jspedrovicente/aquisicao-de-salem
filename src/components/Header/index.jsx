@@ -5,9 +5,9 @@ const Header = () => {
     return (
         
         <div className='header'>
-            <h1>
+            <h3>
                 A Aquisição de Salem
-            </h1>
+            </h3>
         </div>
         )
 }

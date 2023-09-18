@@ -45,7 +45,11 @@ const PlayerList = () => {
                 victoryPoints: 0,
                 role: "none",
                 filliation: "none",
-                life: "none"
+                life: "none",
+                image: "none",
+                willText: "none",
+                action: "pending",
+                newResponse: ''
             })
         }
         setPlayerName('')
