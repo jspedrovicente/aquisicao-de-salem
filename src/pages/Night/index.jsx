@@ -275,9 +275,9 @@ const Night = () => {
     const encerrarNoiteMobile = async () => {
         interruptMusicPlaying();
         let rolesImunetoBlocks = ['meretriz', 'taberneiro', 'miragem', 'executor'];
-        let rolesThatAttackBlockers = ['assassino em serie', 'godfather', 'lobisomen'];
-        let rolesImunetoAttacks = ['arsonista', 'assassino em serie']
-        let consideredEvilRoles = ['fome', 'guerra', 'morte', 'estranho', 'amaldicoadora', 'feiticeira benevolente', 'parasita', 'conselheira', 'godfather', 'vigarista', 'zelador', 'arsonista', 'assassino em serie', 'bobo da corte', 'executor', 'lobisomen', 'medico da peste', 'palhaco', 'pistoleiro' ]
+        let rolesThatAttackBlockers = ['assassino em serie', 'mestre', 'lobisomen', 'morte'];
+        let rolesImunetoAttacks = ['piromaniaco', 'assassino em serie']
+        let consideredEvilRoles = ['fome', 'guerra', 'morte', 'estranho', 'amaldicoadora', 'feiticeira benevolente', 'parasita', 'matriarca', 'mestre', 'mordomo', 'zelador', 'piromaniaco', 'assassino em serie', 'bobo da corte', 'executor', 'lobisomen', 'medico da peste', 'palhaco', 'pistoleiro' ]
         let blockedTargets = [];
         let attackingAction = [];
         let visitsThatOccured = [];
@@ -307,7 +307,7 @@ const Night = () => {
 
         // First FOR to run through for blocks
         for (let i = 0; i < Sactions.length; i++) {
-            if (Sactions[i].userRole === 'meretriz' || Sactions[i].userRole === 'taberneiro') {
+            if (Sactions[i].userRole === 'meretriz' || Sactions[i].userRole === 'taberneiro' || Sactions[i].userRole === 'fome') {
                 if (rolesImunetoBlocks.includes(Sactions[i].targetRole)) {
                     // in this case nothing happens
                     // If the person thats getting blocked is imune, nothing happens
@@ -476,7 +476,11 @@ const Night = () => {
                     case 'zelador':
                         zeladorTarget = true;
                         break;
-                    
+                    case 'morte':
+                        attackingAction.push({ attacker: Sactions[i].user, attackerRole: Sactions[i].userRole, target: Sactions[i].target, targetRole: Sactions[i].targetRole })
+                        break;
+                    case 'guerra':
+                        break;
                     case 'FILLER HERE FOR ME TO REMEMBER':
                         // Mafia is getting written together, same as coven!
                         break;

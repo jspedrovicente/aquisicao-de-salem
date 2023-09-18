@@ -351,7 +351,7 @@ const PlayerMobile = () => {
             }
         } else {
             if ((playerCurrentRole[0].wakeTrigger === 1 && playerCurrentInformation[0].actionforRoleCounter > 0) ||(playerCurrentRole[0].wakeTrigger === 1 && playerCurrentInformation[0].actionforRoleCounter === null)) {
-                const playersInGame = alivePlayers;
+            const playersInGame = alivePlayers;
             const targetRole = playersInGame.filter((player) => player.playerName === target1);
             const ref = collection(database, `playeradmin/playerStatuses/jspedrogarcia@gmail.com/mobilePlayerActions/mobilePlayerActionsSingle`)
             addDoc(ref, {
@@ -380,8 +380,33 @@ const PlayerMobile = () => {
             updateDoc(doc(database, "playeradmin", "players", "jspedrogarcia@gmail.com", registeredPlayerId), { action: "complete" } )
             
         } else {
-                if (playerCurrentInformation[0].actionforRoleCounter === 0) {
+        if (playerCurrentInformation[0].actionforRoleCounter === 0) {
                     updateDoc(doc(database, "playeradmin", "players", "jspedrogarcia@gmail.com", registeredPlayerId), { action: "complete" } )
+                }    
+                if (playerCurrentRole[0].wakeTrigger === 2) {
+                    const playersInGame = alivePlayers;
+                    const targetRole = playersInGame.filter((player) => player.playerName === target1);
+                    const ref = collection(database, `playeradmin/playerStatuses/jspedrogarcia@gmail.com/mobilePlayerActions/mobilePlayerActionsSingle`)
+                    addDoc(ref, {
+                        user: playerCurrentInformation[0].playerName,
+                        userID: playerCurrentInformation[0].id,
+                        userRole: playerCurrentInformation[0].role,
+                        target: target1,
+                        targetRole: targetRole[0].role,
+                        wakeOrder: playerCurrentInformation[0].wakeOrder,
+                        targetId: targetRole[0].id
+                    })
+                    const targetRole2 = playersInGame.filter((player) => player.playerName === target1);
+                    addDoc(ref, {
+                        user: playerCurrentInformation[0].playerName,
+                        userID: playerCurrentInformation[0].id,
+                        userRole: playerCurrentInformation[0].role,
+                        target: target2,
+                        targetRole: targetRole2[0].role,
+                        wakeOrder: playerCurrentInformation[0].wakeOrder,
+                        targetId: targetRole2[0].id
+                    })
+                        updateDoc(doc(database, "playeradmin", "players", "jspedrogarcia@gmail.com", registeredPlayerId), { action: "complete" })
           }      
         }
         }
@@ -546,12 +571,29 @@ const PlayerMobile = () => {
                                                     Quantidade de ações restantes: {playerCurrentInformation[0]?.actionforRoleCounter}
                                                 </div>
                                             )}
-                                            {(playerCurrentRole[0].role === 'lobisomen' && currentDay % 2 === 0) || (playerCurrentRole[0].wakeTrigger === 1 && playerCurrentInformation[0].action === "pending" && playerCurrentInformation[0].actionforRoleCounter > 0) || (playerCurrentRole[0].wakeTrigger === 1 && playerCurrentInformation[0].action === "pending" && playerCurrentInformation[0]?.actionforRoleCounter === null)? (
+                                            {(playerCurrentRole[0].role === 'lobisomen' && currentDay % 2 === 0) || (playerCurrentRole[0].wakeTrigger === 1 && playerCurrentInformation[0].action === "pending" && playerCurrentInformation[0].actionforRoleCounter > 0) || (playerCurrentRole[0].wakeTrigger === 1 && playerCurrentInformation[0].action === "pending" && playerCurrentInformation[0]?.actionforRoleCounter === null) || (playerCurrentInformation[0].action === "pending" && playerCurrentRole[0].wakeTrigger === 2)? (
                                                 <div className="actualAction">
                                                     <span>
                                                         Selecione seu Alvo
                                                     </span>
                                                     <select  name="alivePlayerTarget1" id="alivePlayerTarget1" value={target1} onChange={(e) => setTarget1(e.target.value)}>
+                                                    <option value="" defaultValue disabled>Selecione</option>
+                                                        {alivePlayers
+                                                            .filter((player) => player.playerName !== playerCurrentInformation[0].playerName)
+                                                            .map((player) => (
+                                                                <option key={player.key}>{player.playerName}</option>
+                                                            ))
+                                                        }
+                                                    </select>
+                                            
+                                                </div>
+                                            ) : (null)}
+                                            {playerCurrentRole[0].wakeTrigger === 2 && playerCurrentInformation[0].action === "pending" ? (
+                                                <div className="actualAction">
+                                                    <span>
+                                                        Selecione seu Alvo 2
+                                                    </span>
+                                                    <select  name="alivePlayerTarget2" id="alivePlayerTarget2" value={target2} onChange={(e) => setTarget2(e.target.value)}>
                                                     <option value="" defaultValue disabled>Selecione</option>
                                                         {alivePlayers
                                                             .filter((player) => player.playerName !== playerCurrentInformation[0].playerName)
