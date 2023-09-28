@@ -125,7 +125,9 @@ const Day = () => {
                         pistoleiroMark: doc.data().pistoleiroMark,
                         buff: doc.data().buff,
                         debuff: doc.data().debuff,
-                        executorTarget: doc.data().executorTarget
+                        executorTarget: doc.data().executorTarget,
+                        newResponse: doc.data().newResponse,
+                        doused: doc.data().doused
                     })
                 })
                 setPlayers(list);
@@ -360,32 +362,7 @@ const Day = () => {
             await deleteDoc(theRef)
 
         }
-        for (let i = 0; i < poisonAction.length; i++) {
-            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/poisonTarget/poisonTarget`, poisonAction[i].id)
-            await deleteDoc(theRef)
-
-        }
-        for (let i = 0; i < parasiteTarget.length; i++) {
-            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/parasiteTarget/parasiteTarget`, parasiteTarget[i].id)
-            await deleteDoc(theRef)
-
-        }
-        for (let i = 0; i < armadilheiroInformation.length; i++) {
-            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/armadilheiroInformation/armadilheiroInformation`, armadilheiroInformation[i].id)
-            await deleteDoc(theRef)
-
-        }
-        for (let i = 0; i < spyInformation.length; i++) {
-            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/spyInformation/spyInformation`, spyInformation[i].id)
-            await deleteDoc(theRef)
-
-        }
         
-        for (let i = 0; i < fuxiqueiraInformation.length; i++) {
-            const theRef = doc(database, `playeradmin/playerStatuses/${user.email}/fuxiqueiraInformation/fuxiqueiraInformation`, fuxiqueiraInformation[i].id)
-            await deleteDoc(theRef)
-
-        }
         clearNeedlessData();
         stopDayMusic();
         stopDramaticDeathMusic();
@@ -393,7 +370,7 @@ const Day = () => {
 
         // Limpando o NewResponse, o buff e o Debuff
         for (let i = 0; i < players.length; i++){
-            updateDoc(doc(database, `playeradmin/players/${user.email}/${players[i].id}`), { newResponse: "", buff: "", debuff: "", clownBomb: false, pistoleiroMark: false });
+            updateDoc(doc(database, `playeradmin/players/${user.email}/${players[i].id}`), { newResponse: "", buff: "", debuff: "", clownBomb: false, pistoleiroMark: false, doused: false });
         }
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "dayCounter", "dayCounter", "dayCounter"), { currentDay: 1 })
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "padeiraHeals", "padeiraHeals", "padeiraHeals"), { healCountMax: 4 });
@@ -491,7 +468,7 @@ const Day = () => {
         setIsReviveModalOpen(false);
         const target = deadPlayers.filter(player => { return player.playerName === playerKilling });
         const martir = alivePlayers.filter(player => player.role === 'martir')
-        updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "alive" });
+        updateDoc(doc(database, "playeradmin", "players", user.email, target[0].id), { life: "alive", newResponse: '' });
         updateDoc(doc(database, "playeradmin", "players", user.email, martir[0].id), { life: "dead" });
         setKillPanelIsOpen(true);
         setKillAnouncementUpdate(`O jogador ${target[0].playerName} foi ressucitado, o mártir ${martir[0].playerName} se sacrificou por essa troca.`)
@@ -585,18 +562,11 @@ const Day = () => {
                     }, 5000);
                 }
             }
-            const executorStatus = statusAfliction.filter(status => status.status === 'executação');
-
-            if (executorStatus.length > 0) {
-            let execTarget = alivePlayers.filter(player => player.playerName === executorStatus[0].target);
-                if (execTarget[0].playerName === target[0].playerName) {
-                    const executor = alivePlayers.filter(player => player.role === 'executor');
-
+            if (target[0].executorTarget === true ) {
+                    const executor = players.filter(player => player.role === 'executor');
+                    updateDoc(doc(database, "playeradmin", "players", user.email, executor[0].id), { role: 'executor vitorioso' });
                     setNotifierNews('O Alvo do executor acabou de ser executado. Executor ganhou sua parte do jogo!')
                     setNotifierNewsIsOpen(true);
-                    deleteDoc(doc(database, "playeradmin", "playerStatuses", user.email, "statusAfliction", "statusAfliction", executorStatus[0].id));
-                    updateDoc(doc(database, "playeradmin", "players", user.email, executor[0].id), { role: 'executor vitorioso' });
-                }
             }
         } else {
             setJudgementPanelIsOpen(false);
@@ -624,21 +594,13 @@ const Day = () => {
     }
     const executorCheck = () => {
         const executor = alivePlayers.filter(player => player.role === 'executor');
-        const executorStatus = statusAfliction.filter(status => status.status === 'executação');
-        if (executorStatus.length > 0) {
-            let execTarget = alivePlayers.filter(player => player.playerName === executorStatus[0].target);
-            if (execTarget.length === 0) {
+        if (executor.length > 0) {
+            const executorTarget = alivePlayers.filter((player) => player.executorTarget === true);
+            if (executorTarget.length === 0) {
                 setUpdatePanelInfo('O alvo do executor morreu, ele agora virou Bobo da corte!');
-
                 updateDoc(doc(database, "playeradmin", "players", user.email, executor[0].id), { role: 'bobo da corte' });
-                deleteDoc(doc(database, "playeradmin", "playerStatuses", user.email, "statusAfliction", "statusAfliction", executorStatus[0].id));
-    
             }
         };
-        if (executor.length > 0) {
-            updateDoc(doc(database, "playeradmin", "players", user.email, executor[0].id), { wakeOrder: 150 });
-            
-        }
     }
     const dayPrompt2 = () => {
         executorCheck();
@@ -803,6 +765,13 @@ const Day = () => {
                                 <p className="statusAfliction-estado">está</p>
                                 <p className="statusAfliction-evento">Marcado... </p>
                                 <button className="miniButton trigger" onClick={explodeMark}><img src={bulletSvg} alt="bullet" /></button>
+                            </span>
+                    ))}
+                        {alivePlayers.filter((player) => player.executorTarget === true).map((player) => (
+                            <span className="statusAflictions">
+                                <p className="statusAfliction-player">{player.playerName}</p>
+                                <p className="statusAfliction-estado">é o alvo do</p>
+                                <p className="statusAfliction-evento">Executor</p>
                             </span>
                     ))}
                     </div>

@@ -68,18 +68,31 @@
   flex-direction: column;
 
 }
-.playerInfo, .mafiaInfo, .playerNotice, .chatMortos{
+.completedActionWaiting{
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+.playerInfo, .mafiaInfo, .playerNotice, .chatMortos, .piromaniacoInfo, .evilChatInfo{
     border: 1px solid #B0B159;
     width: 90vw;
     min-height: 10vh;
     border-radius: 10px; 
 }
-.playerInfoBox, .mafiaInfoBox, .playerNoticeBox, .chatMortosBox{
+.playerInfoBox, .mafiaInfoBox, .playerNoticeBox, .chatMortosBox, .piromaniacoInfoBox, .evilChatBox{
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
     margin-top: 10px;
+}
+.evilChatButtons{
+  display: flex;
+  align-items: center;
+}
+.evilChatButtons input{
+  padding: 0 20px;
+  height: 30px;
 }
 .eyeButton{
     padding-top: 0px;

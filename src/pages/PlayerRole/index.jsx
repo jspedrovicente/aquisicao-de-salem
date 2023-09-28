@@ -2,14 +2,12 @@ import { useState, useEffect } from "react";
 import "./playerRole.css"
 import ButtonLink from "../../components/ButtonLink"
 import { database } from "../../firebaseConnection";
-import useSound from "use-sound";
-import { Link, redirect, useNavigate } from "react-router-dom";
-import { setDoc, doc, addDoc, collection, onSnapshot, deleteDoc, updateDoc, deleteField } from "firebase/firestore";
+import { Link, useNavigate } from "react-router-dom";
+import {doc, collection, onSnapshot, updateDoc, deleteField } from "firebase/firestore";
 import Popup from 'reactjs-popup';
 
 
 const PlayerRole = () => {
-    const [isRandomizerOpen, setIsRandomizerOpen] = useState(false);
     const [isManualRandomizerOpen, setIsManualRandomizerOpen] = useState(false);
     const [townRole, setTownRole] = useState([]);
     const [covenRole, setCovenRole] = useState([]);
@@ -19,14 +17,12 @@ const PlayerRole = () => {
     const [allRoles, setAllRoles] = useState([]);
     const [playerList, setPlayerList] = useState([]);
     const [neutralRole, setNeutralRole] = useState([]);
-    const [availableRoles, setAvailableRoles] = useState([]);
-    const [enemyfill, setEnemyFill] = useState('');
     const [checkboxCounter, setCheckboxCounter] = useState(0);
-    const [randomizerConditionMet, setRandomizerConditionMet] = useState(true);
     // information for setting the current information for a player
     const [currentFilliation, setCurrentFilliation] = useState('town');
     const [currentPlayer, setCurrentPlayer] = useState('');
     const [currentRole, setCurrentRole] = useState('');
+    const [randomizerChosenRoles, setRandomizerChosenRoles] = useState([]);
     const navigate = useNavigate();
     useEffect(() => {
         async function loadInfo() {
@@ -59,7 +55,9 @@ const PlayerRole = () => {
                         skill: doc.data().skill,
                         special: doc.data().special,
                         wakeOrder: doc.data().wakeOrder,
-                        actionforRoleCounter: doc.data()?.actionforRoleCounter
+                        actionforRoleCounter: doc.data()?.actionforRoleCounter,
+                        enabledRole: doc.data().enabledRole,
+                        multiple: doc.data().multiple
                     })
                 })
                 setTownRole(roles)
@@ -74,7 +72,9 @@ const PlayerRole = () => {
                         skill: doc.data().skill,
                         special: doc.data().special,
                         wakeOrder: doc.data().wakeOrder,
-                        actionforRoleCounter: doc.data()?.actionforRoleCounter
+                        actionforRoleCounter: doc.data()?.actionforRoleCounter,
+                        enabledRole: doc.data().enabledRole,
+                        multiple: doc.data().multiple
                     })
                 })
                 setMafiaRole(roles);
@@ -88,7 +88,9 @@ const PlayerRole = () => {
                         skill: doc.data().skill,
                         special: doc.data().special,
                         wakeOrder: doc.data().wakeOrder,
-                        actionforRoleCounter: doc.data()?.actionforRoleCounter
+                        actionforRoleCounter: doc.data()?.actionforRoleCounter,
+                        enabledRole: doc.data().enabledRole,
+                        multiple: doc.data().multiple
                     })
                 })
                 setCovenRole(roles);
@@ -103,7 +105,9 @@ const PlayerRole = () => {
                         skill: doc.data().skill,
                         special: doc.data().special,
                         wakeOrder: doc.data().wakeOrder,
-                        actionforRoleCounter: doc.data()?.actionforRoleCounter
+                        actionforRoleCounter: doc.data()?.actionforRoleCounter,
+                        enabledRole: doc.data().enabledRole,
+                        multiple: doc.data().multiple
 
                     })
                 })
@@ -119,7 +123,9 @@ const PlayerRole = () => {
                         skill: doc.data().skill,
                         special: doc.data().special,
                         wakeOrder: doc.data().wakeOrder,
-                        actionforRoleCounter: doc.data()?.actionforRoleCounter
+                        actionforRoleCounter: doc.data()?.actionforRoleCounter,
+                        enabledRole: doc.data().enabledRole,
+                        multiple: doc.data().multiple
 
                     })
                 })
@@ -137,7 +143,7 @@ const PlayerRole = () => {
         }
         addAllRoles(covenRole, mafiaRole, townRole, horsemenRole, neutralRole);
 
-    }, [covenRole])
+    }, [covenRole, mafiaRole, townRole, horsemenRole, neutralRole])
     const handleConfirm = async (e) => {
         e.preventDefault();
         const chosenPlayer = playerList.filter(player => player.playerName === currentPlayer);
@@ -162,27 +168,8 @@ const PlayerRole = () => {
         updateDoc(doc(database, "playeradmin", "players", user.email, playerId), { role: "none", filliation: "none", life: "none", action: "none", wakeOrder: 0 })
 
     }
-    function mafiaFill() {
-        document.querySelector('.coven').classList.add('invisible');
-        document.querySelector('.cavaleirosDoApocalipse').classList.add('invisible');
-        document.querySelector('.mafia').classList.remove('invisible');
-    }
-    function covenFill() {
-        document.querySelector('.mafia').classList.add('invisible');
-        document.querySelector('.cavaleirosDoApocalipse').classList.add('invisible');
-        document.querySelector('.coven').classList.remove('invisible');
-
-    }
-    const handleCheckboxChange = (event) => {
-
-        if (event.target.checked) {
-            setCheckboxCounter(checkboxCounter + 1)
-        } else {
-            setCheckboxCounter(checkboxCounter - 1)
-        }
-    }
     const isManualDisabled = () => {
-        return checkboxCounter !== playerList.length;
+        return randomizerChosenRoles.length !== playerList.length;
     }
     const startGame = () => {
         navigate('/day');
@@ -192,30 +179,22 @@ const PlayerRole = () => {
     async function handleManualRandomizer() {
         var randomizedPlayers = []
         const players = playerList.slice();
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        const selectedBoxes = []
+        const roleList = randomizerChosenRoles;
         const chosenRoles = []
-        checkboxes.forEach((checkbox) => {
-            if (checkbox.checked) {
-                selectedBoxes.push(checkbox.value);
-            }
-        })
-        for (var i = 0; i < selectedBoxes.length; i++){
-            const temp = allRoles.filter(role => role.role === selectedBoxes[i]) 
+        for (let i = 0; i < roleList.length; i++){
+            const temp = allRoles.filter(role => role.role === roleList[i]) 
             chosenRoles.push(temp[0]);
-            
         }
-        for (var i = 0; players.length > 0; i++) {
-            var roleIndex = Math.floor(Math.random() * chosenRoles.length)
+        for (let i = 0; players.length > 0; i++) {
+            const roleIndex = Math.floor(Math.random() * chosenRoles.length)
             var selectedIndex = Math.floor(Math.random() * players.length);
             var selectedName = players.splice(selectedIndex, 1)[0];
             var selectedRole = chosenRoles[roleIndex];
             var usedRole = chosenRoles.filter(role => role.role === selectedRole.role);
-            var roleToFind = usedRole[0];
             var index = chosenRoles.findIndex(function (obj) {
-                return obj.role === roleToFind.role;
+                return obj.role === usedRole[0].role;
             })
-            const deletedRole = chosenRoles.splice(index, 1)[0];
+            const deleted = chosenRoles.splice(index, 1)[0];
             randomizedPlayers.push({ selectedName, selectedRole })
         }
         for (let i = 0; i < randomizedPlayers.length; i++) {
@@ -225,23 +204,36 @@ const PlayerRole = () => {
             const currentFilliation = randomizedPlayers[i].selectedRole.filliation
             await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: wakeOrder, willText: "none", actionforRoleCounter: randomizedPlayers[i].selectedRole.actionforRoleCounter? randomizedPlayers[i].selectedRole.actionforRoleCounter : deleteField()})
         }
-
-        setCheckboxCounter(0);
-        checkboxes.forEach((checkbox) => {
-            checkbox.checked = false;
-        })
+        setRandomizerChosenRoles([]);
         setIsManualRandomizerOpen(false);
     }
     const handleCardDelivery = () => {
         updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "gameState", "gameState", "gameState"), { gameState: "entregueCartas"})
 
     }
+
+    const addFunctionToRole = (addedRole) => {
+        setRandomizerChosenRoles([...randomizerChosenRoles, addedRole]);
+        console.log(randomizerChosenRoles);
+    }
+
+    const removeFunctionToRole = (removedRole) => {
+        let tempArray = [...randomizerChosenRoles];
+        const removedRoleIndex = tempArray.indexOf(removedRole);
+        if (removedRoleIndex === -1) {
+            // nothing happens
+        } else {
+            tempArray.splice(removedRoleIndex, 1);
+            setRandomizerChosenRoles(tempArray);
+        }
+    }
+
     return (
         <div className="playerRole">
             <h3 className="page-title">
             Seleciona a função de cada jogador
             </h3>
-            <Popup open={isManualRandomizerOpen} modal closeOnDocumentClick={false}>
+            <Popup className="randomizerModalRoles" open={isManualRandomizerOpen} modal closeOnDocumentClick={false}>
                     <div className="header">Randomizador de Funções</div>
                 <div className="modalRole">
                     <div className="content modalRandomizerContent">
@@ -249,17 +241,21 @@ const PlayerRole = () => {
                         <div className="selector-category">
                             <h4>Cidade</h4>
                                 <hr />
-                                <span className="eachRole townies">
-                                <label >cidadao
-                                </label>
-                                <input type="checkbox" value='cidadao' onChange={handleCheckboxChange} />
-                            </span>
-                        {townRole.map(role => (
-                            <span className="eachRole townies">
+                                {townRole.map(role => (
+                                    role.enabledRole ? (
+                                        
+                                        <span className="eachRole townies" key={role.key}>
                                 <label >{role.role}
                                 </label>
-                                <input type="checkbox" value={role.role} onChange={handleCheckboxChange} />
+                                <div className="buttonSection">
+                                {role.multiple? 'M' : 'U'}
+
+                                <button onClick={() => removeFunctionToRole(role.role)}>-</button>
+                                <input type="number" readOnly value={randomizerChosenRoles.filter(x => x === role.role).length} />
+                                <button onClick={ () => addFunctionToRole(role.role)}>+</button>
+                                </div>
                             </span>
+                                ) : (null)
                         ))}
                             </div>
                             <div>
@@ -267,21 +263,37 @@ const PlayerRole = () => {
                         <div className="selector-category">
                             <h4>A Familia</h4>
                             <hr />
-                            {mafiaRole.map(role => (
+                                {mafiaRole.map(role => (
+                                    role.enabledRole ? (
+                                
                                 <span className="eachRole mafiaies">
-                                    <label >{role.role}</label>
-                                    <input type="checkbox" value={role.role} onChange={handleCheckboxChange} />
-                                </span>
+                               <label >{role.role} 
+                                </label>
+                                            <div className="buttonSection">
+                                {role.multiple? 'M' : 'U'}
+                                <button onClick={() => removeFunctionToRole(role.role)}>-</button>
+                                <input type="number" readOnly value={randomizerChosenRoles.filter(x => x === role.role).length} />
+                                <button onClick={ () => addFunctionToRole(role.role)}>+</button>
+                                </div>
+                                </span>) : (null)
                             ))}
                         </div>
                         <div className="selector-category">
-                            <h4>Coven</h4>
+                            <h4>Coven - Desabilitadas</h4>
                             <hr />
-                            {covenRole.map(role => (
+                                    {covenRole.map(role => (
+                                    role.enabledRole ? (
+                                
                                 <span className="eachRole covenies">
-                                    <label >{role.role}</label>
-                                    <input type="checkbox" value={role.role} onChange={handleCheckboxChange} />
-                                </span>
+                               <label >{role.role}
+                                </label>
+                                <div className="buttonSection">
+                                {role.multiple? 'M' : 'U'}
+                                <button onClick={() => removeFunctionToRole(role.role)}>-</button>
+                                <input type="number" readOnly value={randomizerChosenRoles.filter(x => x === role.role).length} />
+                                <button onClick={ () => addFunctionToRole(role.role)}>+</button>
+                                </div>
+                                </span>):(null)
                             ))}
                                 </div>
                             </div>
@@ -290,22 +302,38 @@ const PlayerRole = () => {
                         <div className="selector-category">
                             <h4>Cavaleiros</h4>
                             <hr />
-                            {horsemenRole.map(role => (
+                                    {horsemenRole.map(role => (
+                                    role.enabledRole ? (
+                                
                                 <span className="eachRole horsies">
-                                    <label >{role.role}</label>
-                                    <input type="checkbox" value={role.role} onChange={handleCheckboxChange} />
-                                </span>
+                               <label >{role.role}
+                                </label>
+                                <div className="buttonSection">
+                                {role.multiple? 'M' : 'U'}
+                                <button onClick={() => removeFunctionToRole(role.role)}>-</button>
+                                <input type="number" readOnly value={randomizerChosenRoles.filter(x => x === role.role).length} />
+                                <button onClick={ () => addFunctionToRole(role.role)}>+</button>
+                                </div>
+                                </span>):(null)
                             ))}
                         </div>
                         <div className="selector-category">
                             <h4>Neutros</h4>
                             <hr />
-                            {neutralRole.map(role => (
+                                    {neutralRole.map(role => (
+                                    role.enabledRole ? (
+                                
                                 <span className="eachRole neutraies">
-                                    <label >{role.role}</label>
-                                    <input type="checkbox" value={role.role} onChange={handleCheckboxChange}/>
-                                </span>
-                            ))}
+                               <label >{role.role}
+                                </label>
+                                <div className="buttonSection">
+                                {role.multiple? 'M' : 'U'}
+                                <button onClick={() => removeFunctionToRole(role.role)}>-</button>
+                                <input type="number" readOnly value={randomizerChosenRoles.filter(x => x === role.role).length} />
+                                <button onClick={ () => addFunctionToRole(role.role)}>+</button>
+                                </div>
+                                </span>) : (null)
+                                ))}
                                 </div>
                                 </div>
                                 
@@ -313,7 +341,7 @@ const PlayerRole = () => {
                         <div className="manualRandomizerLower">
 
                             <div>Funções Selecionadas: <span className="counterBox">
-                            {checkboxCounter}</span></div>
+                            {randomizerChosenRoles.length}</span></div>
                             <div>Quantidade de Jogadores:
                                 <span className="counterBox">{playerList.length}</span>
                             </div>

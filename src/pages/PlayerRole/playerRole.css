@@ -110,7 +110,11 @@
     border: #836E00 1px solid;
     border-radius: 20px;
     margin: 10px;
+    width: 200px;
     padding: 10px;
+}
+.randomizerModalRoles-content{
+    width: 70vw !important;
 }
 .manualRandomizerLower{
     display: flex;
@@ -119,6 +123,34 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    margin-bottom: 5px;
+}
+.selector-category hr{
+    margin-bottom: 10px;
+}
+.eachRole input{
+    width: 7px;
+    padding: 0 5px;
+    color: white;
+    background: black;
+    border: none;
+}
+.eachRole button{
+    background: transparent;
+    color: #836E00;
+    width: 17px;
+    border-radius: 15px;
+    font-size: 15px;
+    border: 1px solid #836E00;
+    animation: all 1s ease;
+}
+.eachRole button:hover{
+    background-color: #ddb904;
+    cursor: pointer;
+}
+.eachRole .buttonSection{
+    display: flex;
+
 }
 
 .modalRole{
