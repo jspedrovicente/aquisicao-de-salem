@@ -217,7 +217,7 @@ const Night = () => {
     const encerrarNoiteMobile = async () => {
         interruptMusicPlaying();
         let rolesImunetoBlocks = ['meretriz', 'taberneiro', 'miragem', 'executor'];
-        let rolesThatAttackBlockers = ['assassino em serie', 'mestre', 'lobisomen', 'morte'];
+        let rolesThatAttackBlockers = ['assassino em serie', 'mestre', 'lobisomen', 'morte', 'vigilante'];
         let rolesImunetoAttacks = ['piromaniaco', 'assassino em serie', 'sobrevivente']
         let consideredEvilRoles = ['fome', 'guerra', 'morte', 'estranho', 'amaldicoadora', 'feiticeira benevolente', 'parasita', 'matriarca', 'mestre', 'mordomo', 'zelador', 'piromaniaco', 'assassino em serie', 'bobo da corte', 'executor', 'lobisomen', 'medico da peste', 'palhaco', 'pistoleiro' ]
         let blockedTargets = [];

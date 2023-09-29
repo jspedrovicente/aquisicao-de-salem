@@ -370,7 +370,7 @@ const Day = () => {
 
         // Limpando o NewResponse, o buff e o Debuff
         for (let i = 0; i < players.length; i++){
-            updateDoc(doc(database, `playeradmin/players/${user.email}/${players[i].id}`), { newResponse: "", buff: "", debuff: "", clownBomb: false, pistoleiroMark: false, doused: false });
+            updateDoc(doc(database, `playeradmin/players/${user.email}/${players[i].id}`), { newResponse: "", buff: "", debuff: "", clownBomb: false, pistoleiroMark: false, doused: false, executorTarget: false });
         }
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "dayCounter", "dayCounter", "dayCounter"), { currentDay: 1 })
         await updateDoc(doc(database, "playeradmin", "playerStatuses", user.email, "padeiraHeals", "padeiraHeals", "padeiraHeals"), { healCountMax: 4 });
@@ -718,6 +718,12 @@ const Day = () => {
                                                 <button className="smallButton" id="innerbomb" onClick={explodeBomb}><img src={bombSvg}></img></button>
                                     </span>
                                 ))}
+                                {alivePlayers.filter(player => player.debuff !== '').map(player => (
+                            <p>{player.playerName} está Chantageado!</p>
+                        ))}
+                                {alivePlayers.filter(player => player.buff !== '').map(player => (
+                            <p>{player.playerName} está Motivado!</p>
+                        ))}
                                 <span>
                                     {updatePanelInfo}
                                 </span>
@@ -737,6 +743,12 @@ const Day = () => {
                                  <p className="announcePlace-function"> Função: {announcement.killedPlayerRole}</p>
                                 <p className="announcePlace-killer"> Ataque: {announcement.attackerRole}</p>
                             </span>
+                        ))}
+                        {alivePlayers.filter(player => player.debuff !== '').map(player => (
+                            <p>{player.playerName} está Chantageado!</p>
+                        ))}
+                        {alivePlayers.filter(player => player.buff !== '').map(player => (
+                            <p>{player.playerName} está Motivado!</p>
                         ))}
                         </div>
                 </div>

@@ -130,6 +130,7 @@ const PlayerRole = () => {
                     })
                 })
                 setNeutralRole(roles);
+                console.log(roles);
                 
             })
         }
@@ -202,7 +203,7 @@ const PlayerRole = () => {
             const currentRole = randomizedPlayers[i].selectedRole.role;
             const wakeOrder = randomizedPlayers[i].selectedRole.wakeOrder;
             const currentFilliation = randomizedPlayers[i].selectedRole.filliation
-            await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: wakeOrder, willText: "none", actionforRoleCounter: randomizedPlayers[i].selectedRole.actionforRoleCounter? randomizedPlayers[i].selectedRole.actionforRoleCounter : deleteField()})
+            await updateDoc(doc(database, "playeradmin", "players", user.email, currentId), { role: currentRole, filliation: currentFilliation, life: "alive", action: "pending", wakeOrder: wakeOrder, willText: "none", actionforRoleCounter: randomizedPlayers[i].selectedRole.actionforRoleCounter? randomizedPlayers[i].selectedRole.actionforRoleCounter : null})
         }
         setRandomizerChosenRoles([]);
         setIsManualRandomizerOpen(false);

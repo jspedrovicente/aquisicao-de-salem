@@ -41,7 +41,7 @@ const PlayerMobile = () => {
     const [allMessages, setAllMessages] = useState([])
     const [hiddenPrivateInfo, setHiddenPrivateInfo] = useState(false);
     const [allEvilChat, setHiddenEvilChat] = useState([]);
-    const [noActionsNight1, setNoActionsNight1] = useState(['assassino em serie', 'mestre', 'vigilante', 'lobisomen', 'palhaco', 'pistoleiro'])
+    const [noActionsNight1, setNoActionsNight1] = useState(['assassino em serie', 'mestre', 'vigilante', 'lobisomen', 'palhaco', 'pistoleiro', 'zelador'])
 
     const [willOpen, setWillOpen] = useState(false);
     const [cardOpen, setCardOpen] = useState(false);
@@ -193,7 +193,7 @@ const PlayerMobile = () => {
                             doused: doc.data().doused,
                             executorTarget: doc.data().executorTarget,
                             life: doc.data().life,
-                            actionforRoleCounter: doc.data().actionforRoleCounter? doc.data().actionforRoleCounter : null,
+                            actionforRoleCounter: doc.data().actionforRoleCounter,
                             
                         })
                         if (playerInfo[0].role !== 'none') {
