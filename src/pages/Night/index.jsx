@@ -216,7 +216,7 @@ const Night = () => {
     }
     const encerrarNoiteMobile = async () => {
         interruptMusicPlaying();
-        let rolesImunetoBlocks = ['meretriz', 'taberneiro', 'miragem', 'executor'];
+        let rolesImunetoBlocks = ['meretriz', 'taberneiro', 'miragem', 'executor', 'caloteira'];
         let rolesThatAttackBlockers = ['assassino em serie', 'mestre', 'lobisomen', 'morte', 'vigilante'];
         let rolesImunetoAttacks = ['piromaniaco', 'assassino em serie', 'sobrevivente']
         let consideredEvilRoles = ['fome', 'guerra', 'morte', 'estranho', 'amaldicoadora', 'feiticeira benevolente', 'parasita', 'matriarca', 'mestre', 'mordomo', 'zelador', 'piromaniaco', 'assassino em serie', 'bobo da corte', 'executor', 'lobisomen', 'medico da peste', 'palhaco', 'pistoleiro' ]
@@ -231,6 +231,7 @@ const Night = () => {
         let agressiveToVisits = [];
         var murderedPlayers = []
         let tabernTarget = []
+        let caloteiraTarget = '';
         updateDoc(doc(database, "playeradmin", "blackout", user.email, 'blackout'), { blackout: 'true' })
         let Sactions = mobilePlayerActionsSingle.sort((a, b) => a.wakeOrder - b.wakeOrder);
         // variables for temporary aflictions
@@ -317,7 +318,7 @@ const Night = () => {
                             actualVisitors.push(possibleVisits[i].visited)
                         }
                         if (actualVisitors.length > 0) {
-                            updateDoc((ref), { newResponse: `Seu alvo visitou: ${actualVisitors.map((visitor) => visitor)} ` });
+                            updateDoc((ref), { newResponse: `Seu alvo: (${Sactions[i].target}) visitou: ${actualVisitors.map((visitor) => visitor)} ` });
                         } else {
                             updateDoc((ref), { newResponse: `Seu alvo não visitou ninguém!` });
                         }
@@ -333,11 +334,13 @@ const Night = () => {
                                 const filteredPlayers = alivePlayers.filter((persons) => persons.playerName !== Sactions[i].user && persons.playerName !== suspects[0] && persons.playerName !== Sactions[i].target);
                                 console.log(filteredPlayers);
                                 for (let i = 0; i < 2; i++){
-                                    let x = Math.floor((Math.random() * filteredPlayers.length) + 1);
-                                    suspects.push(filteredPlayers[x].playerName);
-                                    filteredPlayers.splice(x, 1);
+                                    let xValue = Math.floor((Math.random() * filteredPlayers.length) + 1);
+                                    suspects.push(filteredPlayers[xValue].playerName);
+                                    filteredPlayers.splice(xValue, 1);
                                 }
-                                const organizedSuspects = suspects.sort((a, b) => a - b);
+                                const organizedSuspects = suspects.sort();
+                                console.log(suspects);
+                                console.log(organizedSuspects);
                                 updateDoc((ref), { newResponse: `O(s) jogador(es) ${organizedSuspects.map((suspect) => suspect)} possivelmente visitaram seu alvo: ${Sactions[i].target}` });
                             } else {
                                 console.log('did not trigger fuxiqueira action')
@@ -352,12 +355,13 @@ const Night = () => {
                         let ocurrences = [];
                         console.log(possibleVisitors);
                         for (let i = 0; i < possibleVisitors.length; i++) {
-                            ocurrences.push(possibleVisitors[i].visitor)
+                            const roleOfVisitor = alivePlayers.filter(player => player.playerName === possibleVisitors[i].visitor);
+                            ocurrences.push(roleOfVisitor[0].role)
                         }
                         if (ocurrences.length > 0) {
-                            updateDoc((ref), { newResponse: `O(s) jogador(es) ${ocurrences.map((trigger) => trigger)} visitaram seu alvo!` });
+                            updateDoc((ref), { newResponse: `As funções ${ocurrences.map((trigger) => trigger)} visitaram seu alvo: ${Sactions[i].target}` });
                         } else {
-                            updateDoc((ref), { newResponse: `Ninguém visitou seu alvo` });
+                            updateDoc((ref), { newResponse: `Ninguém ativou a sua armadilha essa noite!` });
                         }
                         break;                  
                     case 'curandeira':
@@ -409,6 +413,8 @@ const Night = () => {
                             for (let j = 0; j < dousedPlayers.length; j++){
                                 // Set as an attacking action?
                                 attackingActionSpecial.push({ attacker: Sactions[i].user, attackerRole: Sactions[i].userRole, target: dousedPlayers[j].playerName, targetRole: dousedPlayers[j].role })
+                                updateDoc((doc(database, "playeradmin", "players", user.email, dousedPlayers[j].id)), { doused: false });
+                                
                             }
                         } else {
                             updateDoc((doc(database, "playeradmin", "players", user.email, Sactions[i].targetId)), { doused: true });
@@ -431,6 +437,9 @@ const Night = () => {
                         break;
                     case 'zelador':
                         zeladorTarget = true;
+                        break;
+                    case 'caloteira':
+                        caloteiraTarget = Sactions[i].target;
                         break;
                     case 'morte':
                         attackingAction.push({ attacker: Sactions[i].user, attackerRole: Sactions[i].userRole, target: Sactions[i].target, targetRole: Sactions[i].targetRole })
@@ -468,7 +477,9 @@ const Night = () => {
         for (let i = 0; i < attackingAction.length; i++) {
             console.log(attackingAction)
             const att = attackingAction[i];
-            if (rolesImunetoAttacks.includes(att.targetRole)) {
+            if (att.target === caloteiraTarget) {
+                murderedPlayers.push({ killedPlayerName: att.target, killedPlayerRole: att.targetRole, attackerRole: att.attackerRole, attacker: att.attacker });
+            } else if (rolesImunetoAttacks.includes(att.targetRole)) {
                 // Nothing happens to the person
             } else if (protectedTargets.includes(att.target)) {
                 // Nothing happens
@@ -497,9 +508,7 @@ const Night = () => {
         for (let i = 0; i < attackingActionSpecial.length; i++) {
             console.log(attackingActionSpecial)
             const att = attackingActionSpecial[i];
-            if (rolesImunetoAttacks.includes(att.targetRole)) {
-                // Nothing happens to the person
-            } else if (healedTargets.includes(att.target)) {
+            if (healedTargets.includes(att.target)) {
                 // nothing happens to the healed person
             } else {
                 // kill the player

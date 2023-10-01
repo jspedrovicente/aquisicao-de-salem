@@ -41,7 +41,7 @@ const PlayerMobile = () => {
     const [allMessages, setAllMessages] = useState([])
     const [hiddenPrivateInfo, setHiddenPrivateInfo] = useState(false);
     const [allEvilChat, setHiddenEvilChat] = useState([]);
-    const [noActionsNight1, setNoActionsNight1] = useState(['assassino em serie', 'mestre', 'vigilante', 'lobisomen', 'palhaco', 'pistoleiro', 'zelador'])
+    const [noActionsNight1, setNoActionsNight1] = useState(['assassino em serie', 'mestre', 'vigilante', 'lobisomen', 'palhaco', 'pistoleiro', 'zelador', 'caloteira', 'veterano'])
 
     const [willOpen, setWillOpen] = useState(false);
     const [cardOpen, setCardOpen] = useState(false);
@@ -66,8 +66,8 @@ const PlayerMobile = () => {
                     })
                 })
                 setPlayers(list);
-                setAlivePlayers(list.sort((a, b) => a.wakeOrder - b.wakeOrder).filter(player => player.life.includes("alive")))
-                setDeadPlayers(list.sort((a, b) => a.wakeOrder - b.wakeOrder).filter(player => player.life.includes("dead")))
+                setAlivePlayers(list.filter(player => player.life.includes("alive")))
+                setDeadPlayers(list.filter(player => player.life.includes("dead")))
             })
         }
         const townSnapshot = onSnapshot(collection(database, "gamedata/roles/town"), (snapshot) => {
@@ -241,17 +241,20 @@ const PlayerMobile = () => {
             let name = "playerID=";
             let decodedCookie = decodeURIComponent(document.cookie);
             let ca = decodedCookie.split(';');
+            console.log(ca);
             for(let i = 0; i <ca.length; i++) {
               let c = ca[i];
               while (c.charAt(0) === ' ') {
                 c = c.substring(1);
-              }
+                }
+                console.log(c.indexOf(name))
                 if (c.indexOf(name) === 0) {
-                    console.log(c.substring(name.length, c.length))
                     const myAcc = players.filter((player) => player.id === c.substring(name.length, c.length))
+                    console.log(myAcc);
                     if (myAcc.length > 0) {
                         setPlayerCurrentInformation(myAcc[0]);
                         setRegisteredPlayerId(c.substring(name.length, c.length))
+                        return;
                     } else {
                         Store.addNotification({
                             title: "Conta NÃO Encontrada",
@@ -267,7 +270,8 @@ const PlayerMobile = () => {
                             }
                         })
                     }
-              }
+                }
+
             }
             return "";
         }
@@ -466,7 +470,7 @@ const PlayerMobile = () => {
         }
         }
         // This triggers for players that have limited roles except for Executor and Padeira that do something else.
-        if ((playerCurrentRole[0].role === 'investigador' && playerCurrentInformation[0].actionforRoleCounter > 0) || (playerCurrentRole[0].role === 'zelador' && playerCurrentInformation[0].actionforRoleCounter > 0) || (playerCurrentRole[0].role === 'matriarca' && playerCurrentInformation[0].actionforRoleCounter > 0) || (playerCurrentRole[0].role === 'veterano' && playerCurrentInformation[0].actionforRoleCounter > 0) ) {
+        if ((playerCurrentRole[0].role === 'investigador' && playerCurrentInformation[0].actionforRoleCounter > 0) || (playerCurrentRole[0].role === 'zelador' && playerCurrentInformation[0].actionforRoleCounter > 0) || (playerCurrentRole[0].role === 'matriarca' && playerCurrentInformation[0].actionforRoleCounter > 0) || (playerCurrentRole[0].role === 'veterano' && playerCurrentInformation[0].actionforRoleCounter > 0) || (playerCurrentRole[0].role === 'caloteira' && playerCurrentInformation[0].actionforRoleCounter > 0) ) {
             updateDoc((doc(database, "playeradmin", "players", "jspedrogarcia@gmail.com", playerCurrentInformation[0].id)), { actionforRoleCounter: playerCurrentInformation[0].actionforRoleCounter - 1 });
         }
         if (playerCurrentRole[0].wakeTrigger === 0) {
@@ -781,11 +785,11 @@ const PlayerMobile = () => {
                                                     <button className="button" onClick={piromaniacoFire}>Tacar fogo!</button>
                                                     )}
 
-                                                    {(currentDay === 1 && noActionsNight1.includes(playerCurrentInformation[0].role)) ? (null) : (
+                                                    {(currentDay === 1 && noActionsNight1.includes(playerCurrentInformation[0].role)) || playerCurrentRole[0].wakeTrigger === 0 ? (null) : (
 
-                                                        <button className="button" onClick={handleActionSave}>{playerCurrentRole[0].role === 'padeira' || playerCurrentRole[0].wakeTrigger === 0 ? 'Encerrar Jogada' : 'Confirmar Ação' }</button>
+                                                        <button className="button" onClick={handleActionSave}>{playerCurrentRole[0].role === 'padeira' ? 'Encerrar Jogada' : 'Confirmar Ação' }</button>
                                                     )}
-                                                <button className="button" onClick={handleSkipTurn}>Pular Vez</button>
+                                                    <button className="button" onClick={handleSkipTurn}>{playerCurrentRole[0].wakeTrigger === 0 ? 'Encerrar Noite' : 'Pular Vez'}</button>
                                                 </div>
                                             )}
                                             {playerCurrentInformation[0].action === "complete" && (
@@ -812,7 +816,7 @@ const PlayerMobile = () => {
                     <div className="header"> Sua Carta</div>
                     <div className="cardDetailedInformation">
             {playerCurrentRole.length > 0 ? (
-                        <img className="cardImg" src={playerCurrentRole[0].image} alt="" /> 
+                        <img className="cardImg img-responsive" src={playerCurrentRole[0].image} alt={playerCurrentRole[0].role} /> 
                 ) : (<div>Você ainda não possui carta! Só aguardar!</div>)}
                 <button className="button" onClick={() => setCardOpen(false)}>Fechar</button>
                     </div>
@@ -836,7 +840,7 @@ const PlayerMobile = () => {
                     <div className="header"> Seu Testamento</div>
                     <div className="testamentInformation">
                         <p>Informações que você gostaria de lembrar</p>
-                        <textarea className="testamentTextArea" name="" id="" value={willText} onChange={(e) => setWillText(e.target.value)}></textarea>
+                        <textarea autoFocus={false} className="testamentTextArea" name="" id="" value={willText} onChange={(e) => setWillText(e.target.value)}></textarea>
                     </div>
                     <div>
                 <button className="button" onClick={handleWillSave}>Salvar Testamento</button>

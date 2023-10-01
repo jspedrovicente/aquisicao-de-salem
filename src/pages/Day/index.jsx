@@ -127,7 +127,8 @@ const Day = () => {
                         debuff: doc.data().debuff,
                         executorTarget: doc.data().executorTarget,
                         newResponse: doc.data().newResponse,
-                        doused: doc.data().doused
+                        doused: doc.data().doused,
+                        actionforRoleCounter: doc.data().actionforRoleCounter
                     })
                 })
                 setPlayers(list);
@@ -443,6 +444,7 @@ const Day = () => {
     }
     const explodeBomb = () => {
         const playerbombed = alivePlayers.filter((player) => player.clownBomb === true);
+        stopDayMusic()
         for (let i = 0; i < playerbombed.length; i++){
             let num = Math.random();
             if (num < 0.75) {
@@ -454,8 +456,14 @@ const Day = () => {
                 setKillAnouncementUpdate(`O jogador ${playerbombed[0].playerName} explodiu. Sua função era ${playerbombed[0].role}`)
             } else {
                 playFizzleSound();
+                updateDoc(doc(database, "playeradmin", "players", user.email, playerbombed[0].id), {clownBomb: false })
+
             }
         }
+        setTimeout(() => {
+            playDayMusic();
+       }, 10000) 
+
     }
     const explodeMark = () => {
         const markedPlayer = alivePlayers.filter((player) => player.pistoleiroMark === true);
@@ -499,7 +507,7 @@ const Day = () => {
                 } else {
                     const conselheiraPresent = mafiaCheck.filter((player) => player.role === 'matriarca');
                     if (conselheiraPresent.length > 0) {
-                    updateDoc(doc(database, `playeradmin/players/jspedrogarcia@gmail.com/${conselheiraPresent[0].id}`), {role: 'mestre'});
+                    updateDoc(doc(database, `playeradmin/players/jspedrogarcia@gmail.com/${conselheiraPresent[0].id}`), {role: 'mestre', actionforRoleCounter: null });
                     } else {
                         const vigaristaPresent = mafiaCheck.filter((player) => player.role === 'mordomo');
                         if (vigaristaPresent.length > 0) {
@@ -507,7 +515,13 @@ const Day = () => {
                         } else {
                         const zeladorPresent = mafiaCheck.filter((player) => player.role === 'zelador');
                             if (zeladorPresent.length > 0) {
-                                updateDoc(doc(database, `playeradmin/players/jspedrogarcia@gmail.com/${zeladorPresent[0].id}`), {role: 'mestre'});
+                                updateDoc(doc(database, `playeradmin/players/jspedrogarcia@gmail.com/${zeladorPresent[0].id}`), {role: 'mestre', actionforRoleCounter: null});
+                            } else {
+                                const caloteiraPresent = mafiaCheck.filter((player) => player.role === 'caloteira');
+                                if (caloteiraPresent.length > 0) {
+                                    updateDoc(doc(database, `playeradmin/players/jspedrogarcia@gmail.com/${caloteiraPresent[0].id}`), {role: 'mestre', actionforRoleCounter: null});
+                                    
+                                }
                             }
                         }
                     }
@@ -563,10 +577,12 @@ const Day = () => {
                 }
             }
             if (target[0].executorTarget === true ) {
-                    const executor = players.filter(player => player.role === 'executor');
+                const executor = alivePlayers.filter(player => player.role === 'executor');
+                if (executor.length > 0) {
                     updateDoc(doc(database, "playeradmin", "players", user.email, executor[0].id), { role: 'executor vitorioso' });
                     setNotifierNews('O Alvo do executor acabou de ser executado. Executor ganhou sua parte do jogo!')
                     setNotifierNewsIsOpen(true);
+                }
             }
         } else {
             setJudgementPanelIsOpen(false);
