@@ -1,4 +1,4 @@
-# A Aquisição de Salem:
+# A Aquisição de Salem VERSÃO de CARTAS:
 
 A card-game created by me based on "Cidade Dorme" a childhood game where someone in a group of people is the killer and Town of Salem, a PC game with similar mechanics.
 
